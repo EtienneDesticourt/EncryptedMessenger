@@ -1,0 +1,3 @@
+
+class MessengerException(Exception):
+	pass

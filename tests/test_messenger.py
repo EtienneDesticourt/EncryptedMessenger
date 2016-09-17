@@ -1,0 +1,126 @@
+import unittest, socket, threading, time
+import messenger, protocol, messenger_exception
+
+TEST_HOST = 'localhost'
+TEST_PORT = 4664
+TEST_MESSAGE = b'This is a test message.'
+
+
+class TestMessenger(unittest.TestCase):
+	"Sets up a client which attempts to connect to the server."
+	def setUpTestClient(self):
+		self.clientSock = socket.socket()
+		self.clientSock.connect((TEST_HOST, TEST_PORT))
+
+	"Sets up a listening test server for the messenger client to connect to."
+	def setUpTestServer(self):
+		self.serverSock = socket.socket()
+		self.serverSock.bind((TEST_HOST, TEST_PORT))
+		self.serverSock.listen(1)
+
+		#Wait for connection from messenger
+		def acceptClientConn():
+			self.clientSock, addr = self.serverSock.accept()
+		threading.Thread(target = acceptClientConn).start()
+
+	"Sets up a messenger client which will connect to our test server."
+	def setUpMessengerClient(self):
+		self.messenger = messenger.Messenger()
+		self.messenger.start(TEST_HOST, TEST_PORT, protocol.CLIENT_ROLE)
+
+	"Sets up a messenger server to which our test client can connect"
+	def setUpMessengerServer(self):
+		self.messenger = messenger.Messenger()
+		self.messenger.start(TEST_HOST, TEST_PORT, protocol.SERVER_ROLE)
+
+	"Closes all the open sockets and stops the running threads if there are any."
+	def tearDown(self):
+		if hasattr(self, 'clientSock'):
+			self.clientSock.close()
+			del self.clientSock
+
+		if hasattr(self, 'serverSock'):
+			self.serverSock.close()
+			del self.serverSock
+
+		if hasattr(self, 'messenger'):
+			self.messenger.stop()
+			del self.messenger
+
+	def test_send_success(self):
+		#Setup test server and client messenger
+		self.setUpTestServer()
+		self.setUpMessengerClient()
+
+		#Check send function works
+		self.messenger.send(TEST_MESSAGE)
+		result = self.clientSock.recv(1024)
+		assert result == TEST_MESSAGE + protocol.MESSAGE_SEPARATOR
+
+	def test_send_not_connected(self):
+		#socket.setdefaulttimeout(0)
+		self.messenger = messenger.Messenger()
+
+		assert not hasattr(self, 'serverSock')
+		assert not hasattr(self, 'clientSock')
+		assert hasattr(self, 'messenger')
+		#Check send function works
+		self.assertRaises(messenger_exception.MessengerException, self.messenger.send, TEST_MESSAGE)
+
+	def test_start_client_connection(self):
+		#Setup test server and client messenger
+		self.setUpTestServer()
+		#Make sure we don't have a client connected already
+		assert not hasattr(self, 'clientSock')
+		self.setUpMessengerClient()
+		assert hasattr(self, 'clientSock')
+
+	def test_start_server_connection(self):
+		threading.Thread(target = self.setUpMessengerServer).start()
+		try:
+			self.setUpTestClient()
+		except ConnectionRefusedError:
+			assert False, "Couldn't connect to messenger server."
+
+	def test_recv(self):
+		#Setup test server and client messenger
+		self.setUpTestServer()
+		self.setUpMessengerClient()
+
+		#Successful connection
+		assert hasattr(self, 'clientSock')
+
+		#Incomplete message (no separator)
+		self.clientSock.send(b'This is the start')
+		assert not self.messenger.messageQueue
+
+		#Finish message and start other
+		self.clientSock.send(b'. And this is the end.' + protocol.MESSAGE_SEPARATOR + b'And this is another incomplete m')
+		time.sleep(0.1)
+		messages = self.messenger.consumeMessages()
+		assert len(messages) == 1
+		assert messages[0] == b'This is the start. And this is the end.'
+
+		#Finish last message on separator
+		self.clientSock.send(b'essage.' + protocol.MESSAGE_SEPARATOR)
+		time.sleep(0.1)
+		messages = self.messenger.consumeMessages()
+		assert len(messages) == 1
+		assert messages[0] == b'And this is another incomplete message.'
+
+	def test_stop(self):
+		#Setup test server and client messenger
+		self.setUpTestServer()
+		self.setUpMessengerClient()
+
+		threads = threading.enumerate()
+		assert len(threads) == 2
+
+		self.messenger.stop()
+		time.sleep(0.1)
+
+		threads = threading.enumerate()
+		assert len(threads) == 1
+
+if __name__ == "__main__":
+    unittest.main()
