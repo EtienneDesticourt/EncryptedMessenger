@@ -1,0 +1,3 @@
+
+class CrypterException(Exception):
+    pass
