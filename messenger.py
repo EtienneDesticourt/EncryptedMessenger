@@ -75,6 +75,7 @@ class Messenger(object):
 		self.messageQueue = []
 		return messages
 
-	def raiseLastError(self):
-		raise MessengerException("Connection closed.") from self.lastError
+	def raiseLastErrorIfAny(self):
+		if self.lastError:
+			raise MessengerException("Connection closed.") from self.lastError
 

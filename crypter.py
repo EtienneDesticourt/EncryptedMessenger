@@ -84,6 +84,10 @@ class Crypter(object):
         decryptor = aes.decryptor()
         message = decryptor.update(encMess) + decryptor.finalize()
 
+        #This doesn't belong here: crypter doesn't necessarily want to handle strings
+        #long term we want to pass message length in message and simply cut the padding
+        #And let messenger or interface decode
+        #Kinda too lazy to do that right now, mby later
         message = message.decode('utf8')
         message = message.split('\0')[0]
         return message
