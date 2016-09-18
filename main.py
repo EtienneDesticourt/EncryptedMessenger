@@ -29,12 +29,13 @@ if __name__ == '__main__':
 	#Check starting role argument
 	if len(sys.argv) < 2:
 		print("Missing role argument. Specify SERVER or CLIENT role.")
-		quit()
-
-	role = sys.argv[1]
-	if role not in [protocol.SERVER_ROLE, protocol.CLIENT_ROLE]:
-		print("Unknown role. Specify SERVER or CLIENT role.")
-		quit()
+		print("CLIENT role defined as default.")
+		role = protocol.CLIENT_ROLE
+	else:
+		role = sys.argv[1]
+		if role not in [protocol.SERVER_ROLE, protocol.CLIENT_ROLE]:
+			print("Unknown role. Specify SERVER or CLIENT role.")
+			quit()
 
 	if role == protocol.SERVER_ROLE:
 		host = HOST
