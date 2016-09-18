@@ -7,7 +7,9 @@ from cryptography.exceptions import InvalidSignature, UnsupportedAlgorithm
 import os, math
 from keys import utils
 import protocol
-from crypter_exception import CrypterException
+from crypter_exceptions import CrypterException, NoKeyException, CorruptedMessageException
+
+DEFAULT_KEY_DIR = "keys"
 
 def DEFAULT_PADDING():
     return padding.OAEP(mgf=padding.MGF1(algorithm=hashes.SHA256()),
@@ -15,21 +17,21 @@ def DEFAULT_PADDING():
         label=None)
 
 class Crypter(object):
-    def __init__(self, role):
-        self.role = role
-        if role == protocol.CLIENT_ROLE:
-            keyType = utils.PUBLIC
-            self.aesKey = os.urandom(32)
-        elif role == protocol.SERVER_ROLE:
-            keyType = utils.PRIVATE
-            self.aesKey = None
-        else:
-            raise CrypterException("Unknown role.")
+    def __init__(self, RNG):
+        self.rsaKey = None
+        self.aesKey = None
+        self.RNG = RNG
 
+    def loadRsaKey(self, keyType, directory=DEFAULT_KEY_DIR):
         try:
-            self.rsaKey = utils.loadKey(keyType)
+            self.rsaKey = utils.loadKey(keyType, directory)
         except (FileNotFoundError, ValueError, UnsupportedAlgorithm) as e:
             raise CrypterException("Unable to load RSA key.") from e
+        self.keyType = keyType
+
+    def genAndSetAesKey(self):
+        self.aesKey = self.RNG(32)
+        return self.aesKey
 
     def genHmac(self, iv, encMess):
         h = hmac.HMAC(self.aesKey, hashes.SHA256(), backend=default_backend())
@@ -39,14 +41,14 @@ class Crypter(object):
 
     def encryptMessage(self, message):
         if not self.aesKey:
-            raise CrypterException("Can't encrypt message. Key hasn't been received from client yet.")
+            raise NoKeyException("Cannot encrypt message: AES key hasn't been set.")
 
         #Pad message for mode
         paddingLength = math.ceil(len(message) / 16) * 16 - len(message)
         message += paddingLength * b"0"
 
         #Random init vector
-        iv = os.urandom(16)
+        iv = self.RNG(16)
 
         #Encrypt message
         aes = Cipher(algorithms.AES(self.aesKey), modes.CBC(iv), backend=default_backend())
@@ -61,10 +63,10 @@ class Crypter(object):
 
     def decryptMessage(self, message):
         if not self.aesKey:
-            raise CrypterException("Can't decrypt message. Key hasn't been received from client yet.")
+            raise NoKeyException("Cannot decrypt message: AES key hasn't been set.")
 
         if len(message) < 16 + 32 + 1:
-            raise CrypterException("Corrupted message.")
+            raise CorruptedMessageException()
 
         iv = message[:16]
         encMess = message[16:-32]
@@ -75,7 +77,7 @@ class Crypter(object):
         try:
             h.verify(hmacBytes)
         except InvalidSignature as e:
-            raise CrypterException("Corrupted message.") from e
+            raise CorruptedMessageException() from e
 
         #Decrypt message if there was no error
         aes = Cipher(algorithms.AES(self.aesKey), modes.CBC(iv), backend=default_backend())
@@ -87,13 +89,17 @@ class Crypter(object):
         return message
 
     def encryptKey(self, rawKey):
-        if self.role != protocol.CLIENT_ROLE:
-            raise CrypterException("Wrong role for encryptKey. The client is in charge of encrypting the AES key.")
+        if self.rsaKey == None:
+            raise NoKeyException("Cannot encrypt AES key: RSA key hasn't been loaded.")
+        if self.keyType != utils.PUBLIC:
+            raise CrypterException("Cannot encrypt key. Public RSA key required.")
         encKey = self.rsaKey.encrypt(rawKey, DEFAULT_PADDING())
         return encKey
 
     def decryptKey(self, encKey):
-        if self.role != protocol.SERVER_ROLE:
-            raise CrypterException("Wrong role for decryptKey. The server is in charge of decrypting the AES key.")
+        if self.rsaKey == None:
+            raise NoKeyException("Cannot decrypt AES key: RSA key hasn't been loaded.")
+        if self.keyType != utils.PRIVATE:
+            raise CrypterException("Cannot decrypt key. Private RSA key required.")
         rawKey = self.rsaKey.decrypt(encKey, DEFAULT_PADDING())
         return rawKey

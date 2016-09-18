@@ -1,9 +1,12 @@
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives.serialization import Encoding, PublicFormat, PrivateFormat, NoEncryption, load_pem_private_key, load_pem_public_key
+import os
 
-PUBLIC = "PUBLIC"
+PUBLIC  = "PUBLIC"
 PRIVATE = "PRIVATE"
+PUBLIC_KEY_FILE  = "public.pem"
+PRIVATE_KEY_FILE = "private.pem"
 
 def newKey():
     private_key = rsa.generate_private_key(public_exponent=65537,
@@ -26,12 +29,12 @@ def newKey():
     with open("new_public.pem", "wb") as f:
         f.write(public_bytes)
 
-def loadKey(type):
+def loadKey(type, directory):
     if type == PRIVATE:
-        path = "keys\\private.pem"
+        path = os.path.join(directory, PRIVATE_KEY_FILE)
         def load_func(data, backend): return load_pem_private_key(data, password=None, backend=backend)
     elif type == PUBLIC:
-        path = "keys\\public.pem"
+        path = os.path.join(directory, PUBLIC_KEY_FILE)
         load_func = load_pem_public_key
     else:
         raise ValueError("Unknown key type.")
