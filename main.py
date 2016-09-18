@@ -6,13 +6,26 @@ from crypter_exceptions import CrypterException
 HOST = 'localhost'
 PORT = 4664
 
+def hideCryptographyExit():
+    sys.stderr.flush()
+    newstderr = os.dup(2)
+    devnull = os.open(os.devnull, os.O_WRONLY)
+    os.dup2(devnull, 2)
+    os.close(devnull)
+    sys.stderr = os.fdopen(newstderr, 'w')
+
+def printExcAndCause(exc):
+	if hasattr(exc, '__cause__'):
+		print(exc, ":", exc.__cause__)
+	else:
+		print(exc)
+
 def quit():
 	print("Aborting execution.")
 	input("Press any key to exit...")
-	exit()
+	sys.exit()
 
 if __name__ == '__main__':
-
 	#Check starting role argument
 	if len(sys.argv) < 2:
 		print("Missing role argument. Specify SERVER or CLIENT role.")
@@ -23,13 +36,18 @@ if __name__ == '__main__':
 		print("Unknown role. Specify SERVER or CLIENT role.")
 		quit()
 
+	if role == protocol.SERVER_ROLE:
+		host = HOST
+	else:
+		host = input("Enter server ip: ")
+
 	#Start messenger server/client
 	print("Starting messenger, waiting for connection...")
 	m = messenger.Messenger()
 	try:
-		m.start(HOST, PORT, role)
+		m.start(host, PORT, role)
 	except MessengerException as e:
-		print(e)
+		printExcAndCause(e)
 		m.stop()
 		quit()
 
@@ -54,7 +72,7 @@ if __name__ == '__main__':
 			encryptedKey = c.encryptKey(c.aesKey)
 			m.send(encryptedKey)
 	except (MessengerException, CrypterException) as e:
-		print(e)
+		printExcAndCause(e)
 		m.stop()
 		quit()
 
@@ -70,7 +88,7 @@ if __name__ == '__main__':
 		try:
 			m.send(encrypted)
 		except MessengerException as e:
-			print(e)
+			printExcAndCause(e)
 			print("Message was not sent.")
 			i.stop()
 			m.stop()
@@ -94,3 +112,4 @@ if __name__ == '__main__':
 	i.stop()
 	m.stop()
 	input("Press any key to exit...")
+	hideCryptographyExit()

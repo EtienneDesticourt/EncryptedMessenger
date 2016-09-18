@@ -78,4 +78,3 @@ class Messenger(object):
 	def raiseLastErrorIfAny(self):
 		if self.lastError:
 			raise MessengerException("Connection closed.") from self.lastError
-

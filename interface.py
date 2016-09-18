@@ -1,4 +1,4 @@
-import time, threading, colorama, curses, readline, sys
+import time, threading, colorama, readline, sys
 
 COLS = 80
 
@@ -37,6 +37,3 @@ class Interface(object):
 
     def stop(self):
         self.run = False
-
-
-
