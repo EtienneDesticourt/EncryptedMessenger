@@ -11,7 +11,10 @@ class Messenger(object):
 		self.lastError = None
 
 	def listen(self, host, port):
-		self.socket.bind((host, port))
+		try:
+			self.socket.bind((host, port))
+		except socket.error as e:
+			raise MessengerException("Other program already using port.") from e
 		self.host, self.port = self.socket.getsockname() #For testing purposes... It's not great
 		self.socket.listen(1)
 		clientSock, addr = self.socket.accept()
@@ -19,7 +22,10 @@ class Messenger(object):
 		self.socket = clientSock
 
 	def connect(self, host, port):
-		self.socket.connect((host, port))
+		try:
+			self.socket.connect((host, port))
+		except ConnectionRefusedError as e:
+			raise MessengerException("No host listening.") from e
 
 	def recv(self):
 		buffer = b''

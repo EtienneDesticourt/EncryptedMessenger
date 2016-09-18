@@ -76,13 +76,19 @@ class TestMessenger(unittest.TestCase):
 		#Check send function works
 		self.assertRaises(messenger_exception.MessengerException, self.messenger.send, TEST_MESSAGE)
 
-	def test_start_client_connection(self):
+	def test_start_client_connection_success(self):
 		#Setup test server and client messenger
 		self.setUpTestServer()
 		#Make sure we don't have a client connected already
 		assert not hasattr(self, 'clientSock')
 		self.setUpMessengerClient()
 		assert hasattr(self, 'clientSock')
+
+	def test_start_client_connection_no_host(self):
+		self.port = 45765
+		#Make sure we don't have a client connected already
+		assert not hasattr(self, 'clientSock')
+		self.assertRaises(messenger_exception.MessengerException, self.setUpMessengerClient)
 
 	def test_start_server_connection(self):
 		threading.Thread(target = self.setUpMessengerServer).start()
