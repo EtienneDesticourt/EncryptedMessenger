@@ -1,21 +1,27 @@
 import unittest, socket, threading, time
 import messenger, protocol, messenger_exception
 
-TEST_HOST = 'localhost'
-TEST_PORT = 4664
+TEST_HOST_CONNECT = 'localhost'
+TEST_HOST_BIND = '0.0.0.0'
+TEST_PORT = 0
 TEST_MESSAGE = b'This is a test message.'
-
+TRAVIS_ON = True
+if TRAVIS_ON:
+	WAIT_TIME = 1
+else:
+	WAIT_TIME = 0.1
 
 class TestMessenger(unittest.TestCase):
 	"Sets up a client which attempts to connect to the server."
 	def setUpTestClient(self):
 		self.clientSock = socket.socket()
-		self.clientSock.connect((TEST_HOST, TEST_PORT))
+		self.clientSock.connect((TEST_HOST_CONNECT, self.port))
 
 	"Sets up a listening test server for the messenger client to connect to."
 	def setUpTestServer(self):
 		self.serverSock = socket.socket()
-		self.serverSock.bind((TEST_HOST, TEST_PORT))
+		self.serverSock.bind((TEST_HOST_BIND, TEST_PORT))
+		ip, self.port = self.serverSock.getsockname()
 		self.serverSock.listen(1)
 
 		#Wait for connection from messenger
@@ -26,15 +32,18 @@ class TestMessenger(unittest.TestCase):
 	"Sets up a messenger client which will connect to our test server."
 	def setUpMessengerClient(self):
 		self.messenger = messenger.Messenger()
-		self.messenger.start(TEST_HOST, TEST_PORT, protocol.CLIENT_ROLE)
+		self.messenger.start(TEST_HOST_CONNECT, self.port, protocol.CLIENT_ROLE)
 
 	"Sets up a messenger server to which our test client can connect"
 	def setUpMessengerServer(self):
 		self.messenger = messenger.Messenger()
-		self.messenger.start(TEST_HOST, TEST_PORT, protocol.SERVER_ROLE)
+		self.messenger.start(TEST_HOST_BIND, TEST_PORT, protocol.SERVER_ROLE)
 
 	"Closes all the open sockets and stops the running threads if there are any."
 	def tearDown(self):
+		if hasattr(self, 'port'):
+			del self.port
+
 		if hasattr(self, 'clientSock'):
 			self.clientSock.close()
 			del self.clientSock
@@ -77,6 +86,11 @@ class TestMessenger(unittest.TestCase):
 
 	def test_start_server_connection(self):
 		threading.Thread(target = self.setUpMessengerServer).start()
+
+		#Wait for messenger to have bound his socket and defined its port
+		time.sleep(WAIT_TIME)
+
+		ip, self.port = self.messenger.socket.getsockname()
 		try:
 			self.setUpTestClient()
 		except ConnectionRefusedError:
@@ -96,14 +110,14 @@ class TestMessenger(unittest.TestCase):
 
 		#Finish message and start other
 		self.clientSock.send(b'. And this is the end.' + protocol.MESSAGE_SEPARATOR + b'And this is another incomplete m')
-		time.sleep(0.1)
+		time.sleep(WAIT_TIME)
 		messages = self.messenger.consumeMessages()
 		assert len(messages) == 1
 		assert messages[0] == b'This is the start. And this is the end.'
 
 		#Finish last message on separator
 		self.clientSock.send(b'essage.' + protocol.MESSAGE_SEPARATOR)
-		time.sleep(0.1)
+		time.sleep(WAIT_TIME)
 		messages = self.messenger.consumeMessages()
 		assert len(messages) == 1
 		assert messages[0] == b'And this is another incomplete message.'
@@ -113,14 +127,13 @@ class TestMessenger(unittest.TestCase):
 		self.setUpTestServer()
 		self.setUpMessengerClient()
 
-		threads = threading.enumerate()
-		assert len(threads) == 2
-
 		self.messenger.stop()
-		time.sleep(0.1)
+		self.clientSock.settimeout(1)
+		try:
+			assert self.clientSock.recv(1) == b''
+		except:
+			assert False, "Did not receive empty byte from messenger."
 
-		threads = threading.enumerate()
-		assert len(threads) == 1
 
 if __name__ == "__main__":
     unittest.main()

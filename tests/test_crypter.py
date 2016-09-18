@@ -9,6 +9,8 @@ import keys.utils as utils
 
 #AES KEY
 TEST_AES_KEY = b'|\x894\xb1\xe5)yE\x9d3{\xcc\xc9E\xb5\xc5IeT\x99\xa2,f~\x98\xe3\x9d\x05\\X\x92\xdf'
+#RSA KEYS
+DUMMY_KEYS_DIR = os.path.join("tests", "dummy_keys")
 #Test message
 TEST_MESSAGE = b"Hello, world!\x00"
 #Encrypted padded test message
@@ -17,6 +19,8 @@ TEST_IV = TEST_ENCRYPTED_MESSAGE[:16]
 TEST_HMAC = TEST_ENCRYPTED_MESSAGE[-32:]
 #Modified encrypted padded test message
 TEST_ENCRYPTED_MESSAGE_MOD = b'z\xd5%\x94\x0b\x1e,\x05\x0bS\x8e\xd8\x90\xfb\x9b\xa0\xa1I\x95k(\xf7\xb9\x88yka\x94\x09p\x12&\xbe{\xb2bg\x9f<\xccmr\xf1\t\xb3q\xeb\xa3\x99\xbb%}\xc3\x04\xa5\xf4\xf7\x01\x07\xbc\x95>\xa1\xbc'
+
+
 
 class TestCrypter(unittest.TestCase):
 
@@ -33,14 +37,14 @@ class TestCrypter(unittest.TestCase):
 
     def test_loadRsaKey_success(self):
         try:
-            self.testCrypter.loadRsaKey(utils.PRIVATE)
+            self.testCrypter.loadRsaKey(utils.PRIVATE, DUMMY_KEYS_DIR)
         except:
             assert False, "Unexpected exception in loadRsaKey."
         assert self.testCrypter.rsaKey != None
 
         self.testCrypter.rsaKey = None
         try:
-            self.testCrypter.loadRsaKey(utils.PUBLIC)
+            self.testCrypter.loadRsaKey(utils.PUBLIC, DUMMY_KEYS_DIR)
         except:
             assert False, "Unexpected exception in loadRsaKey."
         assert self.testCrypter.rsaKey != None
@@ -50,7 +54,7 @@ class TestCrypter(unittest.TestCase):
         assert self.testCrypter.rsaKey == None
 
     def test_loadRsaKey_unknown_type(self):
-        self.assertRaises(crypter_exceptions.CrypterException, self.testCrypter.loadRsaKey, "WRONG KEY TYPE")
+        self.assertRaises(crypter_exceptions.CrypterException, self.testCrypter.loadRsaKey, "WRONG KEY TYPE", DUMMY_KEYS_DIR)
         assert self.testCrypter.rsaKey == None
 
     def test_genAndSetAesKey(self):

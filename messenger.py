@@ -12,6 +12,7 @@ class Messenger(object):
 
 	def listen(self, host, port):
 		self.socket.bind((host, port))
+		self.host, self.port = self.socket.getsockname() #For testing purposes... It's not great
 		self.socket.listen(1)
 		clientSock, addr = self.socket.accept()
 		self.serverSocket = self.socket
@@ -55,6 +56,10 @@ class Messenger(object):
 
 	def stop(self):
 		self.running = False
+		try:
+			self.socket.shutdown(socket.SHUT_RDWR)
+		except OSError: #Was never connected or already closed
+			pass
 		self.socket.close()
 		if self.role == protocol.SERVER_ROLE:
 			self.serverSocket.close()
