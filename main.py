@@ -40,7 +40,7 @@ if __name__ == '__main__':
 	if role == protocol.SERVER_ROLE:
 		host = HOST
 	else:
-		host = input("Enter server ip: ")
+		host = HOST#input("Enter server ip: ")
 
 	#Start messenger server/client
 	print("Starting messenger, waiting for connection...")
@@ -98,6 +98,7 @@ if __name__ == '__main__':
 	def handleIncoming():
 		encMessages = m.consumeMessages()
 		messages = [c.decryptMessage(mess) for mess in encMessages]
+		#for mess in messages: print(mess.encode('utf8'))
 		return messages
 
 	i = interface.Interface(handleIncoming, handleOutgoing)

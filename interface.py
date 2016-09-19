@@ -1,20 +1,30 @@
 import time, threading, colorama, readline, sys
+import msvcrt
 
 COLS = 80
+DEFAULT_IN_HANDLE_PERIOD = 1
+DEFAULT_GETCH_DELAY = 0.05 #120words/min, 1200 letters per minutes,  20 letters per second: 0.05sec/l
+DEFAULT_ENCODING = 'utf8'
 
 class Interface(object):
-    def __init__(self, handleIncoming, handleOutgoing):
-        #self.window = curses.initscr()
-        self.run = False
+    def __init__(self, handleIncoming, handleOutgoing, inHandlePeriod = DEFAULT_IN_HANDLE_PERIOD,
+        encoding = DEFAULT_ENCODING):
         self.handleIncoming = handleIncoming
         self.handleOutgoing = handleOutgoing
+        self.inHandlePeriod = inHandlePeriod
+        self.encoding = encoding
+        self.run = False
+        self.buffer = ''
 
     def goToStart(self):
-        inputLength = len(readline.get_line_buffer()) + 3
+        inputLength = len(self.buffer) + 3
         numInputLines = inputLength // COLS
         sys.stdout.write('\x1b[2K')
         sys.stdout.write('\x1b[1A\x1b[2K' * numInputLines)
         sys.stdout.write('\r')
+
+    def writeStartSymbol(self):
+        sys.stdout.write('>> ')
 
     def displayInputs(self):
         while self.run:
@@ -24,16 +34,44 @@ class Interface(object):
             for mess in messages:
                 print("<< " + mess)
             if messages:
-                print(">> " + readline.get_line_buffer())
-            time.sleep(1)
+                self.writeStartSymbol()
+                sys.stdout.write(self.buffer)
+            time.sleep(self.inHandlePeriod)
+
+    def readInput(self):
+        #data = sys.stdin.read(1)
+        data = msvcrt.getch()
+
+        #Handle Ctrl+C
+        if data == b'\x03':
+            raise KeyboardInterrupt
+
+        character = data.decode(self.encoding)
+        #Handle return
+        if character == '\r':
+            if self.buffer != '':
+                message = self.buffer
+                self.buffer = ''
+                return message
+            else:
+                return
+
+        #Add char to buffer
+        self.buffer += character
+        sys.stdout.write(character)
 
     def start(self):
         colorama.init()
         self.run = True
         threading.Thread(target = self.displayInputs).start()
+        self.writeStartSymbol()
         while 1:
-            out = input(">> ")
-            self.handleOutgoing(out)
+            out = self.readInput()
+            if out:
+                print('') #Linebreak
+                self.writeStartSymbol()
+                self.handleOutgoing(out)
+            time.sleep(DEFAULT_GETCH_DELAY)
 
     def stop(self):
         self.run = False
