@@ -3,7 +3,9 @@ import protocol
 from messenger_exception import MessengerException
 
 class Messenger(object):
+	"Messenger object that handles socket logic to communicate to and fro two PCs."
 	def __init__(self):
+		"Creates a messenger object."
 		self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM);
 		self.messageQueue = []
 		self.running = False
@@ -11,6 +13,7 @@ class Messenger(object):
 		self.lastError = None
 
 	def listen(self, host, port):
+		"Binds a socket to the given address and listens and accepts one incoming connection."
 		try:
 			self.socket.bind((host, port))
 		except socket.error as e:
@@ -22,12 +25,14 @@ class Messenger(object):
 		self.socket = clientSock
 
 	def connect(self, host, port):
+		"Connects the Messenger's socket to the given address."
 		try:
 			self.socket.connect((host, port))
 		except ConnectionRefusedError as e:
 			raise MessengerException("No host listening.") from e
 
 	def recv(self):
+		"Handles the reception of the messages from a remote Messenger object and adds them to the message queue."
 		buffer = b''
 		while self.running:
 			try:
@@ -42,6 +47,7 @@ class Messenger(object):
 			self.messageQueue += messages
 
 	def send(self, message):
+		"Sends the given message to the remote Messenger to which this one is currently connected."
 		formMessage = message + protocol.MESSAGE_SEPARATOR
 		sent = 0
 		while sent < len(formMessage):
@@ -51,6 +57,7 @@ class Messenger(object):
 				raise MessengerException("Socket not connected.") from e
 
 	def start(self, host, port, role):
+		"Starts the Messenger and binds/connects to the given address depending on given CLIENT/SERVER role."
 		self.role = role
 		if role == protocol.CLIENT_ROLE:
 			self.connect(host, port)
@@ -61,6 +68,7 @@ class Messenger(object):
 		t.start()
 
 	def stop(self):
+		"Closes the open sockets and set shutdown flag for running threads."
 		self.running = False
 		try:
 			self.socket.shutdown(socket.SHUT_RDWR)
@@ -71,10 +79,12 @@ class Messenger(object):
 			self.serverSocket.close()
 
 	def consumeMessages(self):
+		"Returns the content of the message queue and empties it."
 		messages = self.messageQueue
 		self.messageQueue = []
 		return messages
 
 	def raiseLastErrorIfAny(self):
+		"Raises the last error that might have occured in the remote thread that deals with reception."
 		if self.lastError:
 			raise MessengerException("Connection closed.") from self.lastError

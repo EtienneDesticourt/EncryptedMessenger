@@ -17,12 +17,15 @@ def DEFAULT_PADDING():
         label=None)
 
 class Crypter(object):
+    "Cryptography wrapper that provides convenience functions to crypt/decrypt keys and messages."
     def __init__(self, RNG):
+        "Takes a random number generating function and creates a Crypter object with it."
         self.rsaKey = None
         self.aesKey = None
         self.RNG = RNG
 
     def loadRsaKey(self, keyType, directory=DEFAULT_KEY_DIR):
+        "Loads a public/private RSA key in the given directory (optional) depending on given keyType."
         try:
             self.rsaKey = utils.loadKey(keyType, directory)
         except (FileNotFoundError, ValueError, UnsupportedAlgorithm) as e:
@@ -30,16 +33,19 @@ class Crypter(object):
         self.keyType = keyType
 
     def genAndSetAesKey(self):
+        "Generates a 32 bytes AES key and returns it. It'll be used by the Crypter from hereon."
         self.aesKey = self.RNG(32)
         return self.aesKey
 
     def genHmac(self, iv, encMess):
+        "Generates 32 bytes of HMAC from a given initialization vector and encrypted message."
         h = hmac.HMAC(self.aesKey, hashes.SHA256(), backend=default_backend())
         h.update(iv)
         h.update(encMess)
         return h
 
     def encryptMessage(self, message):
+        "Encrypts the given message using the Crypter's AES key."
         if not self.aesKey:
             raise NoKeyException("Cannot encrypt message: AES key hasn't been set.")
 
@@ -62,6 +68,7 @@ class Crypter(object):
         return iv + encArray + hmacBytes
 
     def decryptMessage(self, message):
+        "Decrypts the given message using the Crypter's AES key."
         if not self.aesKey:
             raise NoKeyException("Cannot decrypt message: AES key hasn't been set.")
 
@@ -93,6 +100,7 @@ class Crypter(object):
         return message
 
     def encryptKey(self, rawKey):
+        "Encrypts the given key using the Crypter's RSA key."
         if self.rsaKey == None:
             raise NoKeyException("Cannot encrypt AES key: RSA key hasn't been loaded.")
         if self.keyType != utils.PUBLIC:
@@ -101,6 +109,7 @@ class Crypter(object):
         return encKey
 
     def decryptKey(self, encKey):
+        "Decrypts the given key using the Crypter's RSA key."
         if self.rsaKey == None:
             raise NoKeyException("Cannot decrypt AES key: RSA key hasn't been loaded.")
         if self.keyType != utils.PRIVATE:
