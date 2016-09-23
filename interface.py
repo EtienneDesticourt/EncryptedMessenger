@@ -1,4 +1,4 @@
-import time, threading, colorama, readline, sys
+import time, threading, colorama, sys
 import msvcrt
 
 COLS = 80
@@ -48,6 +48,15 @@ class Interface(object):
         "Reads and displays one character from stdin. Returns the input buffer if CR is received."
         data = msvcrt.getch()
 
+        #Handles backspace
+        if data == b'\x08':
+            if len(self.buffer) > 0:
+                self.buffer = self.buffer[:-1]
+                self.goToStart()
+                self.writeStartSymbol()
+                sys.stdout.write(self.buffer)
+            return
+
         #Handle Ctrl+C
         if data == b'\x03':
             raise KeyboardInterrupt
@@ -67,7 +76,7 @@ class Interface(object):
         sys.stdout.write(character)
 
     def start(self):
-        "Starts the two display loops to handle input/output."
+        "Starts the two display loops to handle input(main thread)/output(remote)."
         colorama.init()
         self.run = True
         threading.Thread(target = self.displayInputs).start()
