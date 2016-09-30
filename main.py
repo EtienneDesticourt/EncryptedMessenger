@@ -52,7 +52,7 @@ if __name__ == '__main__':
 	m = encrypted_messenger.EncryptedMessenger(verbose = True)
 	try:
 		m.start(host, PORT, role)
-	except (MessengerException, CrypterException, ValueError) as e:
+	except (MessengerException, CrypterException, ValueError, KeyboardInterrupt) as e:
 		printExcAndCause(e)
 		m.stop()
 		quit()

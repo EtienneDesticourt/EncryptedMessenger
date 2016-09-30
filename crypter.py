@@ -1,8 +1,8 @@
-from cryptography.hazmat.primitives.serialization import load_pem_private_key
+from cryptography.hazmat.primitives.serialization import load_pem_private_key, Encoding, PublicFormat, load_pem_public_key
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives import hashes, hmac
 from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives.asymmetric import padding
+from cryptography.hazmat.primitives.asymmetric import padding, rsa
 from cryptography.exceptions import InvalidSignature, UnsupportedAlgorithm
 import os, math
 from keys import utils
@@ -10,6 +10,8 @@ import protocol
 from crypter_exceptions import CrypterException, NoKeyException, CorruptedMessageException
 
 DEFAULT_KEY_DIR = "keys"
+DEFAULT_EXPONENT = 65537
+DEFAULT_RSA_KEY_SIZE = 2048
 
 def DEFAULT_PADDING():
     return padding.OAEP(mgf=padding.MGF1(algorithm=hashes.SHA256()),
@@ -31,6 +33,26 @@ class Crypter(object):
         except (FileNotFoundError, ValueError, UnsupportedAlgorithm) as e:
             raise CrypterException("Unable to load RSA key.") from e
         self.keyType = keyType
+
+    def genAndSetRsaKey(self):
+        "Generates a new RSA key pair."
+        self.keyType = utils.PRIVATE
+        self.rsaKey = rsa.generate_private_key(public_exponent=DEFAULT_EXPONENT,
+            key_size=DEFAULT_RSA_KEY_SIZE,
+            backend=default_backend())
+
+    def setPublicKeyFromPem(self, pemData):
+        self.keyType = utils.PUBLIC
+        self.rsaKey = load_pem_public_key(pemData, backend=default_backend())
+
+    def getPublicKeyPem(self):
+        if self.keyType == utils.PRIVATE:
+            publicKey = self.rsaKey.public_key()
+        elif self.keyType == utils.PUBLIC:
+            publicKey = self.rsaKey
+        else:
+            raise ValueError("Wrong key type.")
+        return publicKey.public_bytes(Encoding.PEM, PublicFormat.SubjectPublicKeyInfo)
 
     def genAndSetAesKey(self):
         "Generates a 32 bytes AES key and returns it. It'll be used by the Crypter from hereon."

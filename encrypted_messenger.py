@@ -13,18 +13,37 @@ class EncryptedMessenger(messenger.Messenger):
 		if self.verbose:
 			print(*args)
 
-	def performHandshakeAsServer(self):
-		self.crypter.loadRsaKey(keys.utils.PRIVATE)
-		encryptedKey = None
-		while not encryptedKey:
-			encryptedKey = super().consumeMessage()
+	def waitForNextMessage(self):
+		message = None
+		while not message:
+			message = super().consumeMessage()
 			self.raiseLastErrorIfAny()
 			time.sleep(1)
+		return message
 
-		self.crypter.aesKey = self.crypter.decryptKey(encryptedKey)
+	def performHandshakeAsServer(self):
+		#TODO: Uncomment and add auth
+		#self.crypter.loadRsaKey(keys.utils.PRIVATE)
+
+		self.printIfVerbose("Generating new RSA key and sending to client.")
+		self.crypter.genAndSetRsaKey()
+		publicRsaKey = self.crypter.getPublicKeyPem()
+		super().send(publicRsaKey)
+
+		self.printIfVerbose("Waiting for AES key from client.")
+		encryptedAesKey = self.waitForNextMessage()
+
+		self.crypter.aesKey = self.crypter.decryptKey(encryptedAesKey)
 
 	def performHandshakeAsClient(self):
-		self.crypter.loadRsaKey(keys.utils.PUBLIC)
+		#TODO: Uncomment and add auth
+		#self.crypter.loadRsaKey(keys.utils.PUBLIC)
+
+		self.printIfVerbose("Waiting for ephemeral RSA key from server.")
+		publicKeyPem = self.waitForNextMessage()
+		self.crypter.setPublicKeyFromPem(publicKeyPem)
+
+		self.printIfVerbose("Generating new AES key and sending to server.")
 		self.crypter.genAndSetAesKey()
 		encryptedKey = self.crypter.encryptKey(self.crypter.aesKey)
 		super().send(encryptedKey)
@@ -46,7 +65,7 @@ class EncryptedMessenger(messenger.Messenger):
 
 		super().start(host, port, role)
 
-		self.printIfVerbose("Succesful connection.")
+		self.printIfVerbose("Succesful connection.\n")
 		self.printIfVerbose("Attempting handshake...")
 
 		if role == protocol.SERVER_ROLE:
@@ -56,7 +75,7 @@ class EncryptedMessenger(messenger.Messenger):
 		else:
 			raise ValueError("Wrong role.") #huehue
 
-		self.printIfVerbose("Succesful handshake.")
+		self.printIfVerbose("Succesful handshake.\n")
 
 
 
