@@ -1,5 +1,5 @@
 import os, time, sys
-import protocol, messenger, interface, crypter, keys.utils
+import protocol, messenger, encrypted_messenger, interface, crypter, keys.utils
 from messenger_exception import MessengerException
 from crypter_exceptions import CrypterException
 
@@ -26,6 +26,11 @@ def quit():
 	sys.exit()
 
 if __name__ == '__main__':
+
+	############################
+	#SETUP MESSENGER CONNECTION#
+	############################
+
 	#Check starting role argument
 	if len(sys.argv) < 2:
 		print("Missing role argument. Specify SERVER or CLIENT role.")
@@ -44,50 +49,31 @@ if __name__ == '__main__':
 
 	#Start messenger server/client
 	print("Starting messenger, waiting for connection...")
-	m = messenger.Messenger()
+	m = encrypted_messenger.EncryptedMessenger(verbose = True)
 	try:
 		m.start(host, PORT, role)
-	except MessengerException as e:
+	except (MessengerException, CrypterException, ValueError) as e:
 		printExcAndCause(e)
 		m.stop()
 		quit()
 
-	#Start crypter and load/gen/send/recv necessary keys
-	c = crypter.Crypter(os.urandom)
-	#If we're the server load the private key and wait for the AES key
-	try:
-		if role == protocol.SERVER_ROLE:
-			c.loadRsaKey(keys.utils.PRIVATE)
-			print("Waiting for AES key.")
-			while len(m.messageQueue) == 0:
-				m.raiseLastErrorIfAny()
-				time.sleep(1)
-			encryptedKey = m.messageQueue[0]
-			m.messageQueue = m.messageQueue[1:]
-			key = c.decryptKey(encryptedKey)
-			c.aesKey = key
-		#If we're the client load the public key and gen and send AES key
-		else:
-			c.loadRsaKey(keys.utils.PUBLIC)
-			c.genAndSetAesKey()
-			encryptedKey = c.encryptKey(c.aesKey)
-			m.send(encryptedKey)
-	except (MessengerException, CrypterException) as e:
-		printExcAndCause(e)
-		m.stop()
-		quit()
+
+	###########################
+	#START MESSAGING INTERFACE#
+	###########################
 
 
 	#Start interface to link messenger/crypter/stdout/stdin
 	def handleOutgoing(message):
+		#TODO: Check if this belongs here or in messenger or in crypter
 		try:
 			messBytes = message.encode('utf8') + b"\x00"
 		except UnicodeError:
 			print("Forbidden characters. Message was not sent.")
 			return
-		encrypted = c.encryptMessage(messBytes)
+
 		try:
-			m.send(encrypted)
+			m.send(messBytes)
 		except MessengerException as e:
 			printExcAndCause(e)
 			print("Message was not sent.")
@@ -95,13 +81,7 @@ if __name__ == '__main__':
 			m.stop()
 			quit()
 
-	def handleIncoming():
-		encMessages = m.consumeMessages()
-		messages = [c.decryptMessage(mess) for mess in encMessages]
-		#for mess in messages: print(mess.encode('utf8'))
-		return messages
-
-	i = interface.Interface(handleIncoming, handleOutgoing)
+	i = interface.Interface(m.consumeMessages, handleOutgoing)
 
 	print("Starting messaging session. Press Ctrl+C to quit at any time.")
 	try:

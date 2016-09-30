@@ -78,6 +78,14 @@ class Messenger(object):
 		if self.role == protocol.SERVER_ROLE:
 			self.serverSocket.close()
 
+	def consumeMessage(self):
+		"Returns the content of the first message and removes it from the queue."
+		if len(self.messageQueue) > 0:
+			message = self.messageQueue[0]
+			self.messageQueue = self.messageQueue[1:]
+			return message
+		return None
+
 	def consumeMessages(self):
 		"Returns the content of the message queue and empties it."
 		messages = self.messageQueue
