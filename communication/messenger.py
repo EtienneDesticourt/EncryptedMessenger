@@ -1,6 +1,6 @@
 import socket, threading
-import protocol
-from messenger_exception import MessengerException
+from communication import protocol
+from communication.messenger_exception import MessengerException
 
 class Messenger(object):
 	"Messenger object that handles socket logic to communicate to and fro two PCs."

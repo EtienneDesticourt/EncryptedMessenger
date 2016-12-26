@@ -1,5 +1,5 @@
 import unittest, socket, threading, time
-import messenger, protocol, messenger_exception
+from communication import messenger, protocol, messenger_exception
 
 TEST_HOST_CONNECT = 'localhost'
 TEST_HOST_BIND = '0.0.0.0'

@@ -1,7 +1,10 @@
 import os, time, sys
-import protocol, messenger, encrypted_messenger, interface, crypter, keys.utils
-from messenger_exception import MessengerException
-from crypter_exceptions import CrypterException
+from communication import protocol, messenger, encrypted_messenger
+import interface
+from encryption import crypter
+import keys.utils
+from communication.messenger_exception import MessengerException
+from encryption.crypter_exceptions import CrypterException
 
 HOST = 'localhost'
 PORT = 4664

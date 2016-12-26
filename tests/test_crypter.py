@@ -4,8 +4,8 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes, hmac
 from cryptography.hazmat.primitives.asymmetric import padding
 import unittest, socket, threading, time, math, os
-import crypter, crypter_exceptions
-import protocol
+from encryption import crypter, crypter_exceptions
+from communication import protocol
 import keys.utils as utils
 
 #AES KEY
@@ -90,9 +90,7 @@ class TestCrypter(unittest.TestCase):
         encKey = self.testCrypter.encryptKey(TEST_AES_KEY)
 
         privateKey = utils.loadKey(utils.PRIVATE, DUMMY_KEYS_DIR)
-        assert TEST_AES_KEY == privateKey.decrypt(encKey, padding.OAEP(mgf=padding.MGF1(algorithm=hashes.SHA256()),
-                algorithm=hashes.SHA256(),
-                label=None))
+        assert TEST_AES_KEY == privateKey.decrypt(encKey, crypter.DEFAULT_PADDING())
 
     def test_encryptKey_wrong_key(self):
         self.testCrypter.loadRsaKey(utils.PRIVATE, DUMMY_KEYS_DIR)

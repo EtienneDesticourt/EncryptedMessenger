@@ -1,5 +1,7 @@
 import os, time
-import messenger, crypter, protocol, keys.utils
+from communication import messenger, protocol
+from encryption import crypter
+import keys.utils
 
 class EncryptedMessenger(messenger.Messenger):
 	"Messenger object with cryptographic capabilities"

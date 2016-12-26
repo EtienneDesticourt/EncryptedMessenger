@@ -6,8 +6,8 @@ from cryptography.hazmat.primitives.asymmetric import padding, rsa
 from cryptography.exceptions import InvalidSignature, UnsupportedAlgorithm
 import os, math
 from keys import utils
-import protocol
-from crypter_exceptions import CrypterException, NoKeyException, CorruptedMessageException
+from communication import protocol
+from encryption.crypter_exceptions import CrypterException, NoKeyException, CorruptedMessageException
 
 DEFAULT_KEY_DIR = "keys"
 DEFAULT_EXPONENT = 65537
