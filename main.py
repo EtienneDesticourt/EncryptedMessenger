@@ -84,7 +84,7 @@ if __name__ == '__main__':
 			m.stop()
 			quit()
 
-	i = interface.Interface(m.consumeMessages, handleOutgoing)
+	i = interface.Interface(m.consume_messages, handleOutgoing)
 
 	print("Starting messaging session. Press Ctrl+C to quit at any time.")
 	try:

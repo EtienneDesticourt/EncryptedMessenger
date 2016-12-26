@@ -1,140 +1,153 @@
+import math
+
 from cryptography.hazmat.primitives.serialization import load_pem_private_key, Encoding, PublicFormat, load_pem_public_key
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives import hashes, hmac
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.asymmetric import padding, rsa
 from cryptography.exceptions import InvalidSignature, UnsupportedAlgorithm
-import os, math
-from keys import utils
+
 from communication import protocol
 from encryption.crypter_exceptions import CrypterException, NoKeyException, CorruptedMessageException
+from keys import utils
 
 DEFAULT_KEY_DIR = "keys"
 DEFAULT_EXPONENT = 65537
 DEFAULT_RSA_KEY_SIZE = 2048
 
+
 def DEFAULT_PADDING():
     return padding.OAEP(mgf=padding.MGF1(algorithm=hashes.SHA256()),
-        algorithm=hashes.SHA256(),
-        label=None)
+                        algorithm=hashes.SHA256(),
+                        label=None)
+
 
 class Crypter(object):
     "Cryptography wrapper that provides convenience functions to crypt/decrypt keys and messages."
+
     def __init__(self, RNG):
         "Takes a random number generating function and creates a Crypter object with it."
-        self.rsaKey = None
-        self.aesKey = None
+        self.rsa_key = None
+        self.aes_key = None
         self.RNG = RNG
 
-    def loadRsaKey(self, keyType, directory=DEFAULT_KEY_DIR):
+    def load_rsa_key(self, key_type, directory=DEFAULT_KEY_DIR):
         "Loads a public/private RSA key in the given directory (optional) depending on given keyType."
         try:
-            self.rsaKey = utils.loadKey(keyType, directory)
+            self.rsa_key = utils.load_key(key_type, directory)
         except (FileNotFoundError, ValueError, UnsupportedAlgorithm) as e:
             raise CrypterException("Unable to load RSA key.") from e
-        self.keyType = keyType
+        self.key_type = key_type
 
-    def genAndSetRsaKey(self):
+    def gen_and_set_rsa_key(self):
         "Generates a new RSA key pair."
-        self.keyType = utils.PRIVATE
-        self.rsaKey = rsa.generate_private_key(public_exponent=DEFAULT_EXPONENT,
-            key_size=DEFAULT_RSA_KEY_SIZE,
-            backend=default_backend())
+        self.key_type = utils.PRIVATE
+        self.rsa_key = rsa.generate_private_key(public_exponent=DEFAULT_EXPONENT,
+                                                key_size=DEFAULT_RSA_KEY_SIZE,
+                                                backend=default_backend())
 
-    def setPublicKeyFromPem(self, pemData):
-        self.keyType = utils.PUBLIC
-        self.rsaKey = load_pem_public_key(pemData, backend=default_backend())
+    def set_public_key_from_pem(self, pem_data):
+        self.key_type = utils.PUBLIC
+        self.rsa_key = load_pem_public_key(pem_data, backend=default_backend())
 
-    def getPublicKeyPem(self):
-        if self.keyType == utils.PRIVATE:
-            publicKey = self.rsaKey.public_key()
-        elif self.keyType == utils.PUBLIC:
-            publicKey = self.rsaKey
+    def get_public_key_pem(self):
+        if self.key_type == utils.PRIVATE:
+            public_key = self.rsa_key.public_key()
+        elif self.key_type == utils.PUBLIC:
+            public_key = self.rsa_key
         else:
             raise ValueError("Wrong key type.")
-        return publicKey.public_bytes(Encoding.PEM, PublicFormat.SubjectPublicKeyInfo)
+        return public_key.public_bytes(Encoding.PEM, PublicFormat.SubjectPublicKeyInfo)
 
-    def genAndSetAesKey(self):
+    def gen_and_set_aes_key(self):
         "Generates a 32 bytes AES key and returns it. It'll be used by the Crypter from hereon."
-        self.aesKey = self.RNG(32)
-        return self.aesKey
+        self.aes_key = self.RNG(32)
+        return self.aes_key
 
-    def genHmac(self, iv, encMess):
+    def gen_hmac(self, iv, encrypted_message):
         "Generates 32 bytes of HMAC from a given initialization vector and encrypted message."
-        h = hmac.HMAC(self.aesKey, hashes.SHA256(), backend=default_backend())
+        h = hmac.HMAC(self.aes_key, hashes.SHA256(), backend=default_backend())
         h.update(iv)
-        h.update(encMess)
+        h.update(encrypted_message)
         return h
 
-    def encryptMessage(self, message):
+    def encrypt_message(self, message):
         "Encrypts the given message using the Crypter's AES key."
-        if not self.aesKey:
-            raise NoKeyException("Cannot encrypt message: AES key hasn't been set.")
+        if not self.aes_key:
+            raise NoKeyException(
+                "Cannot encrypt message: AES key hasn't been set.")
 
-        #Pad message for mode
-        paddingLength = math.ceil(len(message) / 16) * 16 - len(message)
-        message += paddingLength * b"0"
+        # Pad message for mode
+        padding_length = math.ceil(len(message) / 16) * 16 - len(message)
+        message += padding_length * b"0"
 
-        #Random init vector
+        # Random init vector
         iv = self.RNG(16)
 
-        #Encrypt message
-        aes = Cipher(algorithms.AES(self.aesKey), modes.CBC(iv), backend=default_backend())
+        # Encrypt message
+        aes = Cipher(algorithms.AES(self.aes_key),
+                     modes.CBC(iv), backend=default_backend())
         encryptor = aes.encryptor()
-        encArray = encryptor.update(message) + encryptor.finalize()
+        enc_array = encryptor.update(message) + encryptor.finalize()
 
-        #Gen auth data
-        h = self.genHmac(iv, encArray)
-        hmacBytes = h.finalize()
+        # Gen auth data
+        h = self.gen_hmac(iv, enc_array)
+        hmac_bytes = h.finalize()
 
-        return iv + encArray + hmacBytes
+        return iv + enc_array + hmac_bytes
 
-    def decryptMessage(self, message):
+    def decrypt_message(self, message):
         "Decrypts the given message using the Crypter's AES key."
-        if not self.aesKey:
-            raise NoKeyException("Cannot decrypt message: AES key hasn't been set.")
+        if not self.aes_key:
+            raise NoKeyException(
+                "Cannot decrypt message: AES key hasn't been set.")
 
         if len(message) < 16 + 32 + 1:
             raise CorruptedMessageException()
 
         iv = message[:16]
-        encMess = message[16:-32]
-        hmacBytes = message[-32:]
+        enc_mess = message[16:-32]
+        hmac_bytes = message[-32:]
 
-        #Verify auth
-        h = self.genHmac(iv, encMess)
+        # Verify auth
+        h = self.gen_hmac(iv, enc_mess)
         try:
-            h.verify(hmacBytes)
+            h.verify(hmac_bytes)
         except InvalidSignature as e:
             raise CorruptedMessageException() from e
 
-        #Decrypt message if there was no error
-        aes = Cipher(algorithms.AES(self.aesKey), modes.CBC(iv), backend=default_backend())
+        # Decrypt message if there was no error
+        aes = Cipher(algorithms.AES(self.aes_key),
+                     modes.CBC(iv), backend=default_backend())
         decryptor = aes.decryptor()
-        message = decryptor.update(encMess) + decryptor.finalize()
+        message = decryptor.update(enc_mess) + decryptor.finalize()
 
-        #This doesn't belong here: crypter doesn't necessarily want to handle strings
-        #long term we want to pass message length in message and simply cut the padding
-        #And let messenger or interface decode
-        #Kinda too lazy to do that right now, mby later
+        # This doesn't belong here: crypter doesn't necessarily want to handle strings
+        # long term we want to pass message length in message and simply cut the padding
+        # And let messenger or interface decode
+        # Kinda too lazy to do that right now, mby later
         message = message.decode('utf8')
         message = message.split('\0')[0]
         return message
 
-    def encryptKey(self, rawKey):
+    def encrypt_key(self, raw_key):
         "Encrypts the given key using the Crypter's RSA key."
-        if self.rsaKey == None:
-            raise NoKeyException("Cannot encrypt AES key: RSA key hasn't been loaded.")
-        if self.keyType != utils.PUBLIC:
-            raise CrypterException("Cannot encrypt key. Public RSA key required.")
-        encKey = self.rsaKey.encrypt(rawKey, DEFAULT_PADDING())
-        return encKey
+        if self.rsa_key == None:
+            raise NoKeyException(
+                "Cannot encrypt AES key: RSA key hasn't been loaded.")
+        if self.key_type != utils.PUBLIC:
+            raise CrypterException(
+                "Cannot encrypt key. Public RSA key required.")
+        enc_key = self.rsa_key.encrypt(raw_key, DEFAULT_PADDING())
+        return enc_key
 
-    def decryptKey(self, encKey):
+    def decrypt_key(self, encrypted_key):
         "Decrypts the given key using the Crypter's RSA key."
-        if self.rsaKey == None:
-            raise NoKeyException("Cannot decrypt AES key: RSA key hasn't been loaded.")
-        if self.keyType != utils.PRIVATE:
-            raise CrypterException("Cannot decrypt key. Private RSA key required.")
-        rawKey = self.rsaKey.decrypt(encKey, DEFAULT_PADDING())
-        return rawKey
+        if self.rsa_key == None:
+            raise NoKeyException(
+                "Cannot decrypt AES key: RSA key hasn't been loaded.")
+        if self.key_type != utils.PRIVATE:
+            raise CrypterException(
+                "Cannot decrypt key. Private RSA key required.")
+        raw_key = self.rsa_key.decrypt(encrypted_key, DEFAULT_PADDING())
+        return raw_key
