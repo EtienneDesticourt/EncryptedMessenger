@@ -56,7 +56,7 @@ class Crypter(object):
         elif self.key_type == utils.PUBLIC:
             public_key = self.rsa_key
         else:
-            raise ValueError("Wrong key type.")
+            raise CrypterException("Wrong key type.")
         return public_key.public_bytes(Encoding.PEM, PublicFormat.SubjectPublicKeyInfo)
 
     def gen_and_set_aes_key(self):
@@ -74,8 +74,7 @@ class Crypter(object):
     def encrypt_message(self, message):
         "Encrypts the given message using the Crypter's AES key."
         if not self.aes_key:
-            raise NoKeyException(
-                "Cannot encrypt message: AES key hasn't been set.")
+            raise NoKeyException("Cannot encrypt message: AES key hasn't been set.")
 
         # Pad message for mode
         padding_length = math.ceil(len(message) / 16) * 16 - len(message)
@@ -85,8 +84,7 @@ class Crypter(object):
         iv = self.RNG(16)
 
         # Encrypt message
-        aes = Cipher(algorithms.AES(self.aes_key),
-                     modes.CBC(iv), backend=default_backend())
+        aes = Cipher(algorithms.AES(self.aes_key), modes.CBC(iv), backend=default_backend())
         encryptor = aes.encryptor()
         enc_array = encryptor.update(message) + encryptor.finalize()
 
@@ -99,8 +97,7 @@ class Crypter(object):
     def decrypt_message(self, message):
         "Decrypts the given message using the Crypter's AES key."
         if not self.aes_key:
-            raise NoKeyException(
-                "Cannot decrypt message: AES key hasn't been set.")
+            raise NoKeyException("Cannot decrypt message: AES key hasn't been set.")
 
         if len(message) < 16 + 32 + 1:
             raise CorruptedMessageException()
@@ -117,8 +114,7 @@ class Crypter(object):
             raise CorruptedMessageException() from e
 
         # Decrypt message if there was no error
-        aes = Cipher(algorithms.AES(self.aes_key),
-                     modes.CBC(iv), backend=default_backend())
+        aes = Cipher(algorithms.AES(self.aes_key), modes.CBC(iv), backend=default_backend())
         decryptor = aes.decryptor()
         message = decryptor.update(enc_mess) + decryptor.finalize()
 
@@ -133,21 +129,17 @@ class Crypter(object):
     def encrypt_key(self, raw_key):
         "Encrypts the given key using the Crypter's RSA key."
         if self.rsa_key == None:
-            raise NoKeyException(
-                "Cannot encrypt AES key: RSA key hasn't been loaded.")
+            raise NoKeyException("Cannot encrypt AES key: RSA key hasn't been loaded.")
         if self.key_type != utils.PUBLIC:
-            raise CrypterException(
-                "Cannot encrypt key. Public RSA key required.")
+            raise CrypterException("Cannot encrypt key. Public RSA key required.")
         enc_key = self.rsa_key.encrypt(raw_key, DEFAULT_PADDING())
         return enc_key
 
     def decrypt_key(self, encrypted_key):
         "Decrypts the given key using the Crypter's RSA key."
         if self.rsa_key == None:
-            raise NoKeyException(
-                "Cannot decrypt AES key: RSA key hasn't been loaded.")
+            raise NoKeyException("Cannot decrypt AES key: RSA key hasn't been loaded.")
         if self.key_type != utils.PRIVATE:
-            raise CrypterException(
-                "Cannot decrypt key. Private RSA key required.")
+            raise CrypterException("Cannot decrypt key. Private RSA key required.")
         raw_key = self.rsa_key.decrypt(encrypted_key, DEFAULT_PADDING())
         return raw_key

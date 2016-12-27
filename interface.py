@@ -16,7 +16,7 @@ class Interface(object):
         self.handleOutgoing = handleOutgoing
         self.inHandlePeriod = inHandlePeriod
         self.encoding = encoding
-        self.run = False
+        self.running = False
         self.buffer = ''
 
     def goToStart(self):
@@ -33,7 +33,7 @@ class Interface(object):
 
     def displayInputs(self):
         "Calls the incomig messages fetcher passed at creation regularly and displays its results."
-        while self.run:
+        while self.running:
             messages = self.handleIncoming()
             if messages:
                 self.goToStart()
@@ -75,10 +75,10 @@ class Interface(object):
         self.buffer += character
         sys.stdout.write(character)
 
-    def start(self):
+    def run(self):
         "Starts the two display loops to handle input(main thread)/output(remote)."
         colorama.init()
-        self.run = True
+        self.running = True
         threading.Thread(target = self.displayInputs).start()
         self.writeStartSymbol()
         while 1:
@@ -91,4 +91,4 @@ class Interface(object):
 
     def stop(self):
         "Sets flag to stop output thread."
-        self.run = False
+        self.running = False

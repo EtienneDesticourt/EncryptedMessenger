@@ -8,10 +8,38 @@ import keys.utils
 class EncryptedMessenger(messenger.Messenger):
     "Messenger object with cryptographic capabilities"
 
-    def __init__(self, verbose=False):
-        super().__init__()
+    def __init__(self, role, host, port, verbose=False):
+        super().__init__(role, host, port)
         self.crypter = crypter.Crypter(os.urandom)
         self.verbose = verbose
+
+    def __enter__(self):
+        self.print_if_verbose("Attempting to connect with remote as " + str(self.role) + " ...")
+        super().__enter__()
+        self.print_if_verbose("Succesful connection.\n")
+
+        self.print_if_verbose("Attempting handshake...")
+        if self.role == protocol.SERVER_ROLE:
+            self.perform_handshake_as_server()
+        elif self.role == protocol.CLIENT_ROLE:
+            self.perform_handshake_as_client()
+        else:
+            raise ValueError("Wrong role.")  # huehue
+
+        self.print_if_verbose("Succesful handshake.\n")
+        return self
+
+    def send(self, message):
+        encrypted = self.crypter.encrypt_message(message)
+        super().send(encrypted)
+
+    def consume_message(self):
+        message = super().consume_message()
+        return self.crypter.decryptMessage(message)
+
+    def consume_messages(self):
+        messages = super().consume_messages()
+        return [self.crypter.decrypt_message(mess) for mess in messages]
 
     def print_if_verbose(self, *args):
         if self.verbose:
@@ -51,32 +79,3 @@ class EncryptedMessenger(messenger.Messenger):
         self.crypter.gen_and_set_aes_key()
         encrypted_key = self.crypter.encrypt_key(self.crypter.aes_key)
         super().send(encrypted_key)
-
-    def send(self, message):
-        encrypted = self.crypter.encrypt_message(message)
-        super().send(encrypted)
-
-    def consume_message(self):
-        message = super().consume_message()
-        return self.crypter.decryptMessage(message)
-
-    def consume_messages(self):
-        messages = super().consume_messages()
-        return [self.crypter.decrypt_message(mess) for mess in messages]
-
-    def start(self, host, port, role):
-        self.print_if_verbose("Attempting to connect with remote as " + str(role) + " ...")
-
-        super().start(host, port, role)
-
-        self.print_if_verbose("Succesful connection.\n")
-        self.print_if_verbose("Attempting handshake...")
-
-        if role == protocol.SERVER_ROLE:
-            self.perform_handshake_as_server()
-        elif role == protocol.CLIENT_ROLE:
-            self.perform_handshake_as_client()
-        else:
-            raise ValueError("Wrong role.")  # huehue
-
-        self.print_if_verbose("Succesful handshake.\n")
