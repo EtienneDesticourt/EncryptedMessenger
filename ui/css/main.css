@@ -1,0 +1,442 @@
+/************************
+*********HEADER**********
+*************************/
+
+header.header {
+    background-color: #1E262B;
+    min-height: 50px;
+    padding: 0 20px;
+    position: fixed;
+    display: block;
+    content: " ";
+    display: table;
+    padding-top: 0px;
+    width: 100%;
+    box-shadow: 0 2px 5px rgba(0,0,0,.3);
+    left: 0;
+    top: 0;
+    z-index: 11;
+}
+
+.header::after {
+    clear: both;
+}
+
+header.header p {
+    color: #D8DADA;
+    display: block;
+    font-size: 25px;
+    text-transform: uppercase;
+    text-decoration: none;
+    background-color: transparent;
+    float: left;
+    padding: 12px 0;
+    padding-top: 0;
+    padding-bottom: 10;
+    margin-top: 15px;
+    margin-bottom: 0;
+    position: relative;
+}
+
+header.header div.controls {
+    float: right;
+    padding-right: 40px;
+}
+header.header div.controls a{
+    margin-right: 15px;
+    top: 10px;
+    color: #D8DADA;
+    display: block;
+    font-size: 15px;
+    text-transform: uppercase;
+    text-decoration: none;
+    background-color: transparent;
+    float: left;
+    padding: 12px 0;
+    padding-top: 0;
+    padding-bottom: 10;
+    margin-top: 15px;
+    margin-bottom: 0;
+    position: relative;
+}
+
+/************************
+********SIDE-BAR*********
+*************************/
+
+.main-menu {
+    padding-left: 0;
+}
+
+.main-menu > h4 {
+    color: rgba(255,255,255,.55);
+    padding-left: 15px;
+    padding-bottom: 0;
+    margin-bottom: 3px;
+}
+
+.main-menu > li > a {
+    padding-top: 5px;
+    padding-bottom: 1px;
+    padding-left: 15px;
+    display: block;
+    position: relative;
+    color: rgba(255,255,255,.55);
+    transition-duration: .3s;
+    text-decoration: none;
+    vertical-align: middle;
+}
+
+.main-menu > li > a > i {
+    position: absolute;
+    left: 25px;
+    font-size: 25px;
+    top: 0;
+    width: 25px;
+    text-align: center;
+    padding: 13px 0;
+}
+
+.main-menu .active>a,.main-menu a.active,.main-menu a:hover {
+    color:#fff
+}
+
+.main-menu>li.active>a,.main-menu>li>a:hover {
+    background-color:rgba(255,255,255,.04)
+}
+
+.page-sidebar {
+    background-color: black;
+    width: 200px;
+    position: fixed;
+    background: #2b343a;
+    height: calc(100% - 50px);
+    top: 55px;
+    left: 0px;
+    z-index: 10;
+}
+
+img .icon {
+    display: inline-block;
+}
+
+.main-menu > li > a > div.text {
+    display: inline-block;
+    position: absolute;
+    top: 18px;
+    margin-left: 7px;
+    font-size: 20px;
+}
+
+
+/************************
+**********BODY***********
+*************************/
+
+
+body {
+    background-color: rgb(34, 44, 50);
+}
+
+
+.content {
+    padding-left: 283px;
+    padding-right: 15px;
+    display: block;
+}
+
+.container {
+    padding-left: 15px;
+    padding-right: 15px;
+    margin-right: auto;
+    margin-left: auto;
+    width: 100%;
+}
+
+.block-header {
+    padding: 0 22px;
+    margin-bottom: 25px;
+    position: relative;
+}
+
+.block-header > h2 {
+    font-size: 15px;
+    margin: 0;
+    font-weight: 400;
+    text-transform: uppercase;
+    line-height: 1.1;
+    color: #D8DADA;
+}
+
+
+
+/************************
+*********TABLE***********
+*************************/
+
+/*
+.card {
+    position: relative;
+    background: #2b343a;
+    margin-bottom: 30px;
+    box-shadow: 0 1px 1px rgba(0,0,0,.1);
+}
+
+.table {
+    border: 0;
+    overflow-x: auto;
+    min-height: .01%;
+}
+
+.clients {
+    table-layout: inherit !important;
+    margin-bottom: 0;
+    background-color: transparent;
+    border-collapse: collapse;
+    border-spacing: 0;
+    width: 100%;
+    max-width: 100%;
+}
+
+th {
+    border: 0 !important;
+}
+
+th > a {
+    color: rgb(216, 218, 218);
+    cursor: pointer;
+    display: block;
+    text-decoration: none;
+    text-transform: uppercase;
+    text-align: left;
+    font-family: roboto;
+    font-size: 13px;
+    position: relative;
+}
+
+th > a:hover {
+    color: black;
+}
+
+th:hover {
+    background-color:rgba(255,255,255,.1);
+}
+
+.clients > thead > tr > th:first-child {
+    padding-left: 30px;
+}
+
+.clients > thead > tr > th {
+    background-color: rgba(255,255,255,.04);
+    vertical-align: middle;
+    font-weight: 500;
+    text-transform: uppercase;
+    padding: 15px;
+    line-height: 1.42857143;
+}*/
+
+
+.card {
+    padding-top: 50px;
+    padding-bottom: 50px;
+    background: #2b343a;
+}
+
+.clients {
+    font-family: "Helvetica Neue", Helvetica, Arial;
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+    font-smoothing: antialiased;
+    margin: 0 0 40px 0;
+    width: 100%;
+    display: table;
+    outline: 0 !important;
+    border: 0;
+    table-layout: inherit !important;
+    border-collapse: collapse;
+    border-spacing: 0;
+    box-sizing: border-box;
+}
+
+thead > tr > th:first-child {
+    padding-left: 30px;
+}
+
+
+thead > tr > th {
+    background-color: rgba(255,255,255,.04);
+    vertical-align: middle;
+    font-weight: 500;
+    border-width: 1px;
+    text-transform: uppercase;
+    padding: 15px;
+    line-height: 1.42857143;
+    text-align: left;
+}
+
+thead > tr > th > a {
+    text-decoration: none;
+    display: block;
+    position: relative;
+    color: #D8DADA;
+    font-family: roboto;
+    font-size: 13px;
+}
+
+
+tr {
+    display: table-row;
+    color: white;
+}
+
+tr:nth-of-type(odd) {
+    background-color: rgba(255,255,255,.02);
+}
+
+td {
+    padding: 15px;
+    line-height: 1.42857143;
+    vertical-align: top;
+    text-overflow: inherit !important;
+    white-space: inherit !important;
+}
+
+/************************
+*********CHAT**********
+*************************/
+
+.scrollable {
+    overflow-y: scroll;
+}
+section.main {
+    padding-bottom: 0px;
+    padding-top: 0px;
+    min-height: 20%;
+    display: block;
+    color: white;
+    position: relative;
+    width: calc(100% - 200px);
+    top:50px;
+    left: 200px;
+    height: calc(100% - 125px);
+}
+
+section.main > div.message {
+    margin-left: 10px;
+    margin-right: 10px;
+    border-top: 2px solid rgba(255,255,255,.06);
+}
+
+section.main > div.message > p.message-date {
+    color: rgba(150,150,150,.9);
+    display: inline-block;
+    margin-bottom: 5;
+}
+section.main > div.message > h3.contact-name {
+    font-size: 18px;
+    display: inline-block;
+    margin-right: 10px;
+    margin-bottom: 0;
+}
+
+section.main > div.message > p.message-content {
+    font-size: 18px;
+    color: rgba(255,255,255,.8);
+    margin-top: 0;
+}
+
+section.entry {
+    position: fixed;
+    bottom: 0;
+    background-color: rgb(34, 44, 50);
+    padding-bottom: 15px;
+    padding-left: 15px;
+    padding-right: 30px;
+    width: calc(100% - 230px);
+    left: 200px;
+    height: 70px;
+}
+
+section.entry > div.separator {
+    border-top: 1px groove rgba(255,255,255,.3);
+}
+
+.form-control {
+    margin-top: 25px;
+    word-wrap: break-word;
+    word-break: break-all;
+    font-size: 16px;
+    line-height: 1.42857143;
+    color: #D8DADA;
+    display: block;
+    padding-left: 10px;
+    margin-right: 50px;
+    width: 100%;
+    height: 35px;
+    background-color: rgba(255,255,255,.03);
+    border: 2px solid rgba(255,255,255,.06);
+    border-radius: 0;
+    transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+    box-shadow: none !important;
+    outline: 0 !important;
+    box-sizing: border-box;
+}
+
+
+/************************
+*********LAUNCH**********
+*************************/
+.card-header {
+    font-weight: 700 !important;
+    margin-bottom: 20px !important;
+    margin: 0 0 9px;
+    font-family: roboto;
+    font-size: 18px;
+    line-height: 1.42857143;
+    color: rgba(255,255,255,.7);
+    margin-left: 15px;
+}
+
+.card-body {
+    padding: 0px 27px;
+    margin-left: -15px;
+    margin-right: -15px;
+
+}
+
+
+
+select {
+    text-transform: none;
+    font: inherit;
+    margin: 0;
+}
+
+.fg-line {
+    display: inline-block;
+    width: 100%;
+    position: relative;
+    vertical-align: top;
+
+}
+
+.select {
+    position: relative;
+}
+
+.select::before {
+    position: absolute;
+    top: 0;
+    right: 0;
+    content: "";
+    height: calc(100% - 2px);
+    width: 30px;
+    margin-right: 10px;
+    background-position: right calc(100% - 7px);
+    background-repeat: no-repeat;
+    background-image: url(../img/select.png);
+    pointer-events: none;
+    z-index: 5;
+}

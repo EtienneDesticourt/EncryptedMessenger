@@ -5,3 +5,4 @@ keys/*.pem
 main.exe
 main.spec
 messenger.png
+venv
