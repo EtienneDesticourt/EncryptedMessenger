@@ -4,6 +4,7 @@ from PyQt5.QtCore import QUrl
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QGraphicsDropShadowEffect
 from PyQt5.QtWebKitWidgets import QWebView
 import os
+from skinned_title_bar import SkinnedTitleBar
 
 # Create an application
 app = QApplication([])
@@ -12,6 +13,7 @@ app = QApplication([])
 win = QWidget()
 win.setWindowTitle('QWebView Interactive Demo')
 win.setWindowFlags(QtCore.Qt.FramelessWindowHint)
+#win.setWindowFlags(QtCore.Qt.MSWindowsOwnDC)
 #win.setContentsMargins(0, 0, 0, 0)
 win.setAttribute(QtCore.Qt.WA_TranslucentBackground)
 #a = win.centralWidget()
@@ -53,15 +55,20 @@ button = QPushButton('Set Full Name')
 # function; print its return value to the console
 def complete_name():
     frame = view.page().mainFrame()
-    print(frame.evaluateJavaScript('completeAndReturnName();'))
+    print()
 
 # Connect 'complete_name' to the button's 'clicked' signal
 button.clicked.connect(complete_name)
 
 # Add the QWebView and button to the layout
+title_bar = SkinnedTitleBar(parent=win, height=20, color_hex="#1E262B")
+layout.addWidget(title_bar)
 layout.addWidget(view)
+layout.setSpacing(0)
 #layout.addWidget(button)
 
+frame = view.page().mainFrame()
+frame.addToJavaScriptWindowObject('title_bar', title_bar)
 # Show the window and run the app
 win.show()
 app.exec_()
