@@ -79,6 +79,26 @@ header.header div.controls a{
     margin-bottom: 3px;
 }
 
+.main-menu > li.last {
+    position: fixed;
+    bottom: 0;
+    width: 200px;
+    height: 85px;
+    background-color:rgba(0,0,0,.4)
+}
+
+.main-menu > li.last > a {
+    height: 100%;
+    padding-top: 20px;
+}
+
+.main-menu > li.last > a > div.text {
+    margin-left: 18%;
+    vertical-align: middle;
+    font-size: 40px;
+    font-weight: bold;
+}
+
 .main-menu > li > a {
     padding-top: 5px;
     padding-bottom: 1px;
