@@ -195,139 +195,6 @@ body {
 
 
 /************************
-*********TABLE***********
-*************************/
-
-/*
-.card {
-    position: relative;
-    background: #2b343a;
-    margin-bottom: 30px;
-    box-shadow: 0 1px 1px rgba(0,0,0,.1);
-}
-
-.table {
-    border: 0;
-    overflow-x: auto;
-    min-height: .01%;
-}
-
-.clients {
-    table-layout: inherit !important;
-    margin-bottom: 0;
-    background-color: transparent;
-    border-collapse: collapse;
-    border-spacing: 0;
-    width: 100%;
-    max-width: 100%;
-}
-
-th {
-    border: 0 !important;
-}
-
-th > a {
-    color: rgb(216, 218, 218);
-    cursor: pointer;
-    display: block;
-    text-decoration: none;
-    text-transform: uppercase;
-    text-align: left;
-    font-family: roboto;
-    font-size: 13px;
-    position: relative;
-}
-
-th > a:hover {
-    color: black;
-}
-
-th:hover {
-    background-color:rgba(255,255,255,.1);
-}
-
-.clients > thead > tr > th:first-child {
-    padding-left: 30px;
-}
-
-.clients > thead > tr > th {
-    background-color: rgba(255,255,255,.04);
-    vertical-align: middle;
-    font-weight: 500;
-    text-transform: uppercase;
-    padding: 15px;
-    line-height: 1.42857143;
-}*/
-
-
-.card {
-    padding-top: 50px;
-    padding-bottom: 50px;
-    background: #2b343a;
-}
-
-.clients {
-    font-family: "Helvetica Neue", Helvetica, Arial;
-    font-size: 14px;
-    line-height: 20px;
-    font-weight: 400;
-    -webkit-font-smoothing: antialiased;
-    font-smoothing: antialiased;
-    margin: 0 0 40px 0;
-    width: 100%;
-    display: table;
-    outline: 0 !important;
-    border: 0;
-    table-layout: inherit !important;
-    border-collapse: collapse;
-    border-spacing: 0;
-    box-sizing: border-box;
-}
-
-thead > tr > th:first-child {
-    padding-left: 30px;
-}
-
-
-thead > tr > th {
-    background-color: rgba(255,255,255,.04);
-    vertical-align: middle;
-    font-weight: 500;
-    border-width: 1px;
-    text-transform: uppercase;
-    padding: 15px;
-    line-height: 1.42857143;
-    text-align: left;
-}
-
-thead > tr > th > a {
-    text-decoration: none;
-    display: block;
-    position: relative;
-    color: #D8DADA;
-    font-family: roboto;
-    font-size: 13px;
-}
-
-
-tr {
-    display: table-row;
-    color: white;
-}
-
-tr:nth-of-type(odd) {
-    background-color: rgba(255,255,255,.02);
-}
-
-td {
-    padding: 15px;
-    line-height: 1.42857143;
-    vertical-align: top;
-    text-overflow: inherit !important;
-    white-space: inherit !important;
-}
-
-/************************
 *********CHAT**********
 *************************/
 
@@ -410,57 +277,35 @@ section.entry > div.separator {
 
 
 /************************
-*********LAUNCH**********
+********REGISTER*********
 *************************/
-.card-header {
-    font-weight: 700 !important;
-    margin-bottom: 20px !important;
-    margin: 0 0 9px;
-    font-family: roboto;
+
+div.register {
+    margin-top: 200px;
+    color: #D8DADA;
+    display: block;
     font-size: 18px;
-    line-height: 1.42857143;
-    color: rgba(255,255,255,.7);
-    margin-left: 15px;
+    text-transform: uppercase;
+    text-decoration: none;
+    text-align: center;
 }
 
-.card-body {
-    padding: 0px 27px;
-    margin-left: -15px;
-    margin-right: -15px;
-
+div.register > a {
+    border-radius: 10px;
+    font-size: 16px;
+    padding: 5px 10px 5px 10px;
+    background-color: rgba(0,0,0,.3);
+    text-decoration: none;
+    color: #D8DADA;
 }
 
-
-
-select {
-    text-transform: none;
-    font: inherit;
-    margin: 0;
+div.register > a:hover {
+    background-color: rgba(255,255,255,.2);
 }
 
-.fg-line {
-    display: inline-block;
-    width: 100%;
-    position: relative;
-    vertical-align: top;
-
-}
-
-.select {
-    position: relative;
-}
-
-.select::before {
-    position: absolute;
-    top: 0;
-    right: 0;
-    content: "";
-    height: calc(100% - 2px);
-    width: 30px;
-    margin-right: 10px;
-    background-position: right calc(100% - 7px);
-    background-repeat: no-repeat;
-    background-image: url(../img/select.png);
-    pointer-events: none;
-    z-index: 5;
+div.register > input.form-control {
+    width: 30%;
+    margin: 0px auto;
+    margin-bottom: 20px;
+    display: block;
 }
