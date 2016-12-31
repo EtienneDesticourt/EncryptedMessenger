@@ -7,11 +7,21 @@ import os
 from ui.skinned_title_bar import SkinnedTitleBar
 from ui.default_dialog import DefaultDialog
 from communication.contact import Contact
-
+from ui.application import Application
+from communication.network import Network
+from communication.contact_manager import ContactManager
 
 app = QApplication([])
-path = os.path.join(os.getcwd(), "ui\\register.html")
-path = QUrl.fromLocalFile(path)
-win = DefaultDialog(path)
+
+URL = "http://localhost:5000"
+network = Network(URL)
+
+contact_manager = ContactManager(network)
+
+win = DefaultDialog()
+wrapper = Application(win, network, contact_manager)
 win.show()
+wrapper.execute()
+
+
 app.exec_()

@@ -2,7 +2,7 @@
 <head>
 
     <link rel="stylesheet" type="text/css" href="css/main.css" media="screen" />
-    <!--<script type="text/javascript" src="js/main.js"></script>-->
+    <script type="text/javascript" src="js/main.js"></script>
 </head>
 <body>
 
@@ -18,8 +18,10 @@
 
     <div class="register">
         <h3> Register New Account </h1>
-        <input class="form-control" type="text" placeholder="Account name ([a-zA-Z0-9])">
-        <a href="#" onclick="">create</a>
+        <input id="account-name" class="form-control" type="text" value="hello" placeholder="Account name ([a-zA-Z0-9])">
+        <button onclick="register();">create</button>
+
+        <p id="error" class="error"> Error </p>
     </div>
 </body>
 </html>

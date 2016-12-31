@@ -1,3 +1,5 @@
+import os
+from communication.contact import Contact
 
 CONTACT_DIR = "contacts"
 
@@ -11,7 +13,7 @@ class ContactManager(object):
         path = os.path.join(self.contact_dir, username)
         with open(path, "r") as f:
             public_key = f.read()
-        contact = Contact(username, public_key)
+        contact = Contact(username[:-4], public_key)
         self.contacts.append(contact)
 
     def load_contacts(self):

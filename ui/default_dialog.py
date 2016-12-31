@@ -6,27 +6,45 @@ from ui.skinned_title_bar import SkinnedTitleBar
 from ui.dark_shadow_effect import DarkShadowEffect
 
 class DefaultDialog(QWidget):
-    def __init__(self, path):
+    def __init__(self):
         QWidget.__init__(self)
+        self.bindings = []
         self.setWindowFlags(Qt.FramelessWindowHint)
         self.setAttribute(Qt.WA_TranslucentBackground)
 
         effect = DarkShadowEffect()
         self.setGraphicsEffect(effect)
 
-        layout = QVBoxLayout()
-        self.setLayout(layout)
+        self.title_bar = SkinnedTitleBar(parent=self, height=20, color_hex="#1E262B")
+        self.add_binding(self.title_bar, "title_bar")
 
         self.view = QWebView()
-        self.view.load(path)
+        self.view.loadFinished.connect(self.on_load_finished)
         main_frame = self.view.page().mainFrame()
         main_frame.setScrollBarPolicy(Qt.Horizontal, Qt.ScrollBarAlwaysOff)
         main_frame.setScrollBarPolicy(Qt.Vertical, Qt.ScrollBarAlwaysOff)
 
-        title_bar = SkinnedTitleBar(parent=self, height=20, color_hex="#1E262B")
-        layout.addWidget(title_bar)
+        layout = QVBoxLayout()
+        self.setLayout(layout)
+        layout.addWidget(self.title_bar)
         layout.addWidget(self.view)
         layout.setSpacing(0)
 
-        main_frame.addToJavaScriptWindowObject('title_bar', title_bar)
+
+    def add_binding(self, js_object, name):
+        self.bindings.append((js_object, name))
+
+    def add_js_object(self, js_object, name):
+        self.view.page().mainFrame().addToJavaScriptWindowObject(name, js_object)
+
+    def load_page(self, url):
+        self.view.load(url)
+
+    def on_load_finished(self):
+        for binding in self.bindings:
+            self.add_js_object(*binding)
+        self.on_done_binding()
+
+    def on_done_binding(self):
+        self.view.page().mainFrame().evaluateJavaScript("fill_contact_list();")
 

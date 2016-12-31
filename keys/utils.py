@@ -37,13 +37,13 @@ def new_key(username, directory):
     with open(public_path, "wb") as f:
         f.write(public_bytes)
 
-    return (public_path, private_path)
+    return (private_path, public_path)
 
 def load_private_key(username, directory):
     public_path, private_path = gen_key_path(username, directory)
     with open(private_path, "rb") as f:
         pem_data = f.read()
-    return = load_pem_private_key(pem_data, password=None, backend=default_backend())
+    return load_pem_private_key(pem_data, password=None, backend=default_backend())
 
 def load_key(type, directory):
     if type == PRIVATE:

@@ -290,22 +290,35 @@ div.register {
     text-align: center;
 }
 
-div.register > a {
-    border-radius: 10px;
+div.register > p.error{
+    background-color: rgba(0,0,0,.2);
+    color: rgba(255,0,0,.7);;
+    font-size: 14px;
+    text-decoration: none;
+    margin-top: 30px;
+    visibility: hidden;
+}
+
+div.register > button {
+    margin-top: 0px;
+    border: none;
+    border-radius: 13px;
     font-size: 16px;
     padding: 5px 10px 5px 10px;
     background-color: rgba(0,0,0,.3);
-    text-decoration: none;
     color: #D8DADA;
+    text-transform: uppercase;
+    text-decoration: none;
+    text-align: center;
 }
 
-div.register > a:hover {
+div.register > button:hover {
     background-color: rgba(255,255,255,.2);
 }
 
 div.register > input.form-control {
     width: 30%;
     margin: 0px auto;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
     display: block;
 }

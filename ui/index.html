@@ -1,13 +1,15 @@
 <html>
 <head>
-
     <link rel="stylesheet" type="text/css" href="css/main.css" media="screen" />
+    <script type="text/javascript" src="js/main.js"></script>
 </head>
+
 <body>
 
     <header class="header">
         <p>Encrypted Messenger</p>
         <div class="controls">
+            <a href="#" onclick="contact_list.generate_contact_list();">test</a>
             <a href="#" onclick="title_bar.minimize();">-</a>
             <a href="#" onclick="title_bar.maximize();">^</a>
             <a href="#" onclick="title_bar.close();">*</a>
@@ -15,7 +17,7 @@
     </header>
 
     <div class="page-sidebar">
-        <ul class="main-menu">
+        <ul class="main-menu" id="contact-list">
             <h4> CONTACTS </h4>
             <li>
                 <a href="index.html">

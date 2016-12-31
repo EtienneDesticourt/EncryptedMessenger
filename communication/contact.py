@@ -7,7 +7,7 @@ class Contact(object):
         self.ip = ip
 
     def save(self, dir):
-        path = os.path.join(dir, self.name)
+        path = os.path.join(dir, self.name + ".pem")
         with open(path, "w") as f:
             f.write(self.public_key)
 
