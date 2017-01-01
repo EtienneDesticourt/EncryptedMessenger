@@ -6,3 +6,9 @@ main.exe
 main.spec
 messenger.png
 venv
+.user
+contacts
+notes.txt
+temp.py
+icon.jpg
+icon_small.jpg

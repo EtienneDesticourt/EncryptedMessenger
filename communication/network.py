@@ -46,7 +46,6 @@ class Network(object):
         result = self.post(self.url + "/user", data={"username": username,
                                                      "public_key": public_key})
 
-
         content = result.json()
         if content == Network.OK_RESPONSE:
             return (True, "")
@@ -54,7 +53,6 @@ class Network(object):
             return (False, content["error"])
         else:
             raise UnpexpectedResponseError(content)
-
 
     def connect(self, username):
         # Ask for an auth challenge and decrypt it
@@ -86,12 +84,22 @@ class Network(object):
         else:
             raise UnexpectedResponseError()
 
+    def get_peer_info(self, username):
+        response = self.fetch_peer(username)
+        content = response.json()
+        if content == Network.NO_USER_ERROR:
+            raise UserDoesNotExistError()
+        ip = self.fetch_peer_ip(username)
+        content.update(ip)
+        return content
+
     def fetch_peer(self, username):
         response = self.get(self.url + "/user/" + username)
         return response
 
     def fetch_peer_ip(self, username):
-        return requests.get(self.url + "/ip/" + username)
+        response = self.get(self.url + "/ip/" + username)
+        return response.json()
 
     def fetch_contact_ips(self):
         ips = []

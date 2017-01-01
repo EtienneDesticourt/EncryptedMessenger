@@ -1,5 +1,6 @@
 from PyQt5.QtCore import QUrl, QObject, pyqtSlot
 from communication.network import Network
+from communication.network_exception import UserDoesNotExistError
 import os
 
 
@@ -11,6 +12,16 @@ class Application(QObject):
         self.network = network
         self.contact_manager = contact_manager
         self.main_dialog.add_binding(self, "wrapper")
+
+    @property
+    def username(self):
+        return self._username
+
+    @username.setter
+    def username(self, value):
+        self._username = value
+        self.connect(self.username)
+        self.contact_manager.load_contacts()
 
     def build_qurl(self, local_file):
         path = os.path.join(os.getcwd(), local_file)
@@ -26,6 +37,15 @@ class Application(QObject):
             self.load_register()
 
     @pyqtSlot(str, result=str)
+    def add_friend(self, username):
+        try:
+            info = self.network.get_peer_info(username)
+            self.contact_manager.add_contact(info)
+            return "OK"
+        except UserDoesNotExistError:
+            return "There is no user with that name."
+
+    @pyqtSlot(str, result=str)
     def register(self, username):
         if not self.network.has_peer(username):
             success, message = self.network.register(username)
@@ -39,7 +59,7 @@ class Application(QObject):
 
     @pyqtSlot(str, result=str)
     def connect(self, username):
-        response = self.network.connect(username)
+        response = self.network.connect(username) # TODO: Handle errors
 
     @pyqtSlot(result=int)
     def get_num_contacts(self):
@@ -51,13 +71,7 @@ class Application(QObject):
 
     @pyqtSlot()
     def load_index(self):
-        print("called")
-        self.connect(self.username)
-        print("connected")
-        self.contact_manager.load_contacts()
-        print("contacts loaded")
         path = self.build_qurl("ui\\index.html")
-        print("loading index")
         self.main_dialog.load_page(path)
 
     @pyqtSlot()

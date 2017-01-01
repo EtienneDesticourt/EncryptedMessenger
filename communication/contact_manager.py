@@ -4,9 +4,8 @@ from communication.contact import Contact
 CONTACT_DIR = "contacts"
 
 class ContactManager(object):
-    def __init__(self, network, contact_dir=CONTACT_DIR):
+    def __init__(self, contact_dir=CONTACT_DIR):
         self.contacts = []
-        self.network = network
         self.contact_dir = contact_dir
 
     def load_contact(self, username):
@@ -16,15 +15,15 @@ class ContactManager(object):
         contact = Contact(username[:-4], public_key)
         self.contacts.append(contact)
 
-    def load_contacts(self):
+    def load_contacts(self): #TODO: associate contact list to username, save contacts order
         for contact_name in os.listdir(self.contact_dir):
             self.load_contact(contact_name)
 
-    def add_contact(self, username):
-        contact_data = self.network.fetch_peer(username)
-        key = contact_data["public_key"]
-        ip = self.network.fetch_peer_ip(username)
-        contact = Contact(username, key, ip)
+    def add_contact(self, peer):
+        contact = Contact.from_json(peer)
+        for other_contact in self.contacts:
+            if contact.name == other_contact.name:
+                return
         contact.save(self.contact_dir)
         self.contacts.append(contact)
 

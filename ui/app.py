@@ -16,7 +16,7 @@ app = QApplication([])
 URL = "http://localhost:5000"
 network = Network(URL)
 
-contact_manager = ContactManager(network)
+contact_manager = ContactManager()
 
 win = DefaultDialog()
 wrapper = Application(win, network, contact_manager)

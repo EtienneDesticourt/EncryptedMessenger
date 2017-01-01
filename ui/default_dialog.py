@@ -46,5 +46,5 @@ class DefaultDialog(QWidget):
         self.on_done_binding()
 
     def on_done_binding(self):
-        self.view.page().mainFrame().evaluateJavaScript("fill_contact_list();")
+        self.view.page().mainFrame().evaluateJavaScript("fillContactList();") # TODO: Move somewhere else
 
