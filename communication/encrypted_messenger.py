@@ -1,33 +1,25 @@
 import os
 import time
-from communication import messenger, protocol
+import threading
+from communication import messenger
+from communication import protocol
+from communication.encrypted_messenger_exception import HandshakeFailure
 from encryption import crypter
 import keys.utils
 
 
 class EncryptedMessenger(messenger.Messenger):
-    "Messenger object with cryptographic capabilities"
+    "Messenger object with cryptographic capabilities."
 
-    def __init__(self, role, host, port, verbose=False):
-        super().__init__(role, host, port)
+    def __init__(selfrole, socket):
+        super().__init__(socket)
         self.crypter = crypter.Crypter(os.urandom)
-        self.verbose = verbose
+        self.role = role
 
-    def __enter__(self):
-        self.print_if_verbose("Attempting to connect with remote as " + str(self.role) + " ...")
-        super().__enter__()
-        self.print_if_verbose("Succesful connection.\n")
-
-        self.print_if_verbose("Attempting handshake...")
-        if self.role == protocol.SERVER_ROLE:
-            self.perform_handshake_as_server()
-        elif self.role == protocol.CLIENT_ROLE:
-            self.perform_handshake_as_client()
-        else:
-            raise ValueError("Wrong role.")  # huehue
-
-        self.print_if_verbose("Succesful handshake.\n")
-        return self
+    def run(self, private_key, contact_public_key):
+        args = [private_key, contact_public_key]
+        threading.Thread(target=self.perform_handshake, args=args).start()
+        super().run()
 
     def send(self, message):
         encrypted = self.crypter.encrypt_message(message)
@@ -41,10 +33,6 @@ class EncryptedMessenger(messenger.Messenger):
         messages = super().consume_messages()
         return [self.crypter.decrypt_message(mess) for mess in messages]
 
-    def print_if_verbose(self, *args):
-        if self.verbose:
-            print(*args)
-
     def wait_for_next_message(self):
         message = None
         while not message:
@@ -53,29 +41,39 @@ class EncryptedMessenger(messenger.Messenger):
             time.sleep(1)
         return message
 
-    def perform_handshake_as_server(self):
-        # TODO: Uncomment and add auth
-        # self.crypter.loadRsaKey(keys.utils.PRIVATE)
+    def perform_handshake(self, private_key, contact_key):
+        if self.role == protocol.SERVER_ROLE:
+            self.perform_handshake_as_server(private_key, contact_key)
+        elif self.role == protocol.CLIENT_ROLE:
+            self.perform_handshake_as_client(private_key, contact_key)
+        else:
+            raise ValueError("Wrong role.")  # huehue
 
-        self.print_if_verbose("Generating new RSA key and sending to client.")
+    def perform_handshake_as_server(self, private_key, contact_key):
+        # Send ephemeral RSA key and sign it with long-term RSA key
         self.crypter.gen_and_set_rsa_key()
         public_rsa_key = self.crypter.get_public_key_pem()
+        signature = self.crypter.sign(private_key, public_rsa_key)
         super().send(public_rsa_key)
+        super().send(signature)
 
-        self.print_if_verbose("Waiting for AES key from client.")
+
+        # Receive encrypted AES key and verify its author
         encrypted_aes_key = self.wait_for_next_message()
-
+        signature = self.wait_for_next_message()
+        self.crypter.verify_signature(self.contact_key, encrypted_aes_key, signature)
         self.crypter.aes_key = self.crypter.decrypt_key(encrypted_aes_key)
 
-    def perform_handshake_as_client(self):
-        # TODO: Uncomment and add auth
-        # self.crypter.loadRsaKey(keys.utils.PUBLIC)
-
-        self.print_if_verbose("Waiting for ephemeral RSA key from server.")
+    def perform_handshake_as_client(self, private_key, contact_key):
+        # Receive ephemeral RSA key and verify its author
         public_key_pem = self.wait_for_next_message()
+        signature = self.wait_for_next_message()
+        self.crypter.verify_signature(self.contact_key, public_key_pem, signature)
         self.crypter.set_public_key_from_pem(public_key_pem)
 
-        self.print_if_verbose("Generating new AES key and sending to server.")
+        # Send AES key and sign it with long-term RSA key
         self.crypter.gen_and_set_aes_key()
         encrypted_key = self.crypter.encrypt_key(self.crypter.aes_key)
+        signature = self.crypter.sign(private_key, encrypted_key)
         super().send(encrypted_key)
+        super().send(signature)

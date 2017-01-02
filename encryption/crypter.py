@@ -10,8 +10,8 @@ from cryptography.exceptions import InvalidSignature, UnsupportedAlgorithm
 from communication import protocol
 from encryption.crypter_exceptions import CrypterException, NoKeyException, CorruptedMessageException
 from keys import utils
+import config
 
-DEFAULT_KEY_DIR = "keys"
 DEFAULT_EXPONENT = 65537
 DEFAULT_RSA_KEY_SIZE = 2048
 
@@ -31,7 +31,7 @@ class Crypter(object):
         self.aes_key = None
         self.RNG = RNG
 
-    def load_rsa_key(self, key_type, directory=DEFAULT_KEY_DIR):
+    def load_rsa_key(self, key_type, directory=config.KEY_DIR):
         "Loads a public/private RSA key in the given directory (optional) depending on given keyType."
         try:
             self.rsa_key = utils.load_key(key_type, directory)
@@ -74,7 +74,8 @@ class Crypter(object):
     def encrypt_message(self, message):
         "Encrypts the given message using the Crypter's AES key."
         if not self.aes_key:
-            raise NoKeyException("Cannot encrypt message: AES key hasn't been set.")
+            raise NoKeyException(
+                "Cannot encrypt message: AES key hasn't been set.")
 
         # Pad message for mode
         padding_length = math.ceil(len(message) / 16) * 16 - len(message)
@@ -84,7 +85,8 @@ class Crypter(object):
         iv = self.RNG(16)
 
         # Encrypt message
-        aes = Cipher(algorithms.AES(self.aes_key), modes.CBC(iv), backend=default_backend())
+        aes = Cipher(algorithms.AES(self.aes_key),
+                     modes.CBC(iv), backend=default_backend())
         encryptor = aes.encryptor()
         enc_array = encryptor.update(message) + encryptor.finalize()
 
@@ -114,7 +116,8 @@ class Crypter(object):
             raise CorruptedMessageException() from e
 
         # Decrypt message if there was no error
-        aes = Cipher(algorithms.AES(self.aes_key), modes.CBC(iv), backend=default_backend())
+        aes = Cipher(algorithms.AES(self.aes_key),
+                     modes.CBC(iv), backend=default_backend())
         decryptor = aes.decryptor()
         message = decryptor.update(enc_mess) + decryptor.finalize()
 
@@ -143,3 +146,17 @@ class Crypter(object):
             raise CrypterException("Cannot decrypt key. Private RSA key required.")
         raw_key = self.rsa_key.decrypt(encrypted_key, DEFAULT_PADDING())
         return raw_key
+
+    def sign(self, private_key, message):
+        sign_padding = padding.PSS(mgf=padding.MGF1(hashes.SHA256()),
+                                   salt_length=padding.PSS.MAX_LENGTH)
+
+        signature = private_key.sign(message, sign_padding, hashes.SHA256())
+
+        return signature
+
+    def verify_signature(self, public_key, message, signature):
+        sign_padding = padding.PSS(mgf=padding.MGF1(hashes.SHA256()),
+                                   salt_length=padding.PSS.MAX_LENGTH)
+
+        public_key.verify(signature, message, sign_padding, hashes.SHA256())

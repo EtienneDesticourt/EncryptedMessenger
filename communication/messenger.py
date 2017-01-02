@@ -7,62 +7,22 @@ from communication.messenger_exception import MessengerException
 class Messenger(object):
     "Messenger object that handles socket logic to communicate to and fro two PCs."
 
-    def __init__(self, role, host, port):
+    def __init__(self, socket):
         "Creates a messenger object."
-        self.role = role
-        self.host = host
-        self.port = port
+        self.socket = socket
         self.message_queue = []
         self.running = False
         self.last_error = None
 
-    def __enter__(self):
-        "Starts the Messenger and binds/connects to the given address depending on given CLIENT/SERVER role."
-        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        if self.role == protocol.CLIENT_ROLE:
-            self.connect()
-        else:
-            self.listen()
-        self.running = True
-        t = threading.Thread(target=self.recv)
-        t.start()
-        return self
+    def run(self):
+        self.recv()
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        "Closes the open sockets and set shutdown flag for running threads."
+    def stop(self):
         self.running = False
-        try:
-            self.socket.shutdown(socket.SHUT_RDWR)
-        except OSError:  # Was never connected or already closed
-            pass
-        else:
-            self.socket.close()
-
-        if self.role == protocol.SERVER_ROLE:
-            self.server_socket.close()
-
-    def connect(self):
-        "Connects the Messenger's socket to the given address."
-        try:
-            self.socket.connect((self.host, self.port))
-        except ConnectionRefusedError as e:
-            raise MessengerException("No host listening.") from e
-
-    def listen(self):
-        "Binds a socket to the given address and listens and accepts one incoming connection."
-        try:
-            self.socket.bind((self.host, self.port))
-        except socket.error as e:
-            raise MessengerException("Other program already using port.") from e
-        # For testing purposes... It's not great
-        self.host, self.port = self.socket.getsockname()
-        self.socket.listen(1)
-        client_sock, addr = self.socket.accept()
-        self.server_socket = self.socket
-        self.socket = client_sock
 
     def recv(self):
         "Handles the reception of the messages from a remote Messenger object and adds them to the message queue."
+        self.running = True
         buffer = b''
         while self.running:
             try:
