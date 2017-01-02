@@ -8,6 +8,7 @@ class Client(SocketManager):
 
     def __init__(self, host, port):
         "Creates a client object."
+        super().__init__()
         self.host = host
         self.port = port
 

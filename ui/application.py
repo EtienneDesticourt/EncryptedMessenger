@@ -4,7 +4,8 @@ from communication.network_exception import UserDoesNotExistError
 from communication.server import Server
 from communication.socket_manager import SocketManager
 import os
-
+import threading
+import config
 
 class Application(QObject):
 

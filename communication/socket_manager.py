@@ -1,4 +1,4 @@
-
+import socket
 
 class SocketManager(object):
     "Socket manager that cleans itself on exit."

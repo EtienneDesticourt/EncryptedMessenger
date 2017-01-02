@@ -1,4 +1,5 @@
 import os
+import threading
 from communication.contact import Contact
 import config
 
@@ -9,8 +10,8 @@ class ContactManager(object):
         self.contacts = []
         self.contact_dir = contact_dir
 
-    def load_contact(self, owner_name, contact_name):
-        path = os.path.join(self.contact_dir, username)
+    def load_contact(self, owner_name, contact_name, contact_file):
+        path = os.path.join(self.contact_dir, contact_file)
         with open(path, "r") as f:
             public_key = f.read()
         contact = Contact(owner_name, contact_name, public_key)
@@ -21,7 +22,7 @@ class ContactManager(object):
     def load_contacts(self, username):
         for contact_file in os.listdir(self.contact_dir):
             contact_name = contact_file[:-4]
-            contact = self.load_contact(username, contact_name)
+            contact = self.load_contact(username, contact_name, contact_file)
 
     def connect_to_contact(self, contact):
         if not contact.connected:

@@ -9,6 +9,7 @@ class Server(SocketManager):
 
     def __init__(self, host, port):
         "Creates a server object."
+        super().__init__()
         self.host = host
         self.port = port
         self.sockets = []

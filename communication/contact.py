@@ -2,6 +2,7 @@ import os
 from communication.client import Client
 from communication import protocol
 from communication.encrypted_messenger import EncryptedMessenger
+from keys.utils import load_private_key
 import config
 
 
@@ -16,6 +17,8 @@ class Contact(object):
         self.connected = False
 
     def connect_and_receive(self):
+        if self.ip == None:
+            return
         private_key = load_private_key(self.owner, config.KEY_DIR)
         with Client(self.ip, config.PORT) as client:
             self.messenger = EncryptedMessenger(role=protocol.CLIENT,
