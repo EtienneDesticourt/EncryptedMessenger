@@ -1,6 +1,8 @@
 from PyQt5.QtCore import QUrl, QObject, pyqtSlot
 from communication.network import Network
 from communication.network_exception import UserDoesNotExistError
+from communication.server import Server
+from communication.socket_manager import SocketManager
 import os
 
 
@@ -21,12 +23,23 @@ class Application(QObject):
     def username(self, value):
         self._username = value
         self.connect(self.username)
-        self.contact_manager.load_contacts()
 
     def build_qurl(self, local_file):
         path = os.path.join(os.getcwd(), local_file)
         path = QUrl.fromLocalFile(path)
         return path
+
+    def handle_connecting_contact(self, socket, ip):
+        with SocketManager(socket) as socket_manager:
+            for contact in self.contact_manager:
+                contact_ip = self.network.get_peer_ip(contact.name)
+                if contact_ip == ip:
+                    contact.receive_from(socket)
+                    break
+
+    def launch_server(self):
+        with Server("0.0.0.0", config.PORT) as server:
+            server.listen(self.handle_connecting_contact)
 
     def execute(self):
         try:
@@ -59,7 +72,10 @@ class Application(QObject):
 
     @pyqtSlot(str, result=str)
     def connect(self, username):
-        response = self.network.connect(username) # TODO: Handle errors
+        response = self.network.connect(username)  # TODO: Handle errors
+        self.contact_manager.load_contacts(username)
+        self.contact_manager.connect_to_contacts()
+        threading.Thread(target=self.launch_server).start()
 
     @pyqtSlot(result=int)
     def get_num_contacts(self):

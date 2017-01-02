@@ -3,13 +3,11 @@ from communication.network_exception import NetworkException
 from communication.network_exception import UnexpectedResponseError
 from communication.network_exception import UserDoesNotExistError
 from communication.network_exception import ChallengeFailureError
+import config
 import requests
 import keys.utils
 import json
 import base64
-
-KEY_DIR = "keys"
-
 
 class Network(object):
     NO_USER_ERROR = {'error': 'No such user.'}
@@ -18,7 +16,7 @@ class Network(object):
     FAILED_CHALLENGE_ERROR = {'error': 'Challenge failed.'}
     NO_CHALLENGE_ERROR = {'error': 'No existing challenge for user.'}
 
-    def __init__(self, url, key_dir=KEY_DIR):
+    def __init__(self, url, key_dir=config.KEY_DIR):
         self.url = url
         self.key_dir = key_dir
         self.get = self.raise_on_wrong_http_code(requests.get)
@@ -92,6 +90,9 @@ class Network(object):
         ip = self.fetch_peer_ip(username)
         content.update(ip)
         return content
+
+    def get_peer_ip(self, username):
+        return fetch_peer_ip(username)["ip"]
 
     def fetch_peer(self, username):
         response = self.get(self.url + "/user/" + username)
