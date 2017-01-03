@@ -31,12 +31,11 @@ class Application(QObject):
         return path
 
     def handle_connecting_contact(self, socket, ip):
-        with SocketManager(socket) as socket_manager:
-            for contact in self.contact_manager:
-                contact_ip = self.network.get_peer_ip(contact.name)
-                if contact_ip == ip:
-                    contact.receive_from(socket)
-                    break
+        for contact in self.contact_manager.contacts:
+            contact_ip = self.network.get_peer_ip(contact.name)
+            if contact_ip == ip:
+                contact.has_connected(socket)
+                break
 
     def launch_server(self):
         with Server("0.0.0.0", config.PORT) as server:
@@ -76,7 +75,6 @@ class Application(QObject):
         response = self.network.connect(username)  # TODO: Handle errors
         self.contact_manager.load_contacts(username)
         self.contact_manager.connect_to_contacts()
-        threading.Thread(target=self.launch_server).start()
 
     @pyqtSlot(result=int)
     def get_num_contacts(self):

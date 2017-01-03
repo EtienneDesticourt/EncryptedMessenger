@@ -26,7 +26,7 @@ class ContactManager(object):
 
     def connect_to_contact(self, contact):
         if not contact.connected:
-            threading.Thread(target=contact.connect_and_receive).start()
+            threading.Thread(target=contact.connect).start()
 
     def connect_to_contacts(self):
         for contact in self.contacts:

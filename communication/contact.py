@@ -2,6 +2,7 @@ import os
 from communication.client import Client
 from communication import protocol
 from communication.encrypted_messenger import EncryptedMessenger
+from communication.socket_manager import SocketManager
 from keys.utils import load_private_key
 import config
 
@@ -16,21 +17,23 @@ class Contact(object):
         self.messenger = None
         self.connected = False
 
-    def connect_and_receive(self):
+    def connect(self):
         if self.ip == None:
-            return
-        private_key = load_private_key(self.owner, config.KEY_DIR)
-        with Client(self.ip, config.PORT) as client:
-            self.messenger = EncryptedMessenger(role=protocol.CLIENT,
-                                                socket=client.socket)
-            self.connected = True
-            self.messenger.run(private_key, self.public_key)
+            raise ValueError("Contact has no known ip.")
 
-    def receive_from(self, socket):
-        private_key = load_private_key(self.owner, config.KEY_DIR)
-        self.messenger = EncryptedMessenger(role=protocol.SERVER,
-                                            socket=client.socket)
+        with Client(self.ip, config.PORT) as client:
+            client.connect()
+            self.start_messenger(client.socket, protocol.CLIENT)
+
+    def has_connected(self, socket):
+        with SocketManager(socket) as socket_manager:
+            self.start_messenger(socket, protocol.SERVER)
+
+    def start_messenger(self, socket, role):
+        self.messenger = EncryptedMessenger(role=role,
+                                            socket=socket)
         self.connected = True
+        private_key = load_private_key(self.owner, config.KEY_DIR)
         self.messenger.run(private_key, self.public_key)
 
     def stop_messenger(self):
