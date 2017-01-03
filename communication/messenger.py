@@ -1,5 +1,6 @@
 import socket
 import threading
+import logging
 from communication import protocol
 from communication.messenger_exception import MessengerException
 
@@ -13,11 +14,14 @@ class Messenger(object):
         self.message_queue = []
         self.running = False
         self.last_error = None
+        self.logger = logging.getLogger(__name__)
 
     def run(self):
+        self.logger.info("Starting messenger.")
         self.recv()
 
     def stop(self):
+        self.logger.info("Stopping messenger.")
         self.running = False
 
     def recv(self):
@@ -38,6 +42,7 @@ class Messenger(object):
             # separator
             buffer = messages.pop()
             self.message_queue += messages
+        self.logger.info("Messenger stopped.")
 
     def send(self, message):
         "Sends the given message to the remote Messenger to which this one is currently connected."

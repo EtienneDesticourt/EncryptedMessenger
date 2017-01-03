@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import QVBoxLayout
 from PyQt5.QtWebKitWidgets import QWebView
 from ui.widgets.skinned_title_bar import SkinnedTitleBar
 from ui.widgets.dark_shadow_effect import DarkShadowEffect
+import logging
 
 class DefaultDialog(QWidget):
     def __init__(self):
@@ -30,6 +31,7 @@ class DefaultDialog(QWidget):
         layout.addWidget(self.view)
         layout.setSpacing(0)
 
+        self.logger = logging.getLogger(__name__)
 
     def add_binding(self, js_object, name):
         self.bindings.append((js_object, name))
@@ -38,6 +40,7 @@ class DefaultDialog(QWidget):
         self.view.page().mainFrame().addToJavaScriptWindowObject(name, js_object)
 
     def load_page(self, url):
+        self.logger.info("Loading page %s.", url.path())
         self.view.load(url)
 
     def on_load_finished(self):

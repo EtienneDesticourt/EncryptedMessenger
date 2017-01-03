@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QGr
 from PyQt5.QtWebKitWidgets import QWebView
 import os
 import threading
+import time
 from ui.widgets.skinned_title_bar import SkinnedTitleBar
 from ui.widgets.default_dialog import DefaultDialog
 from communication.contact import Contact
@@ -13,6 +14,13 @@ from communication.network import Network
 from communication.contact_manager import ContactManager
 from communication.server import Server
 import config
+import logging
+import logging.config
+
+logging.config.fileConfig("logging.conf")
+
+logger = logging.getLogger(__name__)
+logger.info("Starting main program.")
 
 app = QApplication([])
 
@@ -27,6 +35,12 @@ win.show()
 wrapper.execute()
 
 
-with Server("0.0.0.0", config.PORT) as server:
-    threading.Thread(target=server.listen, args=[wrapper.handle_connecting_contact])
+with Server("localhost", config.PORT) as server:
+    threading.Thread(target=server.listen, args=[wrapper.handle_connecting_contact]).start()
     app.exec_()
+for contact in contact_manager.contacts:
+    contact.stop_messenger()
+
+time.sleep(1)
+logger.info("Ending main program.")
+logger.info("--------------------")

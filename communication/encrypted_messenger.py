@@ -1,6 +1,7 @@
 import os
 import time
 import threading
+import logging
 from communication import messenger
 from communication import protocol
 from communication.encrypted_messenger_exception import HandshakeFailure
@@ -11,10 +12,11 @@ import keys.utils
 class EncryptedMessenger(messenger.Messenger):
     "Messenger object with cryptographic capabilities."
 
-    def __init__(selfrole, socket):
+    def __init__(self, role, socket):
         super().__init__(socket)
         self.crypter = crypter.Crypter(os.urandom)
         self.role = role
+        self.logger = logging.getLogger(__name__)
 
     def run(self, private_key, contact_public_key):
         args = [private_key, contact_public_key]
@@ -42,12 +44,14 @@ class EncryptedMessenger(messenger.Messenger):
         return message
 
     def perform_handshake(self, private_key, contact_key):
+        self.logger.info("Performing handshake as %s.", self.role)
         if self.role == protocol.SERVER_ROLE:
             self.perform_handshake_as_server(private_key, contact_key)
         elif self.role == protocol.CLIENT_ROLE:
             self.perform_handshake_as_client(private_key, contact_key)
         else:
             raise ValueError("Wrong role.")  # huehue
+        self.logger.info("Handshake finished.")
 
     def perform_handshake_as_server(self, private_key, contact_key):
         # Send ephemeral RSA key and sign it with long-term RSA key
@@ -61,14 +65,14 @@ class EncryptedMessenger(messenger.Messenger):
         # Receive encrypted AES key and verify its author
         encrypted_aes_key = self.wait_for_next_message()
         signature = self.wait_for_next_message()
-        self.crypter.verify_signature(self.contact_key, encrypted_aes_key, signature)
+        self.crypter.verify_signature(contact_key, encrypted_aes_key, signature)
         self.crypter.aes_key = self.crypter.decrypt_key(encrypted_aes_key)
 
     def perform_handshake_as_client(self, private_key, contact_key):
         # Receive ephemeral RSA key and verify its author
         public_key_pem = self.wait_for_next_message()
         signature = self.wait_for_next_message()
-        self.crypter.verify_signature(self.contact_key, public_key_pem, signature)
+        self.crypter.verify_signature(contact_key, public_key_pem, signature)
         self.crypter.set_public_key_from_pem(public_key_pem)
 
         # Send AES key and sign it with long-term RSA key

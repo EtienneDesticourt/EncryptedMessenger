@@ -5,6 +5,7 @@ from communication.network_exception import UserDoesNotExistError
 from communication.network_exception import ChallengeFailureError
 import config
 import requests
+import logging
 import keys.utils
 import json
 import base64
@@ -21,9 +22,12 @@ class Network(object):
         self.key_dir = key_dir
         self.get = self.raise_on_wrong_http_code(requests.get)
         self.post = self.raise_on_wrong_http_code(requests.post)
+        self.logger = logging.getLogger(__name__)
+        self.logger.info("Created network consumer with url %s.", url)
 
     def raise_on_wrong_http_code(self, func):
         def new_func(*args, **kwargs):
+            self.logger.debug("Executed query. args: %s, kwargs: %s", str(args), str(kwargs))
             resp = func(*args, **kwargs)
             if resp.status_code != 200:
                 raise NetworkException(resp.status_code)
@@ -31,12 +35,15 @@ class Network(object):
         return new_func
 
     def has_peer(self, name):
+        self.logger.info("Checking if peer %s exists.", name)
         response = self.fetch_peer(name)
         if response.json() == Network.NO_USER_ERROR:
             return False
         return True
 
     def register(self, username):
+        self.logger.info("Registering new user: %s", username)
+
         private_path, public_path = keys.utils.new_key(username, self.key_dir)
         with open(public_path, "r") as f:
             public_key = f.read()
@@ -53,6 +60,7 @@ class Network(object):
             raise UnpexpectedResponseError(content)
 
     def connect(self, username):
+        self.logger.info("Connecting to network as %s.", username)
         # Ask for an auth challenge and decrypt it
         response = self.get(self.url + "/challenge/" + username)
         challenge = response.json()
@@ -61,7 +69,7 @@ class Network(object):
             if challenge == Network.NO_USER_ERROR:
                 raise UserDoesNotExistError()
             else:
-                raise UnpexpectedResponseError()
+                raise UnpexpectedResponseError("Server provided unexpected response to challenge request.")
 
         encrypted_secret = base64.b64decode(challenge["challenge"])
         key = keys.utils.load_private_key(username, self.key_dir)
@@ -76,11 +84,12 @@ class Network(object):
         result = self.post(self.url + "/ip", data=data)
         content = result.json()
         if content == Network.OK_RESPONSE:
+            self.logger.info("Succesfully connected to network.")
             return
         elif content == Network.FAILED_CHALLENGE_ERROR or content == Network.NO_CHALLENGE_ERROR:
-            raise ChallengeFailureError("Failed to solve the challenge. There might be a server problem or you're using the wrong key.")
+            raise ChallengeFailureError()
         else:
-            raise UnexpectedResponseError()
+            raise UnexpectedResponseError("Server provided unexpected response to ip update request.")
 
     def get_peer_info(self, username):
         response = self.fetch_peer(username)
@@ -92,13 +101,14 @@ class Network(object):
         return content
 
     def get_peer_ip(self, username):
-        return fetch_peer_ip(username)["ip"]
+        return self.fetch_peer_ip(username)["ip"]
 
     def fetch_peer(self, username):
         response = self.get(self.url + "/user/" + username)
         return response
 
     def fetch_peer_ip(self, username):
+        self.logger.info("Fetching ip for %s", username)
         response = self.get(self.url + "/ip/" + username)
         return response.json()
 

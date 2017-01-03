@@ -39,6 +39,9 @@ def new_key(username, directory):
 
     return (private_path, public_path)
 
+def load_public_key(public_key_data):
+    return load_pem_public_key(public_key_data, backend=default_backend())
+
 def load_private_key(username, directory):
     public_path, private_path = gen_key_path(username, directory)
     with open(private_path, "rb") as f:

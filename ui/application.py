@@ -1,10 +1,12 @@
 from PyQt5.QtCore import QUrl, QObject, pyqtSlot
 from communication.network import Network
+from communication.network_exception import NetworkException
 from communication.network_exception import UserDoesNotExistError
 from communication.server import Server
 from communication.socket_manager import SocketManager
 import os
 import threading
+import logging
 import config
 
 class Application(QObject):
@@ -15,6 +17,7 @@ class Application(QObject):
         self.network = network
         self.contact_manager = contact_manager
         self.main_dialog.add_binding(self, "wrapper")
+        self.logger = logging.getLogger(__name__)
 
     @property
     def username(self):
@@ -22,8 +25,10 @@ class Application(QObject):
 
     @username.setter
     def username(self, value):
+        self.logger.info("Changed user to %s.", value)
         self._username = value
         self.connect(self.username)
+        self.load_index()
 
     def build_qurl(self, local_file):
         path = os.path.join(os.getcwd(), local_file)
@@ -31,11 +36,25 @@ class Application(QObject):
         return path
 
     def handle_connecting_contact(self, socket, ip):
+        self.logger.info("New contact trying to connect from ip %s.", ip)
+        found_contact = False
         for contact in self.contact_manager.contacts:
-            contact_ip = self.network.get_peer_ip(contact.name)
+            try:
+                contact_ip = self.network.get_peer_ip(contact.name)
+            except Exception:
+                self.logger.error("There was an error while trying to fetch the ip for %s.", contact.name, exc_info=True)
+                continue
+
             if contact_ip == ip:
+                self.logger.info("Found contact %s for ip %s.", contact.name, ip)
+                found_contact = True
                 contact.has_connected(socket)
                 break
+
+        if not found_contact:
+            self.logger.info("No contact found for ip %s.", ip)
+            with SocketManager(socket):
+                pass
 
     def launch_server(self):
         with Server("0.0.0.0", config.PORT) as server:
@@ -43,37 +62,68 @@ class Application(QObject):
 
     def execute(self):
         try:
-            with open(".user", "r") as f:
+            with open(config.USER_FILE, "r") as f:
                 self.username = f.read()
-                self.load_index()
         except FileNotFoundError:
+            self.logger.info("No user file.")
             self.load_register()
 
     @pyqtSlot(str, result=str)
     def add_friend(self, username):
+        self.logger.info("Attempting to add contact %s.", username)
         try:
             info = self.network.get_peer_info(username)
-            self.contact_manager.add_contact(info)
+            self.contact_manager.add_contact(self.username, info)
             return "OK"
         except UserDoesNotExistError:
             return "There is no user with that name."
+        except NetworkException:
+            self.logger.error("There was a problem during a request to the peer registry.", exc_info=True)
+            return "There was a network exception."
 
     @pyqtSlot(str, result=str)
     def register(self, username):
-        if not self.network.has_peer(username):
-            success, message = self.network.register(username)
-            if success:
-                with open(".user", "w") as f:
-                    f.write(username)
-                    self.username = username
-            return message
-        else:
-            return "There is already a user with that name."
+        self.logger.info("Attempting to register as %s.", username)
+        try:
+            peer_exists = self.network.has_peer(username)
+            if not peer_exists:
+                success, message = self.network.register(username)
+                if success:
+                    with open(config.USER_FILE, "w") as f:
+                        f.write(username)
+                        self.username = username
+                return message
+            else:
+                return "There is already a user with that name."
+
+        except NetworkException:
+            self.logger.error("There was a problem during a request to the peer registry.", exc_info=True)
+            return "There was a network exception during the registration process."
+
+        except Exception:
+            self.logger.critical("There was a problem while attempting to register a new user under id %s.", username, exc_info=True)
+            return "There was a critical error during the registration process."
 
     @pyqtSlot(str, result=str)
     def connect(self, username):
-        response = self.network.connect(username)  # TODO: Handle errors
+        try:
+            response = self.network.connect(username)
+        except NetworkException:
+            # TODO: show error page
+            self.logger.critical("There was a problem during a request to the peer registry.", exc_info=True)
+            return
+        except Exception:
+            # TODO: show error page
+            self.logger.critical("There was an unexpected exception.", exc_info=True)
+            return
+
         self.contact_manager.load_contacts(username)
+        for contact in self.contact_manager.contacts:
+            try:
+                contact.ip = self.network.get_peer_ip(contact.name)
+            except Exception:
+                self.logger.error("Unable to fetch ip for contact %s.", contact.name, exc_info=True)
+
         self.contact_manager.connect_to_contacts()
 
     @pyqtSlot(result=int)
