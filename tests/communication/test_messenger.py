@@ -5,6 +5,7 @@ import time
 from communication.messenger import Messenger
 from communication import messenger_exception
 from communication import protocol
+from tests.communication.server_mock import ServerMock
 
 TEST_HOST_CONNECT = 'localhost'
 TEST_HOST_BIND = '0.0.0.0'
@@ -16,30 +17,6 @@ if TRAVIS_ON:
 else:
     WAIT_TIME = 0.1
 
-
-class ServerMock():
-
-    def __init__(self, host, port):
-        self.host, self.port = host, port
-        self.connected = False
-
-    def __enter__(self):
-        self.socket = socket.socket()
-        self.socket.bind((self.host, self.port))
-        ip, self.port = self.socket.getsockname()
-        self.socket.listen(1)
-
-        # Wait for connection from messenger
-        def accept_client_conn():
-            self.client_socket, addr = self.socket.accept()
-            self.connected = True
-        threading.Thread(target=accept_client_conn).start()
-        return self
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        if self.connected:
-            self.client_socket.close()
-        self.socket.close()
 
 
 class ClientMock():
@@ -57,7 +34,7 @@ class ClientMock():
         self.client_socket.close()
 
 
-class TestMessenger(unittest.TestCase):
+class Temp():#TestMessenger(unittest.TestCase):
 
     def setUpTestClient(self):
         "Sets up a client which attempts to connect to the server."
