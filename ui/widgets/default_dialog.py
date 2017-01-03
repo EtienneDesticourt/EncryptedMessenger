@@ -2,8 +2,8 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtWidgets import QVBoxLayout
 from PyQt5.QtWebKitWidgets import QWebView
-from ui.skinned_title_bar import SkinnedTitleBar
-from ui.dark_shadow_effect import DarkShadowEffect
+from ui.widgets.skinned_title_bar import SkinnedTitleBar
+from ui.widgets.dark_shadow_effect import DarkShadowEffect
 
 class DefaultDialog(QWidget):
     def __init__(self):

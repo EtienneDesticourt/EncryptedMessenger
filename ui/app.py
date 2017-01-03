@@ -5,14 +5,15 @@ from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QGr
 from PyQt5.QtWebKitWidgets import QWebView
 import os
 import threading
-from ui.skinned_title_bar import SkinnedTitleBar
-from ui.default_dialog import DefaultDialog
+from ui.widgets.skinned_title_bar import SkinnedTitleBar
+from ui.widgets.default_dialog import DefaultDialog
 from communication.contact import Contact
 from ui.application import Application
 from communication.network import Network
 from communication.contact_manager import ContactManager
 from communication.server import Server
 import config
+
 app = QApplication([])
 
 URL = "http://localhost:5000"

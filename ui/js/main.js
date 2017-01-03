@@ -32,7 +32,7 @@ function createContactElement(name) {
 
     var icon = document.createElement("img");
     icon.className = "icon";
-    icon.src = "images/icon_small.png";
+    icon.src = "../images/icon_small.png";
 
     var contactName = document.createElement("div");
     contactName.className = "text";

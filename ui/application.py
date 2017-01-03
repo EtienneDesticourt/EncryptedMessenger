@@ -86,12 +86,12 @@ class Application(QObject):
 
     @pyqtSlot()
     def load_index(self):
-        path = self.build_qurl("ui\\index.html")
+        path = self.build_qurl("ui\\html\\index.html")
         self.main_dialog.load_page(path)
 
     @pyqtSlot()
     def load_register(self):
-        path = self.build_qurl("ui\\register.html")
+        path = self.build_qurl("ui\\html\\register.html")
         self.main_dialog.load_page(path)
 
     @pyqtSlot(str)
