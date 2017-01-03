@@ -13,10 +13,9 @@ class SocketManager(object):
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         "Closes the open sockets and set shutdown flag for running threads."
-        self.running = False
         try:
             self.socket.shutdown(socket.SHUT_RDWR)
         except OSError:  # Was never connected or already closed
             pass
-        else:
+        finally:
             self.socket.close()

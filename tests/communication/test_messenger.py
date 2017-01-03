@@ -6,6 +6,7 @@ from communication.messenger import Messenger
 from communication import messenger_exception
 from communication import protocol
 from tests.communication.server_mock import ServerMock
+from tests.communication.client_mock import ClientMock
 
 TEST_HOST_CONNECT = 'localhost'
 TEST_HOST_BIND = '0.0.0.0'
@@ -19,19 +20,6 @@ else:
 
 
 
-class ClientMock():
-
-    def __init__(self, host, port):
-        self.host, self.port = host, port
-        self.connected = False
-
-    def __enter__(self):
-        self.client_socket = socket.socket()
-        self.client_socket.connect((self.host, self.port))
-        return self
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        self.client_socket.close()
 
 
 class Temp():#TestMessenger(unittest.TestCase):

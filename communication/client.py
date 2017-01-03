@@ -12,12 +12,6 @@ class Client(SocketManager):
         self.host = host
         self.port = port
 
-    def __enter__(self):
-        "Starts the server and binds to the given address."
-        super().__enter__()
-        self.connect()
-        return self
-
     def connect(self):
         "Connects the client's socket to the given address."
         try:

@@ -15,7 +15,10 @@ class ServerMock():
 
         # Wait for connection from messenger
         def accept_client_conn():
-            self.client_socket, addr = self.socket.accept()
+            try:
+                self.client_socket, addr = self.socket.accept()
+            except OSError:
+                return
             self.connected = True
         threading.Thread(target=accept_client_conn).start()
         return self
