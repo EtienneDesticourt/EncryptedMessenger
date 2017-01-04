@@ -20,6 +20,14 @@
         <ul class="main-menu" id="contact-list">
             <h4> CONTACTS </h4>
 
+
+            <li>
+                <a href="index.html">
+                    <img class="icon" src="../images/icon_small.png"/>
+                    <div class="text">Contact 2</div>
+                </a>
+            </li>
+
             <li class="last">
                 <a href="add_friend.html">
                     <img class="icon" src="../images/icon_small.png"/>
@@ -30,51 +38,11 @@
 
     </div>
 
-    <section class="main scrollable">
-        <div class="message">
-            <h3 class="contact-name"> Contact Name </h3>
-            <p class="message-date"> 00:11 28/12/16 </p>
-            <p class="message-content"> This is a random message of random length that I'm trying to display. I hope it displays well =). unending text unending text unending text unending text unending text unending text unending text unending text </p>
-        </div>
-        <div class="message">
-            <h3 class="contact-name"> Contact Name </h3>
-            <p class="message-date"> 00:11 28/12/16 </p>
-            <p class="message-content"> This is a random message of random length that I'm trying to display. I hope it displays well =). unending text unending text unending text unending text unending text unending text unending text unending text </p>
-        </div>
-        <div class="message">
-            <h3 class="contact-name"> Contact Name </h3>
-            <p class="message-date"> 00:11 28/12/16 </p>
-            <p class="message-content"> This is a random message of random length that I'm trying to display. I hope it displays well =). unending text unending text unending text unending text unending text unending text unending text unending text </p>
-        </div>
-        <div class="message">
-            <h3 class="contact-name"> Contact Name </h3>
-            <p class="message-date"> 00:11 28/12/16 </p>
-            <p class="message-content"> This is a random message of random length that I'm trying to display. I hope it displays well =). unending text unending text unending text unending text unending text unending text unending text unending text </p>
-        </div>
-        <div class="message">
-            <h3 class="contact-name"> Contact Name </h3>
-            <p class="message-date"> 00:11 28/12/16 </p>
-            <p class="message-content"> This is a random message of random length that I'm trying to display. I hope it displays well =). unending text unending text unending text unending text unending text unending text unending text unending text </p>
-        </div>
-        <div class="message">
-            <h3 class="contact-name"> Contact Name </h3>
-            <p class="message-date"> 00:11 28/12/16 </p>
-            <p class="message-content"> This is a random message of random length that I'm trying to display. I hope it displays well =). unending text unending text unending text unending text unending text unending text unending text unending text </p>
-        </div>
-        <div class="message">
-            <h3 class="contact-name"> Contact Name </h3>
-            <p class="message-date"> 00:11 28/12/16 </p>
-            <p class="message-content"> This is a random message of random length that I'm trying to display. I hope it displays well =). unending text unending text unending text unending text unending text unending text unending text unending text </p>
-        </div>
-        <div class="message">
-            <h3 class="contact-name"> endContact Name </h3>
-            <p class="message-date"> 00:11 28/12/16 </p>
-            <p class="message-content"> This is a random message of random length that I'm trying to display. I hope it displays well =). unending text unending text unending text unending text unending text unending text unending text unending text </p>
-        </div>
+    <section id="message-list" class="main scrollable">
     </section>
     <section class="entry">
         <div class="separator"></div>
-        <input class="form-control">
+        <input id="message-input" class="form-control" onkeypress="handleInputKeypress(event);">
     </section>
 </body>
 </html>

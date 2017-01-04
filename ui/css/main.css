@@ -79,6 +79,12 @@ header.header div.controls a{
     margin-bottom: 3px;
 }
 
+
+.main-menu > li.active {
+    background-color:rgba(0,0,0,.35);
+    border-right: 2px solid rgba(100,100,255,.6);
+}
+
 .main-menu > li.last {
     position: fixed;
     bottom: 0;

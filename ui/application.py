@@ -9,6 +9,7 @@ import threading
 import logging
 import config
 
+
 class Application(QObject):
 
     def __init__(self, main_dialog, network, contact_manager):
@@ -17,6 +18,7 @@ class Application(QObject):
         self.network = network
         self.contact_manager = contact_manager
         self.main_dialog.add_binding(self, "wrapper")
+        self.active_contact_name = None
         self.logger = logging.getLogger(__name__)
 
     @property
@@ -67,6 +69,26 @@ class Application(QObject):
         except FileNotFoundError:
             self.logger.info("No user file.")
             self.load_register()
+
+    @pyqtSlot(str)
+    def load_contact_page(self, contact_name):
+        print(contact_name)
+        found = False
+        for contact in self.contact_manager.contacts:
+            if contact.name == contact_name:
+                found = True
+                break
+
+        if not found:
+            return
+        if not contact.messenger:
+            return
+
+        self.active_contact = contact
+        if contact.connected:
+            self.main_dialog.evaluate_js("addNewMessages();")
+        else:
+            self.main_dialog.evaluate_js("addNotConnectedMessage();")
 
     @pyqtSlot(str, result=str)
     def add_friend(self, username):
@@ -126,6 +148,25 @@ class Application(QObject):
 
         self.contact_manager.connect_to_contacts()
 
+        def create_callback(contact):
+            def callback(messenger):
+                if contact.name == self.active_contact.name:
+                    self.main_dialog.evaluateJavaScript("addNewMessages();")
+                else:
+                    # TODO: new message indicator
+                    pass
+            return callback
+
+        for contact in self.contact_manager.contacts:
+            if contact.messenger:
+                callback = create_callback(contact)
+                contact.messenger.set_messenger_callback(callback)
+
+    @pyqtSlot(str)
+    def post_message(self, message):
+        if self.active_contact.connected:
+            self.active_contact.messenger.send(message.encode('utf8') + b"\x00")
+
     @pyqtSlot(result=int)
     def get_num_contacts(self):
         return len(self.contact_manager.contacts)
@@ -133,6 +174,18 @@ class Application(QObject):
     @pyqtSlot(int, result=str)
     def get_contact_name(self, index):
         return self.contact_manager.contacts[index].name
+
+    @pyqtSlot(result=str)
+    def get_active_contact_name(self):
+        return self.active_contact.name
+
+    @pyqtSlot(result=int)
+    def get_active_contact_num_messages(self):
+        return self.active_contact.messenger.num_pending_messages()
+
+    @pyqtSlot(result=str)
+    def get_active_contact_latest_message(self):
+        return self.active_contact.messenger.consume_message()
 
     @pyqtSlot()
     def load_index(self):

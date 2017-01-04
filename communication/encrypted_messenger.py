@@ -29,7 +29,7 @@ class EncryptedMessenger(messenger.Messenger):
 
     def consume_message(self):
         message = super().consume_message()
-        return self.crypter.decryptMessage(message)
+        return self.crypter.decrypt_message(message)
 
     def consume_messages(self):
         messages = super().consume_messages()

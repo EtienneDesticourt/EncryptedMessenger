@@ -42,6 +42,8 @@ class Messenger(object):
             # separator
             buffer = messages.pop()
             self.message_queue += messages
+            if len(messages):
+                self.message_callback()
         self.logger.info("Messenger stopped.")
 
     def send(self, message):
@@ -67,6 +69,15 @@ class Messenger(object):
         messages = self.message_queue
         self.message_queue = []
         return messages
+
+    def num_pending_messages(self):
+        return len(self.message_queue)
+
+    def message_callback(self):
+        pass
+
+    def set_message_callback(self, callback):
+        self.message_callback = callback
 
     def raise_last_error_if_any(self):
         "Raises the last error that might have occured in the remote thread that deals with reception."

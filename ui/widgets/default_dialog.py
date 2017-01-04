@@ -39,6 +39,9 @@ class DefaultDialog(QWidget):
     def add_js_object(self, js_object, name):
         self.view.page().mainFrame().addToJavaScriptWindowObject(name, js_object)
 
+    def evaluate_js(self, js):
+        self.view.page().mainFrame().evaluateJavaScript(js);
+
     def load_page(self, url):
         self.logger.info("Loading page %s.", url.path())
         self.view.load(url)

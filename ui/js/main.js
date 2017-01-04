@@ -29,6 +29,18 @@ function register() {
 function createContactElement(name) {
     var listElement = document.createElement("li");
     var contactLink = document.createElement("a");
+    contactLink.onclick = function () {
+        list = document.getElementById("contact-list");
+        var children = list.children;
+        for (var i = 0; i < children.length; i++) {
+          var child = children[i];
+          if (child.className == "active") {
+            child.className = "";
+          }
+        }
+        listElement.className = "active";
+        wrapper.load_contact_page(name);
+    };
 
     var icon = document.createElement("img");
     icon.className = "icon";
@@ -56,4 +68,70 @@ function fillContactList() {
         var listElement = createContactElement(name);
         list.appendChild(listElement);
     }
+}
+
+function postMessage() {
+    input = document.getElementById("message-input");
+    message = input.value;
+    wrapper.post_message(message);
+    input.value = "";
+    name = wrapper.get_active_contact_name();
+    var today = new Date();
+    date = today.toISOString();
+    addMessage(name, date, message);
+}
+
+function handleInputKeypress(event) {
+    if (event.keyCode == 13) {
+        postMessage();
+    }
+}
+
+function createMessageElement(name, date, content) {
+    var divElement = document.createElement("div");
+    divElement.className = "message";
+
+    var titleElement = document.createElement("h3");
+    titleElement.className = "contact-name";
+    var titleNode = document.createTextNode(name);
+    titleElement.appendChild(titleNode);
+
+
+    var dateElement = document.createElement("p");
+    dateElement.className = "message-date";
+    var dateNode = document.createTextNode(date);
+    dateElement.appendChild(dateNode);
+
+    var contentElement = document.createElement("p");
+    contentElement.className = "message-content";
+    var contentNode = document.createTextNode(content);
+    contentElement.appendChild(contentNode);
+
+
+    divElement.appendChild(titleElement);
+    divElement.appendChild(dateElement);
+    divElement.appendChild(contentElement);
+    return divElement;
+}
+
+function addMessage(name, date, content) {
+    list = document.getElementById("message-list");
+    messageElement = createMessageElement(name, date, content);
+    list.appendChild(messageElement);
+}
+
+function addNewMessages() {
+    var numMessages = wrapper.get_active_contact_num_messages();
+    for(i = 0; i < numMessages; i++) {
+        message = wrapper.get_active_contact_latest_message();
+        name = wrapper.get_active_contact_name();
+        var today = new Date();
+        date = today.toISOString().substring(0, 10);
+        addMessage(name, date, message);
+    }
+}
+
+function addNotConnectedMessage() {
+    list = document.getElementById("message-list");
+    list.innerHtml = "NOT CONNECTED";
 }
