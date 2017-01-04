@@ -61,5 +61,5 @@ class Contact(object):
 
     def save(self, save_dir):
         path = os.path.join(save_dir, self.name + ".pem")
-        with open(path, "w") as f:
+        with open(path, "wb") as f:
             f.write(self.public_key)

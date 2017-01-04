@@ -72,7 +72,6 @@ class Application(QObject):
 
     @pyqtSlot(str)
     def load_contact_page(self, contact_name):
-        print(contact_name)
         found = False
         for contact in self.contact_manager.contacts:
             if contact.name == contact_name:
