@@ -165,6 +165,7 @@ function addMessage(name, date, content) {
     list = document.getElementById("message-list");
     messageElement = createMessageElement(name, date, content);
     list.appendChild(messageElement);
+    list.scrollTop = list.scrollHeight;
 }
 
 function addNewMessages() {
