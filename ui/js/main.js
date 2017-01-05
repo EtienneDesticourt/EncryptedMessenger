@@ -5,7 +5,7 @@
  function createContactElement(name) {
     var listElement = document.createElement("li");
     var contactLink = document.createElement("a");
-    contactLink.onclick = function () { activateContact(listElement); };
+    contactLink.onclick = function () { activateContact(listElement, name); };
 
     var icon = document.createElement("img");
     icon.id = "contact-icon-".concat(name)
@@ -54,15 +54,37 @@ function updateStatus() {
 
 function setStatus(name, online) {
     icon = document.getElementById("contact-icon-".concat(name));
+    online_src = "../images/icon_small.png";
+    offline_src = "../images/icon_small_offline.png"
     if (online) {
-        icon.src = "../images/icon_small.png";
+        if (icon.src.indexOf("offline") !== -1) {
+            icon.src = online_src;
+            wrapper.display_online_notification();
+        }
     }
     else {
-        icon.src = "../images/icon_small_offline.png";
+        if (icon.src.indexOf("offline") == -1) {
+            icon.src = offline_src;
+            wrapper.display_offline_notification();
+            desactivateContact(name);
+        }
     }
 }
 
-function activateContact(contactElement) {
+function activateContact(contactElement, name) {
+    online = wrapper.is_online(name);
+    if (!online) {
+        return;
+    }
+
+    desactivateContact("");
+    contactElement.className = "active";
+
+    document.getElementById("entry-section").style.visibility = "visible";
+    wrapper.activate_contact(name);
+}
+
+function desactivateContact(name) {
     list = document.getElementById("contact-list");
     var children = list.children;
     for (var i = 0; i < children.length; i++) {
@@ -71,8 +93,11 @@ function activateContact(contactElement) {
         child.className = "";
       }
     }
-    contactElement.className = "active";
-    wrapper.activate_contact(name);
+
+    active_name = wrapper.get_active_contact_name();
+    if (active_name == name) {
+        document.getElementById("entry-section").style.visibility = "hidden";
+    }
 }
 
 setInterval(updateStatus, 5000);

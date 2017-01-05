@@ -16,6 +16,7 @@ class EncryptedMessenger(messenger.Messenger):
         super().__init__(socket)
         self.crypter = crypter.Crypter(os.urandom)
         self.role = role
+        self.ready = False
         self.logger = logging.getLogger(__name__)
 
     def run(self, private_key, contact_public_key):
@@ -67,6 +68,7 @@ class EncryptedMessenger(messenger.Messenger):
         signature = self.wait_for_next_message()
         self.crypter.verify_signature(contact_key, encrypted_aes_key, signature)
         self.crypter.aes_key = self.crypter.decrypt_key(encrypted_aes_key)
+        self.ready = True
 
     def perform_handshake_as_client(self, private_key, contact_key):
         # Receive ephemeral RSA key and verify its author
@@ -81,3 +83,4 @@ class EncryptedMessenger(messenger.Messenger):
         signature = self.crypter.sign(private_key, encrypted_key)
         super().send(encrypted_key)
         super().send(signature)
+        self.ready = True

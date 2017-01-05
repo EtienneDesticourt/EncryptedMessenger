@@ -18,7 +18,7 @@ class Application(QObject):
         QObject.__init__(self)
         self.main_dialog = main_dialog
         self.network = network
-        self.contact_manager = ContactManager(network, self.connection_callback, self.new_messages_callback)
+        self.contact_manager = ContactManager(network)
         self.main_dialog.add_binding(self, "wrapper")
         self.active_contact_name = None
         self.logger = logging.getLogger(__name__)
@@ -94,18 +94,17 @@ class Application(QObject):
             self.display_error_notification()
         SocketManager.close(socket)
 
+
+    @pyqtSlot()
+    def display_online_notification(self):
+        print("Went online")
+
+    @pyqtSlot()
+    def display_offline_notification(self):
+        print("Went offline")
+
     def display_error_notification(self):
         pass
-
-    def connection_callback(self):
-        pass
-
-    def new_messages_callback(self):
-        return
-        if contact.name == self.user.active_contact.name:
-            self.main_dialog.evaluate_js("addNewMessages();")
-        else:
-            self.main_dialog.evaluate_js("notifyNewMessages(\"" + contact.name + "\");")
 
     @pyqtSlot(str)
     def post_message(self, message):

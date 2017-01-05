@@ -19,26 +19,24 @@ class Contact(object):
         self.ip = ip
         self.messenger = None
         self.connected = False
+        self.message_history = []
         self.logger = logging.getLogger(__name__)
-
-    @property
-    def connected(self):
-        return self._connected
-
-    @connected.setter
-    def connected(self, value):
-        self._connected = value
-        self.connection_callback()
-
-    def connection_callback(self):
-        pass
-
-    def new_messages_callback(self):
-        pass
 
     def tell(self, message):
         message_bytes = message.encode("utf8") + b"\x00" # TODO: move to messenger
         self.messenger.send(message_bytes)
+
+    def get_pending_messages(self):
+        if self.connected and self.messenger.ready:
+            new_messages = self.messenger.consume_messages()
+            self.message_history += new_messages
+            return new_messages
+        return []
+
+    def num_pending_messages(self):
+        if self.connected:
+            return len(self.messenger.num_pending_messages())
+        return 0
 
     def connect(self):
         self.logger.info("Connecting to contact %s for user %s.", self.name, self.owner)
@@ -62,7 +60,6 @@ class Contact(object):
         self.logger.info("Starting messenger for contact %s.", self.name)
         self.messenger = EncryptedMessenger(role=role,
                                             socket=socket)
-        self.messenger.set_message_callback(self.new_messages_callback)
         self.connected = True
         private_key = load_private_key(self.owner, config.KEY_DIR)
         public_key = load_public_key(self.public_key)

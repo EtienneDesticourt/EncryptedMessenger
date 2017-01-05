@@ -6,12 +6,10 @@ import logging
 
 class ContactManager(object):
 
-    def __init__(self, peer_registry, conn_callback=None, mess_callback=None, contact_dir=config.CONTACT_DIR):
+    def __init__(self, peer_registry, contact_dir=config.CONTACT_DIR):
         self.contacts = []
         self.peer_registry = peer_registry
         self.contact_dir = contact_dir
-        self.conn_callback = conn_callback
-        self.mess_callback = mess_callback
         self.logger = logging.getLogger(__name__)
 
     def get_contact(self, name):
@@ -20,16 +18,20 @@ class ContactManager(object):
                 return contact
         return None
 
+    def update_contacts_ip(self):
+        for contact in self.contacts:
+            contact.ip = self.peer_registry.get_peer_ip(contact.name)
+
     def get_contact_by_ip(self, ip):
         for contact in self.contacts:
-            # We have to recheck each contact's ip because contacts
-            # update their ip in the registry when they connect
-            contact_ip = self.peer_registry.get_peer_ip(contact.name)
-            if contact_ip == ip:
+            if contact.ip == ip:
                 return contact
         return None
 
     def contact_connected(self, socket, ip):
+        # We have to recheck each contact's ip because contacts
+        # update their ip in the registry when they connect
+        self.update_contacts_ip()
         contact = self.get_contact_by_ip(ip)
         if contact:
             contact.has_connected(socket)
@@ -42,10 +44,6 @@ class ContactManager(object):
             public_key = f.read()
 
         contact = Contact(owner_name, contact_name, public_key)
-        if self.conn_callback:
-            contact.connection_callback = self.conn_callback
-        if self.mess_callback:
-            contact.new_messages_callback = self.mess_callback
 
         self.contacts.append(contact)
         return contact
@@ -69,6 +67,7 @@ class ContactManager(object):
             threading.Thread(target=self.connect_to_contact, args=[contact]).start()
 
     def add_contact(self, owner, peer):
+        self.logger.info("Adding new contact %s for owner %s.", peer, owner)
         contact = Contact.from_json(owner, peer)
         for other_contact in self.contacts:
             if contact.name == other_contact.name:

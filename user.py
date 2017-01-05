@@ -1,3 +1,4 @@
+import logging
 import keys.utils
 
 
@@ -10,6 +11,8 @@ class User(object):
         self.key_utils = key_utils
         self.contact_manager = contact_manager
         self.active_contact = None
+        self.logger = logging.getLogger(__name__)
+        self.logger.info("Created new user with name %s.", username)
 
     def register(self):
         "Registers the user to the peer registry and saves his credentials."
@@ -36,12 +39,13 @@ class User(object):
         info = self.peer_registry.get_peer_info(name)
         self.contact_manager.add_contact(self.username, info)
 
-    def set_active_contact(self, name):
-        self.active_contact = self.contact_manager.get_contact(name)
-
     def say(self, message):
+        "Sends a message to the currently active contact."
         if self.active_contact and self.active_contact.connected:
             self.active_contact.tell(message)
+
+    def set_active_contact(self, name):
+        self.active_contact = self.contact_manager.get_contact(name)
 
     @property
     def username(self):

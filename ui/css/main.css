@@ -79,6 +79,9 @@ header.header div.controls a{
     margin-bottom: 3px;
 }
 
+.main-menu > li {
+    cursor: pointer;
+}
 
 .main-menu > li.active {
     background-color:rgba(0,0,0,.35);
