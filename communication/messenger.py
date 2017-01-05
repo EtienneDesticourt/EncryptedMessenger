@@ -30,12 +30,18 @@ class Messenger(object):
         buffer = b''
         while self.running:
             try:
-                buffer += self.socket.recv(1024)
+                mess = self.socket.recv(1024)
             except socket.error as e:
                 self.last_error = e
                 self.running = False
-                return
+                break
 
+            if mess == "":
+                self.running = False
+                break
+
+
+            buffer += mess
             # Parse messages from buffer
             messages = buffer.split(protocol.MESSAGE_SEPARATOR)
             # Set buffer to last incomplete message or '' if ending on a

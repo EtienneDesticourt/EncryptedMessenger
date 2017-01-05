@@ -21,6 +21,25 @@ class Contact(object):
         self.connected = False
         self.logger = logging.getLogger(__name__)
 
+    @property
+    def connected(self):
+        return self._connected
+
+    @connected.setter
+    def connected(self, value):
+        self._connected = value
+        self.connection_callback()
+
+    def connection_callback(self):
+        pass
+
+    def new_messages_callback(self):
+        pass
+
+    def tell(self, message):
+        message_bytes = message.encode("utf8") + b"\x00" # TODO: move to messenger
+        self.messenger.send(message_bytes)
+
     def connect(self):
         self.logger.info("Connecting to contact %s for user %s.", self.name, self.owner)
 
@@ -43,10 +62,12 @@ class Contact(object):
         self.logger.info("Starting messenger for contact %s.", self.name)
         self.messenger = EncryptedMessenger(role=role,
                                             socket=socket)
+        self.messenger.set_message_callback(self.new_messages_callback)
         self.connected = True
         private_key = load_private_key(self.owner, config.KEY_DIR)
         public_key = load_public_key(self.public_key)
         self.messenger.run(private_key, public_key)
+        self.connected = False
 
     def stop_messenger(self):
         if self.connected:

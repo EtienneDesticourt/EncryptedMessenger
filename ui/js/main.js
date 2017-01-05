@@ -1,3 +1,86 @@
+/*
+ *  CONTACT LIST
+ */
+
+ function createContactElement(name) {
+    var listElement = document.createElement("li");
+    var contactLink = document.createElement("a");
+    contactLink.onclick = function () { activateContact(listElement); };
+
+    var icon = document.createElement("img");
+    icon.id = "contact-icon-".concat(name)
+    icon.className = "icon";
+    if (wrapper.is_online(name)) {
+        icon.src = "../images/icon_small.png";
+    }
+    else {
+        icon.src = "../images/icon_small_offline.png";
+    }
+
+    var contactName = document.createElement("div");
+    contactName.className = "text";
+    var nameNode = document.createTextNode(name);
+    contactName.appendChild(nameNode);
+
+    contactLink.appendChild(icon);
+    contactLink.appendChild(contactName);
+
+    listElement.appendChild(contactLink);
+    return listElement;
+}
+
+
+function fillContactList() {
+    list = document.getElementById("contact-list");
+    list.innerHtml = "";
+
+    // Loop through friends and add one li for each
+    numContacts = wrapper.get_num_contacts();
+    for(i = 0; i < numContacts; i++) {
+        name = wrapper.get_contact_name(i);
+        var listElement = createContactElement(name);
+        list.appendChild(listElement);
+    }
+}
+
+function updateStatus() {
+    numContacts = wrapper.get_num_contacts();
+    for(i = 0; i < numContacts; i++) {
+        name = wrapper.get_contact_name(i);
+        online = wrapper.is_online(name);
+        setStatus(name, online);
+    }
+}
+
+function setStatus(name, online) {
+    icon = document.getElementById("contact-icon-".concat(name));
+    if (online) {
+        icon.src = "../images/icon_small.png";
+    }
+    else {
+        icon.src = "../images/icon_small_offline.png";
+    }
+}
+
+function activateContact(contactElement) {
+    list = document.getElementById("contact-list");
+    var children = list.children;
+    for (var i = 0; i < children.length; i++) {
+      var child = children[i];
+      if (child.className == "active") {
+        child.className = "";
+      }
+    }
+    contactElement.className = "active";
+    wrapper.activate_contact(name);
+}
+
+setInterval(updateStatus, 5000);
+
+/*
+ * OTHER
+ */
+
 function showError(message) {
     errorMessage = document.getElementById('error');
     errorMessage.innerText = message;
@@ -15,6 +98,10 @@ function addFriend() {
     }
 }
 
+/*
+ * REGISTER
+ */
+
 function register() {
     accountName = document.getElementById('account-name').value;
     result = wrapper.register(accountName);
@@ -26,56 +113,16 @@ function register() {
     }
 }
 
-function createContactElement(name) {
-    var listElement = document.createElement("li");
-    var contactLink = document.createElement("a");
-    contactLink.onclick = function () {
-        list = document.getElementById("contact-list");
-        var children = list.children;
-        for (var i = 0; i < children.length; i++) {
-          var child = children[i];
-          if (child.className == "active") {
-            child.className = "";
-          }
-        }
-        listElement.className = "active";
-        wrapper.load_contact_page(name);
-    };
-
-    var icon = document.createElement("img");
-    icon.className = "icon";
-    icon.src = "../images/icon_small.png";
-
-    var contactName = document.createElement("div");
-    contactName.className = "text";
-    var nameNode = document.createTextNode(name);
-    contactName.appendChild(nameNode);
-
-    contactLink.appendChild(icon);
-    contactLink.appendChild(contactName);
-
-    listElement.appendChild(contactLink);
-    return listElement;
-}
-
-function fillContactList() {
-    list = document.getElementById("contact-list");
-
-    // Loop through friends and add one li for each
-    numContacts = wrapper.get_num_contacts();
-    for(i = 0; i < numContacts; i++) {
-        name = wrapper.get_contact_name(i);
-        var listElement = createContactElement(name);
-        list.appendChild(listElement);
-    }
-}
+/*
+ * MESSAGES
+ */
 
 function postMessage() {
     input = document.getElementById("message-input");
     message = input.value;
     wrapper.post_message(message);
     input.value = "";
-    name = wrapper.get_active_contact_name();
+    name = wrapper.get_username();
     var today = new Date();
     date = today.toISOString();
     addMessage(name, date, message);
@@ -132,6 +179,14 @@ function addNewMessages() {
 }
 
 function addNotConnectedMessage() {
-    list = document.getElementById("message-list");
-    list.innerHtml = "NOT CONNECTED";
+    var today = new Date();
+    date = today.toISOString().substring(0, 10);
+    addMessage("NOT CONNECTED", date, "----------------------------------------------");
 }
+
+
+function updateMessages() {
+    addNewMessages();
+}
+
+setInterval(updateMessages, 1000);

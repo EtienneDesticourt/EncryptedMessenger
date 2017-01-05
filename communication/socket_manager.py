@@ -23,3 +23,6 @@ class SocketManager(object):
             pass
         finally:
             self.socket.close()
+
+    def close(socket):
+        with SocketManager(socket): pass

@@ -3,6 +3,8 @@
 class NetworkException(Exception):
     pass
 
+class CommandFailureError(NetworkException):
+    pass
 
 class UnexpectedResponseError(NetworkException):
     pass

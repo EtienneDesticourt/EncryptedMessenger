@@ -8,10 +8,10 @@ PRIVATE = "PRIVATE"
 PUBLIC_KEY_FILE = "public.pem"
 PRIVATE_KEY_FILE = "private.pem"
 
-def gen_key_path(username, directory):
+def gen_key_paths(username, directory):
     private_path = os.path.join(directory, username + "_private.pem")
     public_path = os.path.join(directory, username + "_public.pem")
-    return (public_path, private_path)
+    return (private_path, public_path)
 
 def new_key(username, directory):
     public_path, private_path = gen_key_path(username, directory)
@@ -24,7 +24,6 @@ def new_key(username, directory):
                                               NoEncryption())
 
 
-    public_key = private_key.public_key()
     public_bytes = public_key.public_bytes(Encoding.PEM,
                                            PublicFormat.SubjectPublicKeyInfo)
 
@@ -39,11 +38,42 @@ def new_key(username, directory):
 
     return (private_path, public_path)
 
+def generate_new_key():
+    private_key = rsa.generate_private_key(public_exponent=65537,
+                                           key_size=2048,
+                                           backend=default_backend())
+    return private_key
+
+def get_public_pem(private_key):
+    public_key = private_key.public_key()
+    return public_key.public_bytes(Encoding.PEM, PublicFormat.SubjectPublicKeyInfo)
+
+def save_keys(private_key, username, directory):
+    private_path, public_path = gen_key_paths(username, directory)
+
+    private_bytes = private_key.private_bytes(Encoding.PEM,
+                                              PrivateFormat.PKCS8,
+                                              NoEncryption())
+
+    public_key = private_key.public_key()
+    public_bytes = public_key.public_bytes(Encoding.PEM,
+                                           PublicFormat.SubjectPublicKeyInfo)
+
+
+    with open(private_path, "wb") as f:
+        f.write(private_bytes)
+    with open(public_path, "wb") as f:
+        f.write(public_bytes)
+
+
+
+
+
 def load_public_key(public_key_data):
     return load_pem_public_key(public_key_data, backend=default_backend())
 
 def load_private_key(username, directory):
-    public_path, private_path = gen_key_path(username, directory)
+    private_path, public_path = gen_key_paths(username, directory)
     with open(private_path, "rb") as f:
         pem_data = f.read()
     return load_pem_private_key(pem_data, password=None, backend=default_backend())

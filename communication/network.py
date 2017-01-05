@@ -3,6 +3,7 @@ from communication.network_exception import NetworkException
 from communication.network_exception import UnexpectedResponseError
 from communication.network_exception import UserDoesNotExistError
 from communication.network_exception import ChallengeFailureError
+from communication.network_exception import CommandFailureError
 import config
 import requests
 import logging
@@ -41,21 +42,18 @@ class Network(object):
             return False
         return True
 
-    def register(self, username):
+    def register(self, username, public_pem):
         self.logger.info("Registering new user: %s", username)
 
-        private_path, public_path = keys.utils.new_key(username, self.key_dir)
-        with open(public_path, "r") as f:
-            public_key = f.read()
-
+        public_key = public_pem.decode("utf8")
         result = self.post(self.url + "/user", data={"username": username,
                                                      "public_key": public_key})
 
         content = result.json()
         if content == Network.OK_RESPONSE:
-            return (True, "")
+            return
         elif "error" in content:
-            return (False, content["error"])
+            raise CommandFailureError(content["error"])
         else:
             raise UnpexpectedResponseError(content)
 

@@ -27,18 +27,16 @@ app = QApplication([])
 URL = "http://localhost:5000"
 network = Network(URL)
 
-contact_manager = ContactManager()
-
 win = DefaultDialog()
-wrapper = Application(win, network, contact_manager)
+wrapper = Application(win, network)
 win.show()
-wrapper.execute()
+wrapper.start()
 
 
 with Server("localhost", config.PORT) as server:
     threading.Thread(target=server.listen, args=[wrapper.handle_connecting_contact]).start()
     app.exec_()
-for contact in contact_manager.contacts:
+for contact in wrapper.contact_manager.contacts:
     contact.stop_messenger()
 
 time.sleep(1)
