@@ -1,4 +1,4 @@
-from encryption.crypter import DEFAULT_PADDING
+from encryption.crypter import DEFAULT_PADDING, OPENSSL_PADDING
 from communication.network_exception import NetworkException
 from communication.network_exception import UnexpectedResponseError
 from communication.network_exception import UserDoesNotExistError
@@ -71,13 +71,14 @@ class Network(object):
 
         encrypted_secret = base64.b64decode(challenge["challenge"])
         key = keys.utils.load_private_key(username, self.key_dir)
-        secret_bytes = key.decrypt(encrypted_secret, DEFAULT_PADDING())
+        secret_bytes = key.decrypt(encrypted_secret, OPENSSL_PADDING())
         secret = secret_bytes.decode('utf8')
 
         # Send decrypted challenge along with new ip
         data = {"username": username,
                 "challenge": secret,
                 "ip": challenge["ip"]}
+        self.logger.debug("Messenger public ip is %s.", challenge["ip"])
 
         result = self.post(self.url + "/ip", data=data)
         content = result.json()

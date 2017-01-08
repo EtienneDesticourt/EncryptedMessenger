@@ -31,15 +31,16 @@ class Messenger(object):
         while self.running:
             try:
                 mess = self.socket.recv(1024)
-            except socket.error as e:
+            except Exception as e:
+                self.logger.info("There was an error during socket.recv.", exc_info=True)
                 self.last_error = e
                 self.running = False
                 break
 
-            if mess == "":
+            if len(mess) == 0:
+                self.logger.info("Received empty string from socket.")
                 self.running = False
                 break
-
 
             buffer += mess
             # Parse messages from buffer
@@ -60,6 +61,7 @@ class Messenger(object):
             try:
                 sent += self.socket.send(form_message[sent:])
             except (socket.error, AttributeError) as e:
+                self.logger.critical("Error while sending message.", exc_info=True)
                 raise MessengerException("Socket not connected.") from e
 
     def consume_message(self):

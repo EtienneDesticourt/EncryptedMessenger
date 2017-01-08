@@ -5,6 +5,7 @@ import logging
 from communication import messenger
 from communication import protocol
 from communication.encrypted_messenger_exception import HandshakeFailure
+from communication.encrypted_messenger_exception import HandshakeTimeout
 from encryption import crypter
 import keys.utils
 
@@ -38,10 +39,16 @@ class EncryptedMessenger(messenger.Messenger):
 
     def wait_for_next_message(self):
         message = None
+        timeout_counter = 0
         while not message:
             message = super().consume_message()
             self.raise_last_error_if_any()
             time.sleep(1)
+            timeout_counter += 1
+            if timeout_counter > 45:
+                self.logger.critical("Messenger timed out while waiting for next message.")
+                raise HandshakeTimeout()
+
         return message
 
     def perform_handshake(self, private_key, contact_key):
@@ -59,12 +66,16 @@ class EncryptedMessenger(messenger.Messenger):
         self.crypter.gen_and_set_rsa_key()
         public_rsa_key = self.crypter.get_public_key_pem()
         signature = self.crypter.sign(private_key, public_rsa_key)
+        self.logger.debug("Sending ephemeral RSA key.")
         super().send(public_rsa_key)
+        self.logger.debug("Sending signature.")
         super().send(signature)
 
 
         # Receive encrypted AES key and verify its author
+        self.logger.debug("Waiting for AES key.")
         encrypted_aes_key = self.wait_for_next_message()
+        self.logger.debug("Waiting for signature.")
         signature = self.wait_for_next_message()
         self.crypter.verify_signature(contact_key, encrypted_aes_key, signature)
         self.crypter.aes_key = self.crypter.decrypt_key(encrypted_aes_key)
@@ -72,7 +83,9 @@ class EncryptedMessenger(messenger.Messenger):
 
     def perform_handshake_as_client(self, private_key, contact_key):
         # Receive ephemeral RSA key and verify its author
+        self.logger.debug("Waiting for public pem.")
         public_key_pem = self.wait_for_next_message()
+        self.logger.debug("Waiting for signature.")
         signature = self.wait_for_next_message()
         self.crypter.verify_signature(contact_key, public_key_pem, signature)
         self.crypter.set_public_key_from_pem(public_key_pem)
@@ -81,6 +94,8 @@ class EncryptedMessenger(messenger.Messenger):
         self.crypter.gen_and_set_aes_key()
         encrypted_key = self.crypter.encrypt_key(self.crypter.aes_key)
         signature = self.crypter.sign(private_key, encrypted_key)
+        self.logger.debug("Sending AES key.")
         super().send(encrypted_key)
+        self.logger.debug("Sending signature.")
         super().send(signature)
         self.ready = True

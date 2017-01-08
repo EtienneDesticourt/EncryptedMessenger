@@ -24,8 +24,7 @@ logger.info("Starting main program.")
 
 app = QApplication([])
 
-URL = "http://localhost:5000"
-network = Network(URL)
+network = Network(config.PEER_REGISTRY_URL)
 
 win = DefaultDialog()
 wrapper = Application(win, network)

@@ -5,3 +5,6 @@ class EncryptedMessengerException(Exception):
 
 class HandshakeFailure(EncryptedMessengerException):
     pass
+
+class HandshakeTimeout(HandshakeFailure):
+    pass

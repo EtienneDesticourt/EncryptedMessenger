@@ -39,7 +39,7 @@ class Contact(object):
         return 0
 
     def connect(self):
-        self.logger.info("Connecting to contact %s for user %s.", self.name, self.owner)
+        self.logger.info("Connecting to contact %s with ip %s for user %s.", self.name, self.ip, self.owner)
 
         if self.ip == None:
             raise ValueError("Contact has no known ip.")
@@ -53,6 +53,7 @@ class Contact(object):
                 self.start_messenger(client.socket, protocol.CLIENT_ROLE)
 
     def has_connected(self, socket):
+        self.logger.info("Contact %s has connected with ip %s.", self.name, self.ip)
         with SocketManager(socket) as socket_manager:
             self.start_messenger(socket, protocol.SERVER_ROLE)
 

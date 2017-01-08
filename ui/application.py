@@ -21,6 +21,7 @@ class Application(QObject):
         self.contact_manager = ContactManager(network)
         self.main_dialog.add_binding(self, "wrapper")
         self.active_contact_name = None
+        self.user = None
         self.logger = logging.getLogger(__name__)
 
     def start(self):
@@ -108,7 +109,10 @@ class Application(QObject):
 
     @pyqtSlot(str)
     def post_message(self, message):
-        self.user.say(message)
+        try:
+            self.user.say(message)
+        except Exception:
+            self.logger.critical("There was an error while posting message.", exc_info=True)
 
     @pyqtSlot(str, result=bool)
     def is_online(self, name):
@@ -124,12 +128,12 @@ class Application(QObject):
 
     @pyqtSlot(result=str)
     def get_active_contact_name(self):
-        if self.user.active_contact:
+        if self.user and self.user.active_contact:
             return self.user.active_contact.name
 
     @pyqtSlot(result=int)
     def get_active_contact_num_messages(self):
-        if self.user.active_contact:
+        if self.user and self.user.active_contact:
             return self.user.active_contact.messenger.num_pending_messages()
         return 0
 
@@ -142,7 +146,8 @@ class Application(QObject):
 
     @pyqtSlot(result=str)
     def get_username(self):
-        return self.user.username
+        if self.user:
+            return self.user.username
 
     @pyqtSlot()
     def load_index(self):

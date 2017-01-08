@@ -19,6 +19,7 @@ class ContactManager(object):
         return None
 
     def update_contacts_ip(self):
+        self.logger.info("Updating contact ips.")
         for contact in self.contacts:
             contact.ip = self.peer_registry.get_peer_ip(contact.name)
 
@@ -29,12 +30,15 @@ class ContactManager(object):
         return None
 
     def contact_connected(self, socket, ip):
+        self.logger.info("Incoming connection from ip %s on socket %s.", ip, str(socket))
         # We have to recheck each contact's ip because contacts
         # update their ip in the registry when they connect
         self.update_contacts_ip()
         contact = self.get_contact_by_ip(ip)
         if contact:
             contact.has_connected(socket)
+        else:
+            self.logger.info("Found no matching contact for ip %s.", ip)
 
     def load_contact(self, owner_name, contact_name, contact_file):
         self.logger.info("Loading contact %s from %s for user %s", contact_name, contact_file, owner_name)

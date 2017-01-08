@@ -21,6 +21,11 @@ def DEFAULT_PADDING():
                         algorithm=hashes.SHA256(),
                         label=None)
 
+def OPENSSL_PADDING():
+    return padding.OAEP(mgf=padding.MGF1(algorithm=hashes.SHA1()),
+                        algorithm=hashes.SHA1(),
+                        label=None)
+
 
 class Crypter(object):
     "Cryptography wrapper that provides convenience functions to crypt/decrypt keys and messages."

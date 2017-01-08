@@ -19,5 +19,5 @@ class Client(SocketManager):
         try:
             self.socket.connect((self.host, self.port))
             self.logger.info("Succesfully connected to %s:%s with socket %s.", self.host, str(self.port), str(self.socket))
-        except ConnectionRefusedError as e:
+        except (ConnectionRefusedError, TimeoutError) as e:
             raise ClientException("No host listening.") from e

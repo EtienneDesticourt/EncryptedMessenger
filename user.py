@@ -1,6 +1,6 @@
 import logging
 import keys.utils
-
+import config
 
 class User(object):
     "The user of the desktop application."
@@ -12,7 +12,7 @@ class User(object):
         self.contact_manager = contact_manager
         self.active_contact = None
         self.logger = logging.getLogger(__name__)
-        self.logger.info("Created new user with name %s.", username)
+        self.logger.info("Created new user instance with name %s.", username)
 
     def register(self):
         "Registers the user to the peer registry and saves his credentials."
@@ -30,7 +30,7 @@ class User(object):
 
     def save(self, private_key):
         "Saves the user's username and private key."
-        self.key_utils.save(private_key, self.username, config.KEY_DIR)
+        self.key_utils.save_keys(private_key, self.username, config.KEY_DIR)
         with open(config.USER_FILE, "w") as f:
             f.write(self.username)
 
