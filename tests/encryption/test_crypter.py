@@ -9,7 +9,7 @@ import threading
 import time
 import math
 import os
-from encryption import crypter, crypter_exceptions
+from encryption import crypter, exceptions
 from communication import protocol
 import keys.utils as utils
 
@@ -56,12 +56,12 @@ class TestCrypter(unittest.TestCase):
         assert self.test_crypter.rsa_key != None, "Public key failed to be loaded."
 
     def test_load_rsa_key_no_file(self):
-        self.assertRaises(crypter_exceptions.CrypterException,
+        self.assertRaises(exceptions.CrypterException,
                           self.test_crypter.load_rsa_key, utils.PUBLIC, "wrong_dir")
         assert self.test_crypter.rsa_key == None
 
     def test_load_rsa_key_unknown_type(self):
-        self.assertRaises(crypter_exceptions.CrypterException,
+        self.assertRaises(exceptions.CrypterException,
                           self.test_crypter.load_rsa_key, "WRONG KEY TYPE", DUMMY_KEYS_DIR)
         assert self.test_crypter.rsa_key == None
 
@@ -77,7 +77,7 @@ class TestCrypter(unittest.TestCase):
         assert encryptedMessage == TEST_ENCRYPTED_MESSAGE
 
     def test_encrypt_message_no_key(self):
-        self.assertRaises(crypter_exceptions.NoKeyException,
+        self.assertRaises(exceptions.NoKeyException,
                           self.test_crypter.encrypt_message,
                           TEST_MESSAGE)
 
@@ -88,13 +88,13 @@ class TestCrypter(unittest.TestCase):
         assert decrypted == TEST_MESSAGE.decode('utf8')[:-1]
 
     def test_decrypt_message_no_key(self):
-        self.assertRaises(crypter_exceptions.NoKeyException,
+        self.assertRaises(exceptions.NoKeyException,
                           self.test_crypter.encrypt_message,
                           TEST_MESSAGE)
 
     def test_decrypt_message_auth_comprommised(self):
         self.test_crypter.gen_and_set_aes_key()
-        self.assertRaises(crypter_exceptions.CorruptedMessageException,
+        self.assertRaises(exceptions.CorruptedMessageException,
                           self.test_crypter.decrypt_message,
                           TEST_ENCRYPTED_MESSAGE_MOD)
 
@@ -107,12 +107,12 @@ class TestCrypter(unittest.TestCase):
 
     def test_encrypt_key_wrong_key(self):
         self.test_crypter.load_rsa_key(utils.PRIVATE, DUMMY_KEYS_DIR)
-        self.assertRaises(crypter_exceptions.CrypterException,
+        self.assertRaises(exceptions.CrypterException,
                           self.test_crypter.encrypt_key,
                           TEST_AES_KEY)
 
     def test_encrypt_key_no_key(self):
-        self.assertRaises(crypter_exceptions.NoKeyException,
+        self.assertRaises(exceptions.NoKeyException,
                           self.test_crypter.encrypt_key,
                           TEST_AES_KEY)
 
@@ -123,12 +123,12 @@ class TestCrypter(unittest.TestCase):
 
     def test_decrypt_key_wrong_key(self):
         self.test_crypter.load_rsa_key(utils.PUBLIC, DUMMY_KEYS_DIR)
-        self.assertRaises(crypter_exceptions.CrypterException,
+        self.assertRaises(exceptions.CrypterException,
                           self.test_crypter.decrypt_key,
                           TEST_ENC_AES_KEY)
 
     def test_decrypt_key_no_key(self):
-        self.assertRaises(crypter_exceptions.NoKeyException,
+        self.assertRaises(exceptions.NoKeyException,
                           self.test_crypter.decrypt_key,
                           TEST_ENC_AES_KEY)
 

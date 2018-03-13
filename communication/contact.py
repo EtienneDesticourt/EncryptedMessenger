@@ -1,7 +1,7 @@
 import os
 import logging
 from communication.client import Client
-from communication.client_exception import ClientException
+from communication.exceptions import ClientException
 from communication import protocol
 from communication.encrypted_messenger import EncryptedMessenger
 from communication.socket_manager import SocketManager

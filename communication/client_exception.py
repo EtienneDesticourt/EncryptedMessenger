@@ -1,4 +1,0 @@
-
-
-class ClientException(Exception):
-    pass

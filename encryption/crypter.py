@@ -8,7 +8,7 @@ from cryptography.hazmat.primitives.asymmetric import padding, rsa
 from cryptography.exceptions import InvalidSignature, UnsupportedAlgorithm
 
 from communication import protocol
-from encryption.crypter_exceptions import CrypterException, NoKeyException, CorruptedMessageException
+from encryption.exceptions import CrypterException, NoKeyException, CorruptedMessageException
 from keys import utils
 import config
 

@@ -1,6 +1,6 @@
 import socket
 import logging
-from communication.client_exception import ClientException
+from communication.exceptions import ClientException
 from communication.socket_manager import SocketManager
 
 

@@ -1,9 +1,9 @@
 from encryption.crypter import DEFAULT_PADDING, OPENSSL_PADDING
-from communication.network_exception import NetworkException
-from communication.network_exception import UnexpectedResponseError
-from communication.network_exception import UserDoesNotExistError
-from communication.network_exception import ChallengeFailureError
-from communication.network_exception import CommandFailureError
+from communication.exceptions import NetworkException
+from communication.exceptions import UnexpectedResponseError
+from communication.exceptions import UserDoesNotExistError
+from communication.exceptions import ChallengeFailureError
+from communication.exceptions import CommandFailureError
 import config
 import requests
 import logging

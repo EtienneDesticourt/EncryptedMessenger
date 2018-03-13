@@ -4,8 +4,8 @@ import threading
 import logging
 from communication import messenger
 from communication import protocol
-from communication.encrypted_messenger_exception import HandshakeFailure
-from communication.encrypted_messenger_exception import HandshakeTimeout
+from communication.exceptions import HandshakeFailure
+from communication.exceptions import HandshakeTimeout
 from encryption import crypter
 import keys.utils
 

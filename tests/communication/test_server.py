@@ -3,7 +3,7 @@ import time
 import threading
 import unittest
 from communication.server import Server
-from communication.server_exception import ServerException
+from communication.exceptions import ServerException
 from tests.communication.server_mock import ServerMock
 from tests.communication.client_mock import ClientMock
 

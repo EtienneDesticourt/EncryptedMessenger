@@ -2,7 +2,7 @@ import socket
 import time
 import unittest
 from communication.client import Client
-from communication.client_exception import ClientException
+from communication.exceptions import ClientException
 from tests.communication.server_mock import ServerMock
 
 TEST_HOST_CONNECT = 'localhost'

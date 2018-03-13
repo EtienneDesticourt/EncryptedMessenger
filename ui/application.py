@@ -1,7 +1,7 @@
 from PyQt5.QtCore import QUrl, QObject, pyqtSlot
 from communication.network import Network
-from communication.network_exception import NetworkException
-from communication.network_exception import UserDoesNotExistError
+from communication.exceptions import NetworkException
+from communication.exceptions import UserDoesNotExistError
 from communication.contact_manager import ContactManager
 from communication.server import Server
 from communication.socket_manager import SocketManager

@@ -1,7 +1,7 @@
 import socket
 import threading
 import logging
-from communication.server_exception import ServerException
+from communication.exceptions import ServerException
 from communication.socket_manager import SocketManager
 
 

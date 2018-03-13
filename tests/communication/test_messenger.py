@@ -3,7 +3,7 @@ import socket
 import threading
 import time
 from communication.messenger import Messenger
-from communication import messenger_exception
+from communication.exceptions import MessengerException
 from communication import protocol
 from tests.communication.server_mock import ServerMock
 from tests.communication.client_mock import ClientMock
@@ -38,7 +38,7 @@ class Temp():#TestMessenger(unittest.TestCase):
 
     def test_send_not_connected(self):
         messenger = Messenger(protocol.CLIENT_ROLE, TEST_HOST_CONNECT, port=45765)
-        self.assertRaises(messenger_exception.MessengerException,
+        self.assertRaises(MessengerException,
                           messenger.send,
                           TEST_MESSAGE)
 
@@ -51,7 +51,7 @@ class Temp():#TestMessenger(unittest.TestCase):
         self.port = 45765
         messenger = Messenger(protocol.CLIENT_ROLE,
                               TEST_HOST_CONNECT, port=45765)
-        self.assertRaises(messenger_exception.MessengerException,
+        self.assertRaises(MessengerException,
                           messenger.__enter__)
 
     def test_start_server_connection(self):

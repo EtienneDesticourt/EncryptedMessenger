@@ -2,7 +2,7 @@ import socket
 import threading
 import logging
 from communication import protocol
-from communication.messenger_exception import MessengerException
+from communication.exceptions import MessengerException
 
 
 class Messenger(object):
