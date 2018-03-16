@@ -10,3 +10,9 @@ class NoKeyException(CrypterException):
 
 class CorruptedMessageException(CrypterException):
     pass
+
+class BackendException(CrypterException):
+    pass
+
+class InvalidSignature(BackendException):
+    pass

@@ -8,11 +8,11 @@ class EncryptedMessengerException(CommunicationException):
     pass
 
 
-class HandshakeFailure(EncryptedMessengerException):
+class HandshakeFailureException(EncryptedMessengerException):
     pass
 
 
-class HandshakeTimeout(HandshakeFailure):
+class HandshakeTimeoutException(HandshakeFailureException):
     pass
 
 

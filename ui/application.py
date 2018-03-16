@@ -93,7 +93,7 @@ class Application(QObject):
         except Exception:
             self.logger.error("There was an error while trying to handle an incoming connection from ip %s with socket %s.", ip, socket, exc_info=True)
             self.display_error_notification()
-        SocketManager.close(socket)
+        SocketManager.close(socket) # TODO: Indent? Closing is done in contact_connected
 
 
     @pyqtSlot()

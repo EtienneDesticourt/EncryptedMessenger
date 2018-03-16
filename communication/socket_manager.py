@@ -2,7 +2,11 @@ import socket
 import logging
 
 class SocketManager(object):
-    "Socket manager that cleans itself on exit."
+    """Manages the lifecycle of a socket handle.
+
+    Args:
+        socket: An optional existing socket.
+    """
 
     def __init__(self, socket=None):
         self.socket = socket
@@ -14,8 +18,7 @@ class SocketManager(object):
             self.logger.info("Created new socket %s.", str(self.socket))
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        "Closes the open sockets and set shutdown flag for running threads."
+    def __exit__(self, *a):
         self.logger.info("Closing socket %s.", str(self.socket))
         try:
             self.socket.shutdown(socket.SHUT_RDWR)
@@ -25,4 +28,10 @@ class SocketManager(object):
             self.socket.close()
 
     def close(socket):
+        """Closes the connection.
+
+        Args:
+            socket: The socket handle to the connection we which to close.
+        """
+        # self.__exit__() # TODO: Try this out to fix this fuckup
         with SocketManager(socket): pass

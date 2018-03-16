@@ -6,10 +6,14 @@ from communication.socket_manager import SocketManager
 
 
 class Server(SocketManager):
-    "Server object that handles socket logic for incoming connections."
+    """A server to listen for and manage incoming connections.
+
+    Args:
+        host: The address to which to bind the server.
+        port: The port to listen on.
+    """
 
     def __init__(self, host, port):
-        "Creates a server object."
         super().__init__()
         self.host = host
         self.port = port
@@ -18,7 +22,6 @@ class Server(SocketManager):
         self.logger = logging.getLogger(__name__)
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        "Closes the open sockets and set shutdown flag for running threads."
         self.running = False
         # Create a socket manager for each connection just to let it close
         for socket in self.sockets:
@@ -27,7 +30,11 @@ class Server(SocketManager):
         super().__exit__(exc_type, exc_val, exc_tb)
 
     def listen(self, handle_incoming_connection):
-        "Binds a socket to the given address and listens and accepts one incoming connection."
+        """Listens for incoming connections indefinitely.
+
+        Args:
+            handle_incoming_connection: A callback that will be called asynchronously and takes a socket handle as parameter.
+        """
         self.logger.info("Server started listening.")
         try:
             self.socket.bind((self.host, self.port))
