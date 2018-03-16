@@ -1,4 +1,4 @@
-Encryption Protocols
+Communication Protocols
 ==================
 
 
