@@ -1,0 +1,293 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Systems &mdash; EncryptedMessenger 0.1.0-alpha documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../genindex.html"/>
+        <link rel="search" title="Search" href="../search.html"/>
+    <link rel="top" title="EncryptedMessenger 0.1.0-alpha documentation" href="../index.html"/>
+        <link rel="next" title="Encryption Protocols" href="encryption_protocols.html"/>
+        <link rel="prev" title="Welcome to EncryptedMessenger’s documentation!" href="../index.html"/> 
+
+  
+  <script src="js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> EncryptedMessenger
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Info:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Systems</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#main-thread">Main Thread</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#connecting-a-user-to-the-peer-network">Connecting a User to the Peer Network</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#registering-a-new-user">Registering a New User</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#starting-a-messaging-session">Starting a Messaging Session</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#as-a-host">As a host</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#as-a-guest">As a guest</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="encryption_protocols.html">Encryption Protocols</a></li>
+<li class="toctree-l1"><a class="reference internal" href="communication_protocols.html">Communication Protocols</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="communication.html">Communication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="encryption.html">Encryption</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ui.html">UI</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">EncryptedMessenger</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+      <li>Systems</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/_static/systems.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="systems">
+<h1><a class="toc-backref" href="#id1">Systems</a><a class="headerlink" href="#systems" title="Permalink to this headline">¶</a></h1>
+<div class="contents topic" id="contents">
+<p class="topic-title first">Contents</p>
+<ul class="simple">
+<li><a class="reference internal" href="#systems" id="id1">Systems</a><ul>
+<li><a class="reference internal" href="#main-thread" id="id2">Main Thread</a></li>
+<li><a class="reference internal" href="#connecting-a-user-to-the-peer-network" id="id3">Connecting a User to the Peer Network</a></li>
+<li><a class="reference internal" href="#registering-a-new-user" id="id4">Registering a New User</a></li>
+<li><a class="reference internal" href="#starting-a-messaging-session" id="id5">Starting a Messaging Session</a><ul>
+<li><a class="reference internal" href="#as-a-host" id="id6">As a host</a></li>
+<li><a class="reference internal" href="#as-a-guest" id="id7">As a guest</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="main-thread">
+<h2><a class="toc-backref" href="#id2">Main Thread</a><a class="headerlink" href="#main-thread" title="Permalink to this headline">¶</a></h2>
+<img alt="../_images/main_thread_diagram.png" src="../_images/main_thread_diagram.png" />
+</div>
+<div class="section" id="connecting-a-user-to-the-peer-network">
+<h2><a class="toc-backref" href="#id3">Connecting a User to the Peer Network</a><a class="headerlink" href="#connecting-a-user-to-the-peer-network" title="Permalink to this headline">¶</a></h2>
+<p><em>Under construction.</em></p>
+</div>
+<div class="section" id="registering-a-new-user">
+<h2><a class="toc-backref" href="#id4">Registering a New User</a><a class="headerlink" href="#registering-a-new-user" title="Permalink to this headline">¶</a></h2>
+<p><em>Under construction.</em></p>
+</div>
+<div class="section" id="starting-a-messaging-session">
+<h2><a class="toc-backref" href="#id5">Starting a Messaging Session</a><a class="headerlink" href="#starting-a-messaging-session" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="as-a-host">
+<h3><a class="toc-backref" href="#id6">As a host</a><a class="headerlink" href="#as-a-host" title="Permalink to this headline">¶</a></h3>
+<p><em>Under construction.</em></p>
+</div>
+<div class="section" id="as-a-guest">
+<h3><a class="toc-backref" href="#id7">As a guest</a><a class="headerlink" href="#as-a-guest" title="Permalink to this headline">¶</a></h3>
+<p><em>Under construction.</em></p>
+</div>
+</div>
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="encryption_protocols.html" class="btn btn-neutral float-right" title="Encryption Protocols" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../index.html" class="btn btn-neutral" title="Welcome to EncryptedMessenger’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Etienne Desticourt.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'0.1.0-alpha',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="jquery.js"></script>
+      <script type="text/javascript" src="underscore.js"></script>
+      <script type="text/javascript" src="doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

@@ -1,0 +1,519 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>encryption.crypter &mdash; EncryptedMessenger 0.1.0-alpha documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../genindex.html"/>
+        <link rel="search" title="Search" href="../../search.html"/>
+    <link rel="top" title="EncryptedMessenger 0.1.0-alpha documentation" href="../../index.html"/>
+        <link rel="up" title="Module code" href="../index.html"/> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> EncryptedMessenger
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Info:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../_static/systems.html">Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_static/encryption_protocols.html">Encryption Protocols</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_static/communication_protocols.html">Communication Protocols</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../_static/communication.html">Communication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_static/encryption.html">Encryption</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_static/ui.html">UI</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">EncryptedMessenger</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>encryption.crypter</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for encryption.crypter</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">math</span>
+
+<span class="kn">from</span> <span class="nn">cryptography.hazmat.primitives.serialization</span> <span class="k">import</span> <span class="n">load_pem_private_key</span><span class="p">,</span> <span class="n">Encoding</span><span class="p">,</span> <span class="n">PublicFormat</span><span class="p">,</span> <span class="n">load_pem_public_key</span>
+<span class="kn">from</span> <span class="nn">cryptography.hazmat.primitives.ciphers</span> <span class="k">import</span> <span class="n">Cipher</span><span class="p">,</span> <span class="n">algorithms</span><span class="p">,</span> <span class="n">modes</span>
+<span class="kn">from</span> <span class="nn">cryptography.hazmat.primitives</span> <span class="k">import</span> <span class="n">hashes</span><span class="p">,</span> <span class="n">hmac</span>
+<span class="kn">from</span> <span class="nn">cryptography.hazmat.backends</span> <span class="k">import</span> <span class="n">default_backend</span>
+<span class="kn">from</span> <span class="nn">cryptography.hazmat.primitives.asymmetric</span> <span class="k">import</span> <span class="n">padding</span><span class="p">,</span> <span class="n">rsa</span>
+<span class="kn">from</span> <span class="nn">cryptography.exceptions</span> <span class="k">import</span> <span class="n">UnsupportedAlgorithm</span>
+<span class="kn">import</span> <span class="nn">cryptography.exceptions</span>
+
+<span class="kn">from</span> <span class="nn">communication</span> <span class="k">import</span> <span class="n">protocol</span>
+<span class="kn">from</span> <span class="nn">encryption.exceptions</span> <span class="k">import</span> <span class="n">CrypterException</span><span class="p">,</span> <span class="n">NoKeyException</span><span class="p">,</span> <span class="n">CorruptedMessageException</span>
+<span class="kn">import</span> <span class="nn">encryption.exceptions</span>
+<span class="kn">from</span> <span class="nn">keys</span> <span class="k">import</span> <span class="n">utils</span>
+<span class="kn">import</span> <span class="nn">config</span>
+
+<span class="n">DEFAULT_EXPONENT</span> <span class="o">=</span> <span class="mi">65537</span>
+<span class="n">DEFAULT_RSA_KEY_SIZE</span> <span class="o">=</span> <span class="mi">2048</span>
+
+
+<div class="viewcode-block" id="DEFAULT_PADDING"><a class="viewcode-back" href="../../_generated/encryption.crypter.html#encryption.crypter.DEFAULT_PADDING">[docs]</a><span class="k">def</span> <span class="nf">DEFAULT_PADDING</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">padding</span><span class="o">.</span><span class="n">OAEP</span><span class="p">(</span><span class="n">mgf</span><span class="o">=</span><span class="n">padding</span><span class="o">.</span><span class="n">MGF1</span><span class="p">(</span><span class="n">algorithm</span><span class="o">=</span><span class="n">hashes</span><span class="o">.</span><span class="n">SHA256</span><span class="p">()),</span>
+                        <span class="n">algorithm</span><span class="o">=</span><span class="n">hashes</span><span class="o">.</span><span class="n">SHA256</span><span class="p">(),</span></div>
+                        <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+
+<div class="viewcode-block" id="OPENSSL_PADDING"><a class="viewcode-back" href="../../_generated/encryption.crypter.html#encryption.crypter.OPENSSL_PADDING">[docs]</a><span class="k">def</span> <span class="nf">OPENSSL_PADDING</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">padding</span><span class="o">.</span><span class="n">OAEP</span><span class="p">(</span><span class="n">mgf</span><span class="o">=</span><span class="n">padding</span><span class="o">.</span><span class="n">MGF1</span><span class="p">(</span><span class="n">algorithm</span><span class="o">=</span><span class="n">hashes</span><span class="o">.</span><span class="n">SHA1</span><span class="p">()),</span>
+                        <span class="n">algorithm</span><span class="o">=</span><span class="n">hashes</span><span class="o">.</span><span class="n">SHA1</span><span class="p">(),</span></div>
+                        <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Crypter"><a class="viewcode-back" href="../../_generated/encryption.crypter.html#encryption.crypter.Crypter">[docs]</a><span class="k">class</span> <span class="nc">Crypter</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A utility that holds a user&#39;s secret keys, handles the authentication handshake, encryption and decryption of messages, </span>
+<span class="sd">    and garantees their integrity.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        RNG: A random function that&#39;ll be used to generate keys. Must be cryptographically secure.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">RNG</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rsa_key</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">aes_key</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">RNG</span> <span class="o">=</span> <span class="n">RNG</span>
+
+<div class="viewcode-block" id="Crypter.load_rsa_key"><a class="viewcode-back" href="../../_generated/encryption.crypter.html#encryption.crypter.Crypter.load_rsa_key">[docs]</a>    <span class="k">def</span> <span class="nf">load_rsa_key</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key_type</span><span class="p">,</span> <span class="n">directory</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">KEY_DIR</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Loads an RSA key to perform handhsakes/authentication with.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            key_type: keys.PUBLIC or keys.PRIVATE.</span>
+<span class="sd">            directory: The directory in which the key is stored.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            CrypterException: If the specified key_type does not exist.</span>
+<span class="sd">            NoKeyException: If there is no key file in the specified directory.</span>
+<span class="sd">            BackendException: If the serialized key is of a type that is not supported by the backend </span>
+<span class="sd">                or if the key is encrypted with a symmetric cipher that is not supported by the backend.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">rsa_key</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">load_key</span><span class="p">(</span><span class="n">key_type</span><span class="p">,</span> <span class="n">directory</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">FileNotFoundError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">NoKeyException</span><span class="p">()</span> <span class="kn">from</span> <span class="nn">e</span>
+        <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">CrypterException</span><span class="p">(</span><span class="s2">&quot;Wrong key type.&quot;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+        <span class="k">except</span> <span class="n">UnsupportedAlgorithm</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">BackendException</span><span class="p">(</span><span class="s2">&quot;Unable to load RSA key.&quot;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">key_type</span> <span class="o">=</span> <span class="n">key_type</span>
+
+<div class="viewcode-block" id="Crypter.gen_and_set_rsa_key"><a class="viewcode-back" href="../../_generated/encryption.crypter.html#encryption.crypter.Crypter.gen_and_set_rsa_key">[docs]</a>    <span class="k">def</span> <span class="nf">gen_and_set_rsa_key</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Generates and stores a new RSA key pair.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">key_type</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">PRIVATE</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rsa_key</span> <span class="o">=</span> <span class="n">rsa</span><span class="o">.</span><span class="n">generate_private_key</span><span class="p">(</span><span class="n">public_exponent</span><span class="o">=</span><span class="n">DEFAULT_EXPONENT</span><span class="p">,</span>
+                                                <span class="n">key_size</span><span class="o">=</span><span class="n">DEFAULT_RSA_KEY_SIZE</span><span class="p">,</span></div>
+                                                <span class="n">backend</span><span class="o">=</span><span class="n">default_backend</span><span class="p">())</span>
+
+<div class="viewcode-block" id="Crypter.set_public_key_from_pem"><a class="viewcode-back" href="../../_generated/encryption.crypter.html#encryption.crypter.Crypter.set_public_key_from_pem">[docs]</a>    <span class="k">def</span> <span class="nf">set_public_key_from_pem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pem_data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sets a new public key from pem data.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            The pem data bytes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">key_type</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">PUBLIC</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rsa_key</span> <span class="o">=</span> <span class="n">load_pem_public_key</span><span class="p">(</span><span class="n">pem_data</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="n">default_backend</span><span class="p">())</span>
+
+<div class="viewcode-block" id="Crypter.get_public_key_pem"><a class="viewcode-back" href="../../_generated/encryption.crypter.html#encryption.crypter.Crypter.get_public_key_pem">[docs]</a>    <span class="k">def</span> <span class="nf">get_public_key_pem</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Gets pem data for the public rsa key.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            The pem data bytes.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            CrypterException: If the current key type does not exist.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">key_type</span> <span class="o">==</span> <span class="n">utils</span><span class="o">.</span><span class="n">PRIVATE</span><span class="p">:</span>
+            <span class="n">public_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rsa_key</span><span class="o">.</span><span class="n">public_key</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">key_type</span> <span class="o">==</span> <span class="n">utils</span><span class="o">.</span><span class="n">PUBLIC</span><span class="p">:</span>
+            <span class="n">public_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rsa_key</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">CrypterException</span><span class="p">(</span><span class="s2">&quot;Wrong key type.&quot;</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">public_key</span><span class="o">.</span><span class="n">public_bytes</span><span class="p">(</span><span class="n">Encoding</span><span class="o">.</span><span class="n">PEM</span><span class="p">,</span> <span class="n">PublicFormat</span><span class="o">.</span><span class="n">SubjectPublicKeyInfo</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Crypter.gen_and_set_aes_key"><a class="viewcode-back" href="../../_generated/encryption.crypter.html#encryption.crypter.Crypter.gen_and_set_aes_key">[docs]</a>    <span class="k">def</span> <span class="nf">gen_and_set_aes_key</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Generates and stores a 32 bytes AES key to encrypt messages with.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            The generated 32 bytes AES key.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">aes_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">RNG</span><span class="p">(</span><span class="mi">32</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">aes_key</span>
+
+<div class="viewcode-block" id="Crypter.gen_hmac"><a class="viewcode-back" href="../../_generated/encryption.crypter.html#encryption.crypter.Crypter.gen_hmac">[docs]</a>    <span class="k">def</span> <span class="nf">gen_hmac</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iv</span><span class="p">,</span> <span class="n">encrypted_message</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Generates 32 bytes of HMAC from a given initialization vector and encrypted message </span>
+<span class="sd">        to ensure the message&#39;s integrity.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            iv: The initialization vector to generate the HMAC.</span>
+<span class="sd">            encrypted_message: The encrypted message to which the HMAC will be merged.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            The generated 32 bytes HMAC.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="n">hmac</span><span class="o">.</span><span class="n">HMAC</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">aes_key</span><span class="p">,</span> <span class="n">hashes</span><span class="o">.</span><span class="n">SHA256</span><span class="p">(),</span> <span class="n">backend</span><span class="o">=</span><span class="n">default_backend</span><span class="p">())</span>
+        <span class="n">h</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">iv</span><span class="p">)</span>
+        <span class="n">h</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">encrypted_message</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">h</span>
+
+<div class="viewcode-block" id="Crypter.encrypt_message"><a class="viewcode-back" href="../../_generated/encryption.crypter.html#encryption.crypter.Crypter.encrypt_message">[docs]</a>    <span class="k">def</span> <span class="nf">encrypt_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Encrypts the given message using the current AES key.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            message: The message to encrypt.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            An encrypted message along with its HMAC and its initialization vector.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            NoKeyException: If an AES key hasn&#39;t been generated yet.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">aes_key</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">NoKeyException</span><span class="p">(</span><span class="s2">&quot;Cannot encrypt message: AES key hasn&#39;t been set.&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Pad message for mode</span>
+        <span class="n">padding_length</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">message</span><span class="p">)</span> <span class="o">/</span> <span class="mi">16</span><span class="p">)</span> <span class="o">*</span> <span class="mi">16</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+        <span class="n">message</span> <span class="o">+=</span> <span class="n">padding_length</span> <span class="o">*</span> <span class="sa">b</span><span class="s2">&quot;0&quot;</span>
+
+        <span class="c1"># Random init vector</span>
+        <span class="n">iv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">RNG</span><span class="p">(</span><span class="mi">16</span><span class="p">)</span>
+
+        <span class="c1"># Encrypt message</span>
+        <span class="n">aes</span> <span class="o">=</span> <span class="n">Cipher</span><span class="p">(</span><span class="n">algorithms</span><span class="o">.</span><span class="n">AES</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">aes_key</span><span class="p">),</span>
+                     <span class="n">modes</span><span class="o">.</span><span class="n">CBC</span><span class="p">(</span><span class="n">iv</span><span class="p">),</span> <span class="n">backend</span><span class="o">=</span><span class="n">default_backend</span><span class="p">())</span>
+        <span class="n">encryptor</span> <span class="o">=</span> <span class="n">aes</span><span class="o">.</span><span class="n">encryptor</span><span class="p">()</span>
+        <span class="n">enc_array</span> <span class="o">=</span> <span class="n">encryptor</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">message</span><span class="p">)</span> <span class="o">+</span> <span class="n">encryptor</span><span class="o">.</span><span class="n">finalize</span><span class="p">()</span>
+
+        <span class="c1"># Gen auth data</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gen_hmac</span><span class="p">(</span><span class="n">iv</span><span class="p">,</span> <span class="n">enc_array</span><span class="p">)</span>
+        <span class="n">hmac_bytes</span> <span class="o">=</span> <span class="n">h</span><span class="o">.</span><span class="n">finalize</span><span class="p">()</span>
+</div>
+        <span class="k">return</span> <span class="n">iv</span> <span class="o">+</span> <span class="n">enc_array</span> <span class="o">+</span> <span class="n">hmac_bytes</span>
+
+<div class="viewcode-block" id="Crypter.decrypt_message"><a class="viewcode-back" href="../../_generated/encryption.crypter.html#encryption.crypter.Crypter.decrypt_message">[docs]</a>    <span class="k">def</span> <span class="nf">decrypt_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Decrypts the given message using the current AES key.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            message: The message to decrypt.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            The decrypted message as a string.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            CorruptedMessageException: The HMAC signature did not match the message or the message wasn&#39;t the right size.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">aes_key</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">NoKeyException</span><span class="p">(</span><span class="s2">&quot;Cannot decrypt message: AES key hasn&#39;t been set.&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">message</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">16</span> <span class="o">+</span> <span class="mi">32</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">CorruptedMessageException</span><span class="p">()</span>
+
+        <span class="n">iv</span> <span class="o">=</span> <span class="n">message</span><span class="p">[:</span><span class="mi">16</span><span class="p">]</span>
+        <span class="n">enc_mess</span> <span class="o">=</span> <span class="n">message</span><span class="p">[</span><span class="mi">16</span><span class="p">:</span><span class="o">-</span><span class="mi">32</span><span class="p">]</span>
+        <span class="n">hmac_bytes</span> <span class="o">=</span> <span class="n">message</span><span class="p">[</span><span class="o">-</span><span class="mi">32</span><span class="p">:]</span>
+
+        <span class="c1"># Verify auth</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gen_hmac</span><span class="p">(</span><span class="n">iv</span><span class="p">,</span> <span class="n">enc_mess</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">h</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">hmac_bytes</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">InvalidSignature</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">CorruptedMessageException</span><span class="p">()</span> <span class="kn">from</span> <span class="nn">e</span>
+
+        <span class="c1"># Decrypt message if there was no error</span>
+        <span class="n">aes</span> <span class="o">=</span> <span class="n">Cipher</span><span class="p">(</span><span class="n">algorithms</span><span class="o">.</span><span class="n">AES</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">aes_key</span><span class="p">),</span>
+                     <span class="n">modes</span><span class="o">.</span><span class="n">CBC</span><span class="p">(</span><span class="n">iv</span><span class="p">),</span> <span class="n">backend</span><span class="o">=</span><span class="n">default_backend</span><span class="p">())</span>
+        <span class="n">decryptor</span> <span class="o">=</span> <span class="n">aes</span><span class="o">.</span><span class="n">decryptor</span><span class="p">()</span>
+        <span class="n">message</span> <span class="o">=</span> <span class="n">decryptor</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">enc_mess</span><span class="p">)</span> <span class="o">+</span> <span class="n">decryptor</span><span class="o">.</span><span class="n">finalize</span><span class="p">()</span>
+
+        <span class="c1"># This doesn&#39;t belong here: crypter doesn&#39;t necessarily want to handle strings</span>
+        <span class="c1"># long term we want to pass message length in message and simply cut the padding</span>
+        <span class="c1"># And let messenger or interface decode</span>
+        <span class="c1"># Kinda too lazy to do that right now, mby later</span>
+        <span class="n">message</span> <span class="o">=</span> <span class="n">message</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf8&#39;</span><span class="p">)</span>
+        <span class="n">message</span> <span class="o">=</span> <span class="n">message</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\0</span><span class="s1">&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span></div>
+        <span class="k">return</span> <span class="n">message</span>
+
+<div class="viewcode-block" id="Crypter.encrypt_key"><a class="viewcode-back" href="../../_generated/encryption.crypter.html#encryption.crypter.Crypter.encrypt_key">[docs]</a>    <span class="k">def</span> <span class="nf">encrypt_key</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">raw_key</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Encrypts a key.</span>
+
+
+<span class="sd">        Args:</span>
+<span class="sd">            raw_key: The secret key to encrypt.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            The encrypted key.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            NoKeyException: If the RSA key hasn&#39;t been loaded yet.</span>
+<span class="sd">            CrypterException: If the loaded RSA key is private. It needs a public key to encrypt things.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rsa_key</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">NoKeyException</span><span class="p">(</span><span class="s2">&quot;Cannot encrypt AES key: RSA key hasn&#39;t been loaded.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">key_type</span> <span class="o">!=</span> <span class="n">utils</span><span class="o">.</span><span class="n">PUBLIC</span><span class="p">:</span> <span class="c1"># TODO: Why just not get the public key from the private one?</span>
+            <span class="k">raise</span> <span class="n">CrypterException</span><span class="p">(</span><span class="s2">&quot;Cannot encrypt key. Public RSA key required.&quot;</span><span class="p">)</span>
+        <span class="n">enc_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rsa_key</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span><span class="n">raw_key</span><span class="p">,</span> <span class="n">DEFAULT_PADDING</span><span class="p">())</span></div>
+        <span class="k">return</span> <span class="n">enc_key</span>
+
+<div class="viewcode-block" id="Crypter.decrypt_key"><a class="viewcode-back" href="../../_generated/encryption.crypter.html#encryption.crypter.Crypter.decrypt_key">[docs]</a>    <span class="k">def</span> <span class="nf">decrypt_key</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">encrypted_key</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Decrypts a key.</span>
+
+
+<span class="sd">        Args:</span>
+<span class="sd">            encrypted_key: The secret key to decrypt.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            The decrypted key.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            NoKeyException: If the RSA key hasn&#39;t been loaded yet.</span>
+<span class="sd">            CrypterException: If the loaded RSA key is public. It needs a private key to decrypt things.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rsa_key</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">NoKeyException</span><span class="p">(</span><span class="s2">&quot;Cannot decrypt AES key: RSA key hasn&#39;t been loaded.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">key_type</span> <span class="o">!=</span> <span class="n">utils</span><span class="o">.</span><span class="n">PRIVATE</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">CrypterException</span><span class="p">(</span><span class="s2">&quot;Cannot decrypt key. Private RSA key required.&quot;</span><span class="p">)</span>
+        <span class="n">raw_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rsa_key</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">encrypted_key</span><span class="p">,</span> <span class="n">DEFAULT_PADDING</span><span class="p">())</span></div>
+        <span class="k">return</span> <span class="n">raw_key</span>
+
+<div class="viewcode-block" id="Crypter.sign"><a class="viewcode-back" href="../../_generated/encryption.crypter.html#encryption.crypter.Crypter.sign">[docs]</a>    <span class="k">def</span> <span class="nf">sign</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">private_key</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Signs a message with the private RSA key to authenticate it.</span>
+
+
+<span class="sd">        Args:</span>
+<span class="sd">            private_key: The secret key with which to sign the message.</span>
+<span class="sd">            message: The message to sign.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            The signature.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">sign_padding</span> <span class="o">=</span> <span class="n">padding</span><span class="o">.</span><span class="n">PSS</span><span class="p">(</span><span class="n">mgf</span><span class="o">=</span><span class="n">padding</span><span class="o">.</span><span class="n">MGF1</span><span class="p">(</span><span class="n">hashes</span><span class="o">.</span><span class="n">SHA256</span><span class="p">()),</span>
+                                   <span class="n">salt_length</span><span class="o">=</span><span class="n">padding</span><span class="o">.</span><span class="n">PSS</span><span class="o">.</span><span class="n">MAX_LENGTH</span><span class="p">)</span>
+
+        <span class="n">signature</span> <span class="o">=</span> <span class="n">private_key</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">sign_padding</span><span class="p">,</span> <span class="n">hashes</span><span class="o">.</span><span class="n">SHA256</span><span class="p">())</span>
+</div>
+        <span class="k">return</span> <span class="n">signature</span>
+
+<div class="viewcode-block" id="Crypter.verify_signature"><a class="viewcode-back" href="../../_generated/encryption.crypter.html#encryption.crypter.Crypter.verify_signature">[docs]</a>    <span class="k">def</span> <span class="nf">verify_signature</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">public_key</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">signature</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Verifies the author&#39;s identity for a given message.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            public_key: The public key of the author.</span>
+<span class="sd">            message: The message to authenticate.</span>
+<span class="sd">            signature: The signature with which the author signed the message.</span>
+
+
+
+
+<span class="sd">        Args:</span>
+<span class="sd">            private_key: The secret key with which to sign the message.</span>
+<span class="sd">            message: The message to sign.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            InvalidSignature: If the signature does not match the public key.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">sign_padding</span> <span class="o">=</span> <span class="n">padding</span><span class="o">.</span><span class="n">PSS</span><span class="p">(</span><span class="n">mgf</span><span class="o">=</span><span class="n">padding</span><span class="o">.</span><span class="n">MGF1</span><span class="p">(</span><span class="n">hashes</span><span class="o">.</span><span class="n">SHA256</span><span class="p">()),</span>
+                                   <span class="n">salt_length</span><span class="o">=</span><span class="n">padding</span><span class="o">.</span><span class="n">PSS</span><span class="o">.</span><span class="n">MAX_LENGTH</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">public_key</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">signature</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">sign_padding</span><span class="p">,</span> <span class="n">hashes</span><span class="o">.</span><span class="n">SHA256</span><span class="p">())</span>
+        <span class="k">except</span> <span class="n">cryptography</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">InvalidSignature</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span></div></div>
+            <span class="k">raise</span> <span class="n">encryption</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">InvalidSignature</span><span class="p">()</span> <span class="kn">from</span> <span class="nn">e</span>
+</pre></div>
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Etienne Desticourt.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'0.1.0-alpha',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

@@ -1,0 +1,461 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>communication.network module &mdash; EncryptedMessenger 0.1.0-alpha documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../genindex.html"/>
+        <link rel="search" title="Search" href="../search.html"/>
+    <link rel="top" title="EncryptedMessenger 0.1.0-alpha documentation" href="../index.html"/>
+        <link rel="up" title="Communication package" href="../_static/communication.html"/>
+        <link rel="next" title="communication.protocol module" href="communication.protocol.html"/>
+        <link rel="prev" title="communication.messenger module" href="communication.messenger.html"/> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> EncryptedMessenger
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Info:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../_static/systems.html">Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_static/encryption_protocols.html">Encryption Protocols</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_static/communication_protocols.html">Communication Protocols</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../_static/communication.html">Communication</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="communication.client.html">Client</a></li>
+<li class="toctree-l2"><a class="reference internal" href="communication.contact.html">Contact</a></li>
+<li class="toctree-l2"><a class="reference internal" href="communication.contact_manager.html">Contact Manager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="communication.encrypted_messenger.html">Encrypted Messenger</a></li>
+<li class="toctree-l2"><a class="reference internal" href="communication.exceptions.html">Exceptions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="communication.messenger.html">Messenger</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Network</a></li>
+<li class="toctree-l2"><a class="reference internal" href="communication.protocol.html">Protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="communication.server.html">Server</a></li>
+<li class="toctree-l2"><a class="reference internal" href="communication.socket_manager.html">Socket Manager</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../_static/encryption.html">Encryption</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_static/ui.html">UI</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">EncryptedMessenger</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../_static/communication.html">Communication package</a> &raquo;</li>
+        
+      <li>communication.network module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/_generated/communication.network.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-communication.network">
+<span id="communication-network-module"></span><h1>communication.network module<a class="headerlink" href="#module-communication.network" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="communication.network.Network">
+<em class="property">class </em><code class="descclassname">communication.network.</code><code class="descname">Network</code><span class="sig-paren">(</span><em>url</em>, <em>key_dir='keys'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/communication/network.html#Network"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#communication.network.Network" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Manages connections to the network of peers on which users are registered.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>url</strong> – The endpoint to the peer network’s API.</li>
+<li><strong>key_dir</strong> – The directory in which the user’s private key is stored.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="communication.network.Network.EXISTING_USER_ERROR">
+<code class="descname">EXISTING_USER_ERROR</code><em class="property"> = {'error': 'User already exists.'}</em><a class="headerlink" href="#communication.network.Network.EXISTING_USER_ERROR" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="communication.network.Network.FAILED_CHALLENGE_ERROR">
+<code class="descname">FAILED_CHALLENGE_ERROR</code><em class="property"> = {'error': 'Challenge failed.'}</em><a class="headerlink" href="#communication.network.Network.FAILED_CHALLENGE_ERROR" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="communication.network.Network.NO_CHALLENGE_ERROR">
+<code class="descname">NO_CHALLENGE_ERROR</code><em class="property"> = {'error': 'No existing challenge for user.'}</em><a class="headerlink" href="#communication.network.Network.NO_CHALLENGE_ERROR" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="communication.network.Network.NO_USER_ERROR">
+<code class="descname">NO_USER_ERROR</code><em class="property"> = {'error': 'No such user.'}</em><a class="headerlink" href="#communication.network.Network.NO_USER_ERROR" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="communication.network.Network.OK_RESPONSE">
+<code class="descname">OK_RESPONSE</code><em class="property"> = {'status': 'OK'}</em><a class="headerlink" href="#communication.network.Network.OK_RESPONSE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="communication.network.Network.connect">
+<code class="descname">connect</code><span class="sig-paren">(</span><em>username</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/communication/network.html#Network.connect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#communication.network.Network.connect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Connects to the network to update the user’s ip.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>username</strong> – The username of the user with which to connect.</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><code class="xref py py-exc docutils literal notranslate"><span class="pre">UserDoesNotExistError</span></code> – There is no user with that username registered on the network.</li>
+<li><code class="xref py py-exc docutils literal notranslate"><span class="pre">UnexpectedResponseError</span></code> – The network answered with an unexpected message.</li>
+<li><code class="xref py py-exc docutils literal notranslate"><span class="pre">ChallengeFailureError</span></code> – The user failed to authenticate by solving the network’s challenge with his private key.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="communication.network.Network.fetch_contact_ips">
+<code class="descname">fetch_contact_ips</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/communication/network.html#Network.fetch_contact_ips"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#communication.network.Network.fetch_contact_ips" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fetches the ips of all the user’s contacts.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A list of ips.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="communication.network.Network.fetch_peer">
+<code class="descname">fetch_peer</code><span class="sig-paren">(</span><em>username</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/communication/network.html#Network.fetch_peer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#communication.network.Network.fetch_peer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fetches the specified user’s identification info (username and public key).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>username</strong> – The name of the user whose ip we want to fetch.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A JSON string that holds the user’s public key and username.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="communication.network.Network.fetch_peer_ip">
+<code class="descname">fetch_peer_ip</code><span class="sig-paren">(</span><em>username</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/communication/network.html#Network.fetch_peer_ip"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#communication.network.Network.fetch_peer_ip" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fetches the last recorded ip of the specified user.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>username</strong> – The name of the user whose ip we want to fetch.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A JSON string holding the user’s ip.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="communication.network.Network.get_peer_info">
+<code class="descname">get_peer_info</code><span class="sig-paren">(</span><em>username</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/communication/network.html#Network.get_peer_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#communication.network.Network.get_peer_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fetches the contact information (ip and public key) of the specified user.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>username</strong> – The name of the user whose info we want to fetch.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A JSON string that holds the user’s data.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><code class="xref py py-exc docutils literal notranslate"><span class="pre">UserDoesNotExistError</span></code> – There is no user with that username registered on the network.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="communication.network.Network.get_peer_ip">
+<code class="descname">get_peer_ip</code><span class="sig-paren">(</span><em>username</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/communication/network.html#Network.get_peer_ip"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#communication.network.Network.get_peer_ip" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fetches the last recorded ip of the specified user.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>username</strong> – The name of the user whose ip we want to fetch.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The user’s ip.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="communication.network.Network.has_peer">
+<code class="descname">has_peer</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/communication/network.html#Network.has_peer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#communication.network.Network.has_peer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks whether the network has a peer with a specific name.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>name</strong> – The name of the peer to look for.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A boolean indicating whether the peer exists.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="communication.network.Network.raise_on_wrong_http_code">
+<code class="descname">raise_on_wrong_http_code</code><span class="sig-paren">(</span><em>func</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/communication/network.html#Network.raise_on_wrong_http_code"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#communication.network.Network.raise_on_wrong_http_code" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a function that will raise a NetworkException when failling to fetch an http resource.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>func</strong> – A function that returns an object that holds an http status code.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A function that raises a NetworkException when the http functions returns an error status code.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="communication.network.Network.register">
+<code class="descname">register</code><span class="sig-paren">(</span><em>username</em>, <em>public_pem</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/communication/network.html#Network.register"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#communication.network.Network.register" title="Permalink to this definition">¶</a></dt>
+<dd><p>Registers a user on the peer network.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>username</strong> – The name to register with.</li>
+<li><strong>public_pem</strong> – The public key to publicize so other users can connect to you.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><code class="xref py py-exc docutils literal notranslate"><span class="pre">CommandFailureError</span></code> – The peer network returned an error when attempting to register.</li>
+<li><code class="xref py py-exc docutils literal notranslate"><span class="pre">UnexpectedResponseError</span></code> – The network answered with an unexpected message.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="communication.protocol.html" class="btn btn-neutral float-right" title="communication.protocol module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="communication.messenger.html" class="btn btn-neutral" title="communication.messenger module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Etienne Desticourt.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'0.1.0-alpha',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

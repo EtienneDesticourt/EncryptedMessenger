@@ -1,0 +1,379 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>communication.contact_manager &mdash; EncryptedMessenger 0.1.0-alpha documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../genindex.html"/>
+        <link rel="search" title="Search" href="../../search.html"/>
+    <link rel="top" title="EncryptedMessenger 0.1.0-alpha documentation" href="../../index.html"/>
+        <link rel="up" title="Module code" href="../index.html"/> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> EncryptedMessenger
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Info:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../_static/systems.html">Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_static/encryption_protocols.html">Encryption Protocols</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_static/communication_protocols.html">Communication Protocols</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../_static/communication.html">Communication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_static/encryption.html">Encryption</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_static/ui.html">UI</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">EncryptedMessenger</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>communication.contact_manager</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for communication.contact_manager</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">threading</span>
+<span class="kn">from</span> <span class="nn">communication.contact</span> <span class="k">import</span> <span class="n">Contact</span>
+<span class="kn">import</span> <span class="nn">config</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+
+<div class="viewcode-block" id="ContactManager"><a class="viewcode-back" href="../../_generated/communication.contact_manager.html#communication.contact_manager.ContactManager">[docs]</a><span class="k">class</span> <span class="nc">ContactManager</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Manages multiple contacts for a user.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        peer_registry: An object that allows the manager to fetch peers&#39; ips by name.</span>
+<span class="sd">        contact_dir: A directory in which contacts are/can be stored.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">peer_registry</span><span class="p">,</span> <span class="n">contact_dir</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">CONTACT_DIR</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">contacts</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">peer_registry</span> <span class="o">=</span> <span class="n">peer_registry</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">contact_dir</span> <span class="o">=</span> <span class="n">contact_dir</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ContactManager.get_contact"><a class="viewcode-back" href="../../_generated/communication.contact_manager.html#communication.contact_manager.ContactManager.get_contact">[docs]</a>    <span class="k">def</span> <span class="nf">get_contact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Fetches a contact by name.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            name: The name of the contact.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            The wanted contact or None if none match the given name.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">contact</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">contacts</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">contact</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">name</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">contact</span></div>
+        <span class="k">return</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="ContactManager.update_contacts_ip"><a class="viewcode-back" href="../../_generated/communication.contact_manager.html#communication.contact_manager.ContactManager.update_contacts_ip">[docs]</a>    <span class="k">def</span> <span class="nf">update_contacts_ip</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Fetches the ip of all contacts from the peer registry.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Updating contact ips.&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">contact</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">contacts</span><span class="p">:</span></div>
+            <span class="n">contact</span><span class="o">.</span><span class="n">ip</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">peer_registry</span><span class="o">.</span><span class="n">get_peer_ip</span><span class="p">(</span><span class="n">contact</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ContactManager.get_contact_by_ip"><a class="viewcode-back" href="../../_generated/communication.contact_manager.html#communication.contact_manager.ContactManager.get_contact_by_ip">[docs]</a>    <span class="k">def</span> <span class="nf">get_contact_by_ip</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ip</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Fetches a contact by ip.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            ip: The contact&#39;s ip.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            The wanted contact or None if none match the given ip.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">contact</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">contacts</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">contact</span><span class="o">.</span><span class="n">ip</span> <span class="o">==</span> <span class="n">ip</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">contact</span></div>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="c1"># TODO: Shouldn&#39;t store callbacks here maybe? Transparent connect_as_server wrapper that doesn&#39;t impose</span>
+    <span class="c1"># that particular use as callback</span>
+    <span class="c1"># Rename connect_contact_as_server?</span>
+<div class="viewcode-block" id="ContactManager.contact_connected"><a class="viewcode-back" href="../../_generated/communication.contact_manager.html#communication.contact_manager.ContactManager.contact_connected">[docs]</a>    <span class="k">def</span> <span class="nf">contact_connected</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">socket</span><span class="p">,</span> <span class="n">ip</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Starts a messaging session with the contact that has just connected from the given IP </span>
+<span class="sd">        if it exists.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            socket: The socket handle to the contact that connected.</span>
+<span class="sd">            ip: The ip of the contact that&#39;s trying to connect.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Incoming connection from ip </span><span class="si">%s</span><span class="s2"> on socket </span><span class="si">%s</span><span class="s2">.&quot;</span><span class="p">,</span> <span class="n">ip</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">socket</span><span class="p">))</span>
+        <span class="c1"># We have to recheck each contact&#39;s ip because contacts</span>
+        <span class="c1"># update their ip in the registry when they connect</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_contacts_ip</span><span class="p">()</span>
+        <span class="n">contact</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_contact_by_ip</span><span class="p">(</span><span class="n">ip</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">contact</span><span class="p">:</span>
+            <span class="n">contact</span><span class="o">.</span><span class="n">has_connected</span><span class="p">(</span><span class="n">socket</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Found no matching contact for ip </span><span class="si">%s</span><span class="s2">.&quot;</span><span class="p">,</span> <span class="n">ip</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ContactManager.load_contact"><a class="viewcode-back" href="../../_generated/communication.contact_manager.html#communication.contact_manager.ContactManager.load_contact">[docs]</a>    <span class="k">def</span> <span class="nf">load_contact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">owner_name</span><span class="p">,</span> <span class="n">contact_name</span><span class="p">,</span> <span class="n">contact_file</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Loads a contact into the manager from a file.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            owner_name: The name of the user whose contact we&#39;re loading.</span>
+<span class="sd">            contact_name: The contact&#39;s name.</span>
+<span class="sd">            contact_file: The file where the contact data is stored.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            The loaded contact.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            FileNotFoundError: The error will be raised if the contact file does not exist in the contact directory.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Loading contact </span><span class="si">%s</span><span class="s2"> from </span><span class="si">%s</span><span class="s2"> for user </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">contact_name</span><span class="p">,</span> <span class="n">contact_file</span><span class="p">,</span> <span class="n">owner_name</span><span class="p">)</span>
+
+        <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">contact_dir</span><span class="p">,</span> <span class="n">contact_file</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">public_key</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+
+        <span class="n">contact</span> <span class="o">=</span> <span class="n">Contact</span><span class="p">(</span><span class="n">owner_name</span><span class="p">,</span> <span class="n">contact_name</span><span class="p">,</span> <span class="n">public_key</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">contacts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">contact</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">contact</span>
+
+    <span class="c1"># TODO: associate contact list to username, save contacts order</span>
+<div class="viewcode-block" id="ContactManager.load_contacts"><a class="viewcode-back" href="../../_generated/communication.contact_manager.html#communication.contact_manager.ContactManager.load_contacts">[docs]</a>    <span class="k">def</span> <span class="nf">load_contacts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">username</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Loads all contacts for a given user.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            username: The name of the user whose contacts will be loaded.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">contact_file</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">contact_dir</span><span class="p">):</span>
+            <span class="n">contact_name</span> <span class="o">=</span> <span class="n">contact_file</span><span class="p">[:</span><span class="o">-</span><span class="mi">4</span><span class="p">]</span></div>
+            <span class="n">contact</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_contact</span><span class="p">(</span><span class="n">username</span><span class="p">,</span> <span class="n">contact_name</span><span class="p">,</span> <span class="n">contact_file</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ContactManager.connect_to_contact"><a class="viewcode-back" href="../../_generated/communication.contact_manager.html#communication.contact_manager.ContactManager.connect_to_contact">[docs]</a>    <span class="k">def</span> <span class="nf">connect_to_contact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">contact</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Starts a messaging session with the given contact.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            contact: A contact to which to connect.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">contact</span><span class="o">.</span><span class="n">connected</span><span class="p">:</span>
+            <span class="n">contact</span><span class="o">.</span><span class="n">ip</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">peer_registry</span><span class="o">.</span><span class="n">get_peer_ip</span><span class="p">(</span><span class="n">contact</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">contact</span><span class="o">.</span><span class="n">ip</span><span class="p">:</span>
+                <span class="n">contact</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span></div>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;No ip for contact </span><span class="si">%s</span><span class="s2">.&quot;</span><span class="p">,</span> <span class="n">contact</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ContactManager.connect_to_contacts"><a class="viewcode-back" href="../../_generated/communication.contact_manager.html#communication.contact_manager.ContactManager.connect_to_contacts">[docs]</a>    <span class="k">def</span> <span class="nf">connect_to_contacts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Starts a messaging session with all loaded contacts.&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">contact</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">contacts</span><span class="p">:</span></div>
+            <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">connect_to_contact</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="n">contact</span><span class="p">])</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+
+<div class="viewcode-block" id="ContactManager.add_contact"><a class="viewcode-back" href="../../_generated/communication.contact_manager.html#communication.contact_manager.ContactManager.add_contact">[docs]</a>    <span class="k">def</span> <span class="nf">add_contact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">owner</span><span class="p">,</span> <span class="n">peer</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Adds a contact to the user&#39;s contact list.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            owner: The username of the user to which we&#39;ll add the contact.</span>
+<span class="sd">            peer: The contact data as a JSON string.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Adding new contact </span><span class="si">%s</span><span class="s2"> for owner </span><span class="si">%s</span><span class="s2">.&quot;</span><span class="p">,</span> <span class="n">peer</span><span class="p">,</span> <span class="n">owner</span><span class="p">)</span>
+        <span class="n">contact</span> <span class="o">=</span> <span class="n">Contact</span><span class="o">.</span><span class="n">from_json</span><span class="p">(</span><span class="n">owner</span><span class="p">,</span> <span class="n">peer</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">other_contact</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">contacts</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">contact</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">other_contact</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>
+                <span class="k">return</span>
+        <span class="n">contact</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">contact_dir</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">contacts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">contact</span><span class="p">)</span></div>
+        <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">connect_to_contact</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="n">contact</span><span class="p">])</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+
+<div class="viewcode-block" id="ContactManager.check_status"><a class="viewcode-back" href="../../_generated/communication.contact_manager.html#communication.contact_manager.ContactManager.check_status">[docs]</a>    <span class="k">def</span> <span class="nf">check_status</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">contact</span><span class="p">):</span></div></div>
+        <span class="k">pass</span>
+</pre></div>
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Etienne Desticourt.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'0.1.0-alpha',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

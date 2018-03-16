@@ -1,0 +1,700 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>communication.igdc &mdash; EncryptedMessenger 0.1.0-alpha documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../genindex.html"/>
+        <link rel="search" title="Search" href="../../search.html"/>
+    <link rel="top" title="EncryptedMessenger 0.1.0-alpha documentation" href="../../index.html"/>
+        <link rel="up" title="Module code" href="../index.html"/> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> EncryptedMessenger
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Info:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../_static/systems.html">Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_static/encryption_protocols.html">Encryption Protocols</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_static/communication_protocols.html">Communication Protocols</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../_static/communication.html">Communication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_static/encryption.html">Encryption</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_static/ui.html">UI</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">EncryptedMessenger</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>communication.igdc</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for communication.igdc</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+
+
+<span class="c1">#-------------------------------------------------------------------------------</span>
+<span class="c1"># Name:        A UPNP IGD Client, implements following services:</span>
+<span class="c1">#               - WANIPConnection</span>
+<span class="c1">#               - WANIPv6FirewallControl</span>
+<span class="c1"># Desc:        Could be used as CLI client or a client lib. to use it as lib,</span>
+<span class="c1">#              use class IGDClient</span>
+<span class="c1">#              require python 2.6+, python3 is not supported</span>
+<span class="c1">#</span>
+<span class="c1"># Author:      Hu Jun</span>
+<span class="c1">#</span>
+<span class="c1"># Created:     10/26/2015</span>
+<span class="c1"># Copyright:   (c) Hu Jun 2015</span>
+<span class="c1"># Licence:     MIT</span>
+<span class="c1">#-------------------------------------------------------------------------------</span>
+
+<span class="kn">import</span> <span class="nn">socket</span>
+<span class="kn">import</span> <span class="nn">argparse</span>
+<span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">from</span> <span class="nn">io</span> <span class="k">import</span> <span class="n">StringIO</span>
+<span class="kn">from</span> <span class="nn">http.client</span> <span class="k">import</span> <span class="n">HTTPResponse</span>
+<span class="kn">from</span> <span class="nn">xml.dom</span> <span class="k">import</span> <span class="n">minidom</span>
+<span class="kn">from</span> <span class="nn">urllib.parse</span> <span class="k">import</span> <span class="n">urlparse</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">ctypes</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<div class="viewcode-block" id="sockaddr"><a class="viewcode-back" href="../../_generated/communication.igdc.html#communication.igdc.sockaddr">[docs]</a><span class="k">class</span> <span class="nc">sockaddr</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">Structure</span><span class="p">):</span>
+    <span class="n">_fields_</span> <span class="o">=</span> <span class="p">[(</span><span class="s2">&quot;sa_family&quot;</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_short</span><span class="p">),</span>
+                <span class="p">(</span><span class="s2">&quot;__pad1&quot;</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_ushort</span><span class="p">),</span>
+                <span class="p">(</span><span class="s2">&quot;ipv4_addr&quot;</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_byte</span> <span class="o">*</span> <span class="mi">4</span><span class="p">),</span>
+                <span class="p">(</span><span class="s2">&quot;ipv6_addr&quot;</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_byte</span> <span class="o">*</span> <span class="mi">16</span><span class="p">),</span></div>
+                <span class="p">(</span><span class="s2">&quot;__pad2&quot;</span><span class="p">,</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_ulong</span><span class="p">)]</span>
+
+<span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">ctypes</span><span class="p">,</span> <span class="s1">&#39;windll&#39;</span><span class="p">):</span>
+    <span class="n">WSAStringToAddressA</span> <span class="o">=</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">windll</span><span class="o">.</span><span class="n">ws2_32</span><span class="o">.</span><span class="n">WSAStringToAddressA</span>
+    <span class="n">WSAAddressToStringA</span> <span class="o">=</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">windll</span><span class="o">.</span><span class="n">ws2_32</span><span class="o">.</span><span class="n">WSAAddressToStringA</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">not_windows</span><span class="p">():</span>
+        <span class="k">raise</span> <span class="ne">SystemError</span><span class="p">(</span>
+            <span class="s2">&quot;Invalid platform. ctypes.windll must be available.&quot;</span>
+        <span class="p">)</span>
+    <span class="n">WSAStringToAddressA</span> <span class="o">=</span> <span class="n">not_windows</span>
+    <span class="n">WSAAddressToStringA</span> <span class="o">=</span> <span class="n">not_windows</span>
+
+
+<div class="viewcode-block" id="inet_pton"><a class="viewcode-back" href="../../_generated/communication.igdc.html#communication.igdc.inet_pton">[docs]</a><span class="k">def</span> <span class="nf">inet_pton</span><span class="p">(</span><span class="n">address_family</span><span class="p">,</span> <span class="n">ip_string</span><span class="p">):</span>
+    <span class="n">addr</span> <span class="o">=</span> <span class="n">sockaddr</span><span class="p">()</span>
+    <span class="n">addr</span><span class="o">.</span><span class="n">sa_family</span> <span class="o">=</span> <span class="n">address_family</span>
+    <span class="n">addr_size</span> <span class="o">=</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_int</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">sizeof</span><span class="p">(</span><span class="n">addr</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">WSAStringToAddressA</span><span class="p">(</span>
+            <span class="n">ip_string</span><span class="p">,</span>
+            <span class="n">address_family</span><span class="p">,</span>
+            <span class="kc">None</span><span class="p">,</span>
+            <span class="n">ctypes</span><span class="o">.</span><span class="n">byref</span><span class="p">(</span><span class="n">addr</span><span class="p">),</span>
+            <span class="n">ctypes</span><span class="o">.</span><span class="n">byref</span><span class="p">(</span><span class="n">addr_size</span><span class="p">)</span>
+    <span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">socket</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">FormatError</span><span class="p">())</span>
+
+    <span class="k">if</span> <span class="n">address_family</span> <span class="o">==</span> <span class="n">socket</span><span class="o">.</span><span class="n">AF_INET</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">string_at</span><span class="p">(</span><span class="n">addr</span><span class="o">.</span><span class="n">ipv4_addr</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">address_family</span> <span class="o">==</span> <span class="n">socket</span><span class="o">.</span><span class="n">AF_INET6</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">string_at</span><span class="p">(</span><span class="n">addr</span><span class="o">.</span><span class="n">ipv6_addr</span><span class="p">,</span> <span class="mi">16</span><span class="p">)</span>
+</div>
+    <span class="k">raise</span> <span class="n">socket</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;unknown address family&#39;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="inet_ntop"><a class="viewcode-back" href="../../_generated/communication.igdc.html#communication.igdc.inet_ntop">[docs]</a><span class="k">def</span> <span class="nf">inet_ntop</span><span class="p">(</span><span class="n">address_family</span><span class="p">,</span> <span class="n">packed_ip</span><span class="p">):</span>
+    <span class="n">addr</span> <span class="o">=</span> <span class="n">sockaddr</span><span class="p">()</span>
+    <span class="n">addr</span><span class="o">.</span><span class="n">sa_family</span> <span class="o">=</span> <span class="n">address_family</span>
+    <span class="n">addr_size</span> <span class="o">=</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_int</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">sizeof</span><span class="p">(</span><span class="n">addr</span><span class="p">))</span>
+    <span class="n">ip_string</span> <span class="o">=</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">create_string_buffer</span><span class="p">(</span><span class="mi">128</span><span class="p">)</span>
+    <span class="n">ip_string_size</span> <span class="o">=</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">c_int</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">sizeof</span><span class="p">(</span><span class="n">ip_string</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">address_family</span> <span class="o">==</span> <span class="n">socket</span><span class="o">.</span><span class="n">AF_INET</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">packed_ip</span><span class="p">)</span> <span class="o">!=</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">sizeof</span><span class="p">(</span><span class="n">addr</span><span class="o">.</span><span class="n">ipv4_addr</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">socket</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;packed IP wrong length for inet_ntoa&#39;</span><span class="p">)</span>
+        <span class="n">ctypes</span><span class="o">.</span><span class="n">memmove</span><span class="p">(</span><span class="n">addr</span><span class="o">.</span><span class="n">ipv4_addr</span><span class="p">,</span> <span class="n">packed_ip</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">address_family</span> <span class="o">==</span> <span class="n">socket</span><span class="o">.</span><span class="n">AF_INET6</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">packed_ip</span><span class="p">)</span> <span class="o">!=</span> <span class="n">ctypes</span><span class="o">.</span><span class="n">sizeof</span><span class="p">(</span><span class="n">addr</span><span class="o">.</span><span class="n">ipv6_addr</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">socket</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;packed IP wrong length for inet_ntoa&#39;</span><span class="p">)</span>
+        <span class="n">ctypes</span><span class="o">.</span><span class="n">memmove</span><span class="p">(</span><span class="n">addr</span><span class="o">.</span><span class="n">ipv6_addr</span><span class="p">,</span> <span class="n">packed_ip</span><span class="p">,</span> <span class="mi">16</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">socket</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;unknown address family&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">WSAAddressToStringA</span><span class="p">(</span>
+            <span class="n">ctypes</span><span class="o">.</span><span class="n">byref</span><span class="p">(</span><span class="n">addr</span><span class="p">),</span>
+            <span class="n">addr_size</span><span class="p">,</span>
+            <span class="kc">None</span><span class="p">,</span>
+            <span class="n">ip_string</span><span class="p">,</span>
+            <span class="n">ctypes</span><span class="o">.</span><span class="n">byref</span><span class="p">(</span><span class="n">ip_string_size</span><span class="p">)</span>
+    <span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">socket</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">ctypes</span><span class="o">.</span><span class="n">FormatError</span><span class="p">())</span>
+</div>
+    <span class="k">return</span> <span class="n">ip_string</span><span class="p">[:</span><span class="n">ip_string_size</span><span class="o">.</span><span class="n">value</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+
+<span class="c1"># Adding our two functions to the socket library</span>
+<span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;nt&#39;</span><span class="p">:</span>
+    <span class="n">socket</span><span class="o">.</span><span class="n">inet_pton</span> <span class="o">=</span> <span class="n">inet_pton</span>
+    <span class="n">socket</span><span class="o">.</span><span class="n">inet_ntop</span> <span class="o">=</span> <span class="n">inet_ntop</span>
+
+
+<div class="viewcode-block" id="str2bool"><a class="viewcode-back" href="../../_generated/communication.igdc.html#communication.igdc.str2bool">[docs]</a><span class="k">def</span> <span class="nf">str2bool</span><span class="p">(</span><span class="n">bstr</span><span class="p">):</span></div>
+    <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">bstr</span><span class="p">))</span>
+
+<div class="viewcode-block" id="getProtoId"><a class="viewcode-back" href="../../_generated/communication.igdc.html#communication.igdc.getProtoId">[docs]</a><span class="k">def</span> <span class="nf">getProtoId</span><span class="p">(</span><span class="n">proto_name</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">proto_name</span><span class="o">==</span><span class="s2">&quot;UDP&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">17</span>
+    <span class="k">if</span> <span class="n">proto_name</span><span class="o">==</span><span class="s2">&quot;TCP&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">6</span>
+    <span class="k">if</span> <span class="n">proto_name</span><span class="o">==</span><span class="s2">&quot;SCTP&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">132</span>
+    <span class="k">if</span> <span class="n">proto_name</span><span class="o">==</span><span class="s2">&quot;ALL&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">65535</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">proto_name</span><span class="p">,</span><span class="nb">int</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">proto_name</span><span class="o">&gt;</span><span class="mi">0</span> <span class="ow">and</span> <span class="n">proto_name</span><span class="o">&lt;=</span><span class="mi">65535</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">proto_name</span></div>
+    <span class="k">return</span> <span class="kc">False</span>
+
+
+
+<div class="viewcode-block" id="isv6"><a class="viewcode-back" href="../../_generated/communication.igdc.html#communication.igdc.isv6">[docs]</a><span class="k">def</span> <span class="nf">isv6</span><span class="p">(</span><span class="n">addr</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">addr</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">)</span><span class="o">!=-</span><span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">addr</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">3</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span></div>
+            <span class="k">return</span> <span class="kc">False</span>
+
+<div class="viewcode-block" id="isLLA"><a class="viewcode-back" href="../../_generated/communication.igdc.html#communication.igdc.isLLA">[docs]</a><span class="k">def</span> <span class="nf">isLLA</span><span class="p">(</span><span class="n">addr</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;return True if addr is IPv6 Link Local Address&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">isv6</span><span class="p">(</span><span class="n">addr</span><span class="p">)</span><span class="o">==</span><span class="kc">False</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">if</span> <span class="s2">&quot;%&quot;</span> <span class="ow">in</span> <span class="n">addr</span><span class="p">:</span>
+        <span class="n">addr</span><span class="o">=</span><span class="n">addr</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;%&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">bina</span><span class="o">=</span><span class="n">socket</span><span class="o">.</span><span class="n">inet_pton</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">AF_INET6</span><span class="p">,</span><span class="n">addr</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">bina</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">8</span><span class="p">]</span><span class="o">==</span><span class="s2">&quot;</span><span class="se">\xfe\x80\x00\x00\x00\x00\x00\x00</span><span class="s2">&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">else</span><span class="p">:</span></div>
+        <span class="k">return</span> <span class="kc">False</span>
+
+
+
+
+<span class="n">UPNPTYPEDICT</span><span class="o">=</span><span class="p">{</span>
+<span class="s2">&quot;NewUptime&quot;</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span>
+<span class="s2">&quot;NewAutoDisconnectTime&quot;</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span>
+<span class="s2">&quot;NewIdleDisconnectTime&quot;</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span>
+<span class="s2">&quot;NewWarnDisconnectDelay&quot;</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span>
+<span class="s2">&quot;NewPortMappingNumberOfEntries&quot;</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span>
+<span class="s2">&quot;NewLeaseDuration&quot;</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span>
+<span class="s2">&quot;NewExternalPort&quot;</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span>
+<span class="s2">&quot;NewInternalPort&quot;</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span>
+<span class="s2">&quot;NewRSIPAvailable&quot;</span><span class="p">:</span><span class="n">str2bool</span><span class="p">,</span>
+<span class="s2">&quot;NewNATEnabled&quot;</span><span class="p">:</span><span class="n">str2bool</span><span class="p">,</span>
+<span class="s2">&quot;NewEnabled&quot;</span><span class="p">:</span><span class="n">str2bool</span><span class="p">,</span>
+<span class="s2">&quot;FirewallEnabled&quot;</span><span class="p">:</span><span class="n">str2bool</span><span class="p">,</span>
+<span class="s2">&quot;InboundPinholeAllowed&quot;</span><span class="p">:</span><span class="n">str2bool</span><span class="p">,</span>
+<span class="s2">&quot;OutboundPinholeTimeout&quot;</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span>
+<span class="s2">&quot;UniqueID&quot;</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span>
+<span class="s2">&quot;PinholePackets&quot;</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span>
+<span class="s2">&quot;IsWorking&quot;</span><span class="p">:</span><span class="n">str2bool</span><span class="p">,</span>
+
+<span class="p">}</span>
+
+<div class="viewcode-block" id="UPNPError"><a class="viewcode-back" href="../../_generated/communication.igdc.html#communication.igdc.UPNPError">[docs]</a><span class="k">class</span> <span class="nc">UPNPError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">hcode</span><span class="p">,</span><span class="n">ucode</span><span class="p">,</span><span class="n">udes</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        hcode is the http error code</span>
+<span class="sd">        ucode is the upnp error code</span>
+<span class="sd">        udes is the upnp error description</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">http_code</span><span class="o">=</span><span class="n">hcode</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">code</span><span class="o">=</span><span class="n">ucode</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">description</span><span class="o">=</span><span class="n">udes</span>
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;HTTP Error Code </span><span class="si">{hc}</span><span class="s2">, UPnP Error Code </span><span class="si">{c}</span><span class="s2">, </span><span class="si">{d}</span><span class="s2">&quot;</span>\</div>
+            <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">hc</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">http_code</span><span class="p">,</span><span class="n">c</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">code</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">description</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="FakeSocket"><a class="viewcode-back" href="../../_generated/communication.igdc.html#communication.igdc.FakeSocket">[docs]</a><span class="k">class</span> <span class="nc">FakeSocket</span><span class="p">(</span><span class="n">StringIO</span><span class="p">):</span>
+<div class="viewcode-block" id="FakeSocket.makefile"><a class="viewcode-back" href="../../_generated/communication.igdc.html#communication.igdc.FakeSocket.makefile">[docs]</a>    <span class="k">def</span> <span class="nf">makefile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span></div></div>
+        <span class="k">return</span> <span class="bp">self</span>
+
+<div class="viewcode-block" id="httpparse"><a class="viewcode-back" href="../../_generated/communication.igdc.html#communication.igdc.httpparse">[docs]</a><span class="k">def</span> <span class="nf">httpparse</span><span class="p">(</span><span class="n">fp</span><span class="p">):</span>
+    <span class="n">socket</span> <span class="o">=</span> <span class="n">FakeSocket</span><span class="p">(</span><span class="n">fp</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">HTTPResponse</span><span class="p">(</span><span class="n">socket</span><span class="p">)</span>
+    <span class="n">response</span><span class="o">.</span><span class="n">begin</span><span class="p">()</span></div>
+    <span class="k">return</span> <span class="n">response</span>
+
+<div class="viewcode-block" id="parseErrMsg"><a class="viewcode-back" href="../../_generated/communication.igdc.html#communication.igdc.parseErrMsg">[docs]</a><span class="k">def</span> <span class="nf">parseErrMsg</span><span class="p">(</span><span class="n">err_resp</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    parse UPnP error message, err_resp is the returned XML in http body</span>
+<span class="sd">    reurn UPnP error code and error description</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dom</span><span class="o">=</span><span class="n">minidom</span><span class="o">.</span><span class="n">parseString</span><span class="p">(</span><span class="n">err_resp</span><span class="p">)</span>
+    <span class="n">err_code</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">dom</span><span class="o">.</span><span class="n">getElementsByTagName</span><span class="p">(</span><span class="s1">&#39;errorCode&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">firstChild</span><span class="o">.</span><span class="n">nodeValue</span><span class="p">)</span>
+    <span class="n">err_desc</span><span class="o">=</span><span class="n">dom</span><span class="o">.</span><span class="n">getElementsByTagName</span><span class="p">(</span><span class="s1">&#39;errorDescription&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">firstChild</span><span class="o">.</span><span class="n">nodeValue</span></div>
+    <span class="k">return</span> <span class="p">(</span><span class="n">err_code</span><span class="p">,</span><span class="n">err_desc</span><span class="p">)</span>
+
+<div class="viewcode-block" id="get1stTagText"><a class="viewcode-back" href="../../_generated/communication.igdc.html#communication.igdc.get1stTagText">[docs]</a><span class="k">def</span> <span class="nf">get1stTagText</span><span class="p">(</span><span class="n">xmls</span><span class="p">,</span><span class="n">tagname_list</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    return 1st tag&#39;s value in the xmls</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">UPNPTYPEDICT</span>
+    <span class="n">dom</span><span class="o">=</span><span class="n">minidom</span><span class="o">.</span><span class="n">parseString</span><span class="p">(</span><span class="n">xmls</span><span class="p">)</span>
+    <span class="n">r</span><span class="o">=</span><span class="p">{}</span>
+    <span class="k">for</span> <span class="n">tagn</span> <span class="ow">in</span> <span class="n">tagname_list</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">txt_node</span> <span class="o">=</span> <span class="n">dom</span><span class="o">.</span><span class="n">getElementsByTagName</span><span class="p">(</span><span class="n">tagn</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">firstChild</span>
+            <span class="k">if</span> <span class="n">txt_node</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">tagn</span> <span class="ow">in</span> <span class="n">UPNPTYPEDICT</span><span class="p">:</span>
+                    <span class="n">r</span><span class="p">[</span><span class="n">tagn</span><span class="p">]</span> <span class="o">=</span> <span class="n">UPNPTYPEDICT</span><span class="p">[</span><span class="n">tagn</span><span class="p">](</span><span class="n">txt_node</span><span class="o">.</span><span class="n">nodeValue</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">r</span><span class="p">[</span><span class="n">tagn</span><span class="p">]</span> <span class="o">=</span> <span class="n">txt_node</span><span class="o">.</span><span class="n">nodeValue</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">r</span><span class="p">[</span><span class="n">tagn</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">((</span><span class="s2">&quot;xml parse err: </span><span class="si">{tag}</span><span class="s2"> not found&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">tag</span><span class="o">=</span><span class="n">tagn</span><span class="p">)))</span></div>
+    <span class="k">return</span> <span class="n">r</span>
+
+
+<span class="c1">#sendSOAP is based on part of source code from miranda-upnp.</span>
+
+
+
+
+<div class="viewcode-block" id="IGDClient"><a class="viewcode-back" href="../../_generated/communication.igdc.html#communication.igdc.IGDClient">[docs]</a><span class="k">class</span> <span class="nc">IGDClient</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    UPnP IGD v1 Client class, supports all actions</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">intIP</span><span class="p">,</span><span class="n">ctrlURL</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">service</span><span class="o">=</span><span class="s2">&quot;WANIPC&quot;</span><span class="p">,</span><span class="n">edebug</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">pprint</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        - intIP is the source address of the request packet, which implies the source interface</span>
+<span class="sd">        - ctrlURL is the the control URL of IGD server, client will do discovery if it is None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="o">=</span><span class="n">edebug</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pprint</span><span class="o">=</span><span class="n">pprint</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">intIP</span><span class="o">=</span><span class="n">intIP</span> <span class="c1">#the source addr of the client</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ctrlURL</span><span class="o">=</span><span class="n">ctrlURL</span>
+        <span class="k">if</span> <span class="n">isv6</span><span class="p">(</span><span class="n">intIP</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">igdsvc</span><span class="o">=</span><span class="s2">&quot;IP6FWCTL&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">igdsvc</span><span class="o">=</span><span class="s2">&quot;WANIPC&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ctrlURL</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">discovery</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="IGDClient.discovery"><a class="viewcode-back" href="../../_generated/communication.igdc.html#communication.igdc.IGDClient.discovery">[docs]</a>    <span class="k">def</span> <span class="nf">discovery</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Find IGD device and its control URL via UPnP multicast discovery</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">isv6</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">intIP</span><span class="p">):</span>
+            <span class="n">up_disc</span><span class="o">=</span><span class="sa">b</span><span class="s1">&#39;M-SEARCH * HTTP/1.1</span><span class="se">\r\n</span><span class="s1">HOST:239.255.255.250:1900</span><span class="se">\r\n</span><span class="s1">ST:upnp:rootdevice</span><span class="se">\r\n</span><span class="s1">MX:2</span><span class="se">\r\n</span><span class="s1">MAN:&quot;ssdp:discover&quot;</span><span class="se">\r\n\r\n</span><span class="s1">&#39;</span>
+            <span class="n">sock</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">socket</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">AF_INET</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">SOCK_DGRAM</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">IPPROTO_UDP</span><span class="p">)</span>
+            <span class="n">sock</span><span class="o">.</span><span class="n">setsockopt</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">IPPROTO_IP</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">IP_MULTICAST_TTL</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+            <span class="n">sock</span><span class="o">.</span><span class="n">bind</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">intIP</span><span class="p">,</span><span class="mi">19110</span><span class="p">))</span>
+            <span class="n">sock</span><span class="o">.</span><span class="n">sendto</span><span class="p">(</span><span class="n">up_disc</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;239.255.255.250&quot;</span><span class="p">,</span> <span class="mi">1900</span><span class="p">))</span>
+
+        <span class="n">sock</span><span class="o">.</span><span class="n">settimeout</span><span class="p">(</span><span class="mf">10.0</span><span class="p">)</span>
+        <span class="n">data</span><span class="p">,</span> <span class="n">addr</span> <span class="o">=</span> <span class="n">sock</span><span class="o">.</span><span class="n">recvfrom</span><span class="p">(</span><span class="mi">1024</span><span class="p">)</span> <span class="c1"># buffer size is 1024 bytes</span>
+        <span class="n">sock</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span><span class="nb">print</span><span class="p">(</span> <span class="s2">&quot;Discovery: ----- rx reply -----</span><span class="se">\n</span><span class="s2"> &quot;</span><span class="o">+</span><span class="n">data</span><span class="p">)</span>
+        <span class="c1">#print(data.decode(&quot;utf8&quot;))</span>
+        <span class="n">descURL</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s2">&quot;LOCATION: (.*?)</span><span class="se">\r\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf8&quot;</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">descXMLs</span><span class="o">=</span><span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">descURL</span><span class="p">)</span><span class="o">.</span><span class="n">text</span> <span class="c1">#urllib2.urlopen(descURL).read()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pr</span><span class="o">=</span><span class="n">urlparse</span><span class="p">(</span><span class="n">descURL</span><span class="p">)</span>
+        <span class="n">baseURL</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pr</span><span class="o">.</span><span class="n">scheme</span><span class="o">+</span><span class="s2">&quot;://&quot;</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">pr</span><span class="o">.</span><span class="n">netloc</span>
+        <span class="n">dom</span><span class="o">=</span><span class="n">minidom</span><span class="o">.</span><span class="n">parseString</span><span class="p">(</span><span class="n">descXMLs</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">dom</span><span class="o">.</span><span class="n">getElementsByTagName</span><span class="p">(</span><span class="s1">&#39;service&#39;</span><span class="p">):</span>
+            <span class="n">stn</span><span class="o">=</span><span class="n">e</span><span class="o">.</span><span class="n">getElementsByTagName</span><span class="p">(</span><span class="s1">&#39;serviceType&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">igdsvc</span><span class="o">==</span><span class="s2">&quot;WANIPC&quot;</span><span class="p">:</span>
+                <span class="n">target_svctype</span><span class="o">=</span><span class="s1">&#39;urn:schemas-upnp-org:service:WANIPConnection&#39;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">target_svctype</span><span class="o">=</span><span class="s1">&#39;urn:schemas-upnp-org:service:WANIPv6FirewallControl&#39;</span>
+            <span class="k">if</span> <span class="n">stn</span> <span class="o">!=</span> <span class="p">[]:</span>
+                <span class="k">if</span> <span class="n">stn</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">firstChild</span><span class="o">.</span><span class="n">nodeValue</span><span class="o">.</span><span class="n">strip</span><span class="p">()[</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="n">target_svctype</span><span class="p">:</span>
+                    <span class="n">cun</span><span class="o">=</span><span class="n">e</span><span class="o">.</span><span class="n">getElementsByTagName</span><span class="p">(</span><span class="s1">&#39;controlURL&#39;</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">ctrlURL</span><span class="o">=</span><span class="n">baseURL</span><span class="o">+</span><span class="n">cun</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">firstChild</span><span class="o">.</span><span class="n">nodeValue</span>
+                    <span class="k">break</span></div>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span> <span class="nb">print</span><span class="p">(</span> <span class="s2">&quot;control URL is &quot;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">ctrlURL</span><span class="p">)</span>
+
+
+
+
+
+<div class="viewcode-block" id="IGDClient.AddPortMapping"><a class="viewcode-back" href="../../_generated/communication.igdc.html#communication.igdc.IGDClient.AddPortMapping">[docs]</a>    <span class="k">def</span> <span class="nf">AddPortMapping</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">intIP</span><span class="p">,</span><span class="n">extPort</span><span class="p">,</span><span class="n">proto</span><span class="p">,</span><span class="n">intPort</span><span class="p">,</span><span class="n">enabled</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">duration</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                        <span class="n">desc</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span><span class="n">remoteHost</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+        <span class="n">upnp_method</span><span class="o">=</span><span class="s1">&#39;AddPortMapping&#39;</span>
+        <span class="n">sendArgs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;NewPortMappingDescription&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">desc</span><span class="p">,</span> <span class="s1">&#39;string&#39;</span><span class="p">),</span>
+            <span class="s1">&#39;NewLeaseDuration&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">duration</span><span class="p">,</span> <span class="s1">&#39;ui4&#39;</span><span class="p">),</span>
+            <span class="s1">&#39;NewInternalClient&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">intIP</span><span class="p">,</span> <span class="s1">&#39;string&#39;</span><span class="p">),</span>
+            <span class="s1">&#39;NewEnabled&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">enabled</span><span class="p">,</span> <span class="s1">&#39;boolean&#39;</span><span class="p">),</span>
+            <span class="s1">&#39;NewExternalPort&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">extPort</span><span class="p">,</span> <span class="s1">&#39;ui2&#39;</span><span class="p">),</span>
+            <span class="s1">&#39;NewRemoteHost&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">remoteHost</span><span class="p">,</span> <span class="s1">&#39;string&#39;</span><span class="p">),</span>
+            <span class="s1">&#39;NewProtocol&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">proto</span><span class="p">,</span> <span class="s1">&#39;string&#39;</span><span class="p">),</span>
+            <span class="s1">&#39;NewInternalPort&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">intPort</span><span class="p">,</span> <span class="s1">&#39;ui2&#39;</span><span class="p">)}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sendSOAP</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pr</span><span class="o">.</span><span class="n">netloc</span><span class="p">,</span>
+                <span class="s1">&#39;urn:schemas-upnp-org:service:WANIPConnection:1&#39;</span><span class="p">,</span></div>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ctrlURL</span><span class="p">,</span><span class="n">upnp_method</span><span class="p">,</span><span class="n">sendArgs</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="IGDClient.DeletePortMapping"><a class="viewcode-back" href="../../_generated/communication.igdc.html#communication.igdc.IGDClient.DeletePortMapping">[docs]</a>    <span class="k">def</span> <span class="nf">DeletePortMapping</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">extPort</span><span class="p">,</span><span class="n">proto</span><span class="p">,</span><span class="n">remoteHost</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+        <span class="n">upnp_method</span><span class="o">=</span><span class="s1">&#39;DeletePortMapping&#39;</span>
+        <span class="n">sendArgs</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;NewExternalPort&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">extPort</span><span class="p">,</span> <span class="s1">&#39;ui2&#39;</span><span class="p">),</span>
+            <span class="s1">&#39;NewRemoteHost&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">remoteHost</span><span class="p">,</span> <span class="s1">&#39;string&#39;</span><span class="p">),</span>
+            <span class="s1">&#39;NewProtocol&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">proto</span><span class="p">,</span> <span class="s1">&#39;string&#39;</span><span class="p">)}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sendSOAP</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pr</span><span class="o">.</span><span class="n">netloc</span><span class="p">,</span>
+                <span class="s1">&#39;urn:schemas-upnp-org:service:WANIPConnection:1&#39;</span><span class="p">,</span></div>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ctrlURL</span><span class="p">,</span><span class="n">upnp_method</span><span class="p">,</span><span class="n">sendArgs</span><span class="p">)</span>
+
+
+
+
+
+
+<div class="viewcode-block" id="IGDClient.sendSOAP"><a class="viewcode-back" href="../../_generated/communication.igdc.html#communication.igdc.IGDClient.sendSOAP">[docs]</a>    <span class="k">def</span> <span class="nf">sendSOAP</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">hostName</span><span class="p">,</span><span class="n">serviceType</span><span class="p">,</span><span class="n">controlURL</span><span class="p">,</span><span class="n">actionName</span><span class="p">,</span>
+                        <span class="n">actionArguments</span><span class="p">,</span><span class="n">hideErr</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        send a SOAP request and get the response</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">argList</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="n">soapResponse</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">controlURL</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;://&#39;</span> <span class="ow">in</span> <span class="n">controlURL</span><span class="p">:</span>
+                <span class="n">urlArray</span> <span class="o">=</span> <span class="n">controlURL</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">urlArray</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">4</span><span class="p">:</span>
+                        <span class="n">controlURL</span> <span class="o">=</span> <span class="s1">&#39;/&#39;</span>
+                <span class="k">else</span><span class="p">:</span>
+                        <span class="n">controlURL</span> <span class="o">=</span> <span class="s1">&#39;/&#39;</span> <span class="o">+</span> <span class="n">urlArray</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+
+
+        <span class="n">soapRequest</span> <span class="o">=</span> <span class="s1">&#39;POST </span><span class="si">%s</span><span class="s1"> HTTP/1.1</span><span class="se">\r\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">controlURL</span>
+
+        <span class="c1">#Check if a port number was specified in the host name; default is port 80</span>
+        <span class="k">if</span> <span class="s1">&#39;:&#39;</span> <span class="ow">in</span> <span class="n">hostName</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="s2">&quot;]&quot;</span> <span class="ow">in</span> <span class="n">hostName</span><span class="p">:</span>
+                    <span class="n">hostNameArray</span> <span class="o">=</span> <span class="n">hostName</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)</span>
+                    <span class="n">host</span> <span class="o">=</span> <span class="n">hostNameArray</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="k">try</span><span class="p">:</span>
+                            <span class="n">port</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">hostNameArray</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                    <span class="k">except</span><span class="p">:</span>
+                            <span class="nb">print</span><span class="p">(</span> <span class="s1">&#39;Invalid port specified for host connection:&#39;</span><span class="p">,</span><span class="n">hostName</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                            <span class="k">return</span> <span class="kc">False</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">hostNameArray</span> <span class="o">=</span> <span class="n">hostName</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;]&#39;</span><span class="p">)</span>
+                    <span class="n">host</span> <span class="o">=</span> <span class="n">hostNameArray</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">:]</span>
+                    <span class="k">try</span><span class="p">:</span>
+                            <span class="n">port</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">hostNameArray</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">:])</span>
+                    <span class="k">except</span><span class="p">:</span>
+                            <span class="nb">print</span><span class="p">(</span> <span class="s1">&#39;Invalid port specified for host connection:&#39;</span><span class="p">,</span><span class="n">hostName</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">else</span><span class="p">:</span>
+                <span class="n">host</span> <span class="o">=</span> <span class="n">hostName</span>
+                <span class="n">port</span> <span class="o">=</span> <span class="mi">80</span>
+
+
+        <span class="n">datatypes</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;NewRemoteHost&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                     <span class="s2">&quot;NewExternalPort&quot;</span><span class="p">:</span> <span class="s2">&quot;ui2&quot;</span><span class="p">,</span>
+                     <span class="s2">&quot;NewInternalPort&quot;</span><span class="p">:</span> <span class="s2">&quot;ui2&quot;</span><span class="p">,</span>
+                     <span class="s2">&quot;NewEnabled&quot;</span><span class="p">:</span> <span class="s2">&quot;boolean&quot;</span><span class="p">,</span>
+                     <span class="s2">&quot;NewPortMappingDescription&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                     <span class="s2">&quot;NewInternalClient&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                     <span class="s2">&quot;NewProtocol&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                     <span class="s2">&quot;NewLeaseDuration&quot;</span><span class="p">:</span> <span class="s2">&quot;ui4&quot;</span><span class="p">}</span>
+        <span class="c1">#Create a string containing all of the SOAP action&#39;s arguments and values</span>
+        <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">actionArguments</span><span class="p">:</span>
+                <span class="n">val</span><span class="p">,</span> <span class="n">dt</span> <span class="o">=</span> <span class="n">actionArguments</span><span class="p">[</span><span class="n">arg</span><span class="p">]</span>
+                <span class="n">datatype</span> <span class="o">=</span> <span class="n">datatypes</span><span class="p">[</span><span class="n">arg</span><span class="p">]</span>
+                <span class="n">argList</span> <span class="o">+=</span> <span class="s1">&#39;  &lt;</span><span class="si">%s</span><span class="s1"> xmlns:dt=&quot;urn:schemas-microsoft-com:datatypes&quot; dt:dt=&quot;</span><span class="si">%s</span><span class="s1">&quot;&gt;</span><span class="si">%s</span><span class="s1">&lt;/</span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">arg</span><span class="p">,</span><span class="n">datatype</span><span class="p">,</span><span class="n">val</span><span class="p">,</span><span class="n">arg</span><span class="p">)</span>
+
+        <span class="c1">#Create the SOAP request</span>
+        <span class="n">soapBody</span> <span class="o">=</span>      <span class="s1">&#39;&lt;?xml version=&quot;1.0&quot;?&gt;&#39;</span>\
+                        <span class="s1">&#39;&lt;SOAP-ENV:Envelope xmlns:SOAP-ENV=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot; SOAP-ENV:encodingStyle=&quot;http://schemas.xmlsoap.org/soap/encoding/&quot;&gt;&#39;</span>\
+                        <span class="s1">&#39;&lt;SOAP-ENV:Body&gt;&#39;</span>\
+                        <span class="s1">&#39;&lt;m:</span><span class="si">%s</span><span class="s1"> xmlns:m=&quot;</span><span class="si">%s</span><span class="s1">&quot;&gt;&#39;</span>\
+                        <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&#39;</span>\
+                        <span class="s1">&#39;&lt;/m:</span><span class="si">%s</span><span class="s1">&gt;&#39;</span>\
+                        <span class="s1">&#39;&lt;/SOAP-ENV:Body&gt;&#39;</span>\
+                        <span class="s1">&#39;&lt;/SOAP-ENV:Envelope&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">actionName</span><span class="p">,</span><span class="n">serviceType</span><span class="p">,</span><span class="n">argList</span><span class="p">,</span><span class="n">actionName</span><span class="p">)</span>
+
+        <span class="c1">#Specify the headers to send with the request</span>
+        <span class="n">headers</span> <span class="o">=</span>       <span class="p">{</span>
+                        <span class="s1">&#39;Host&#39;</span><span class="p">:</span><span class="n">hostName</span><span class="p">,</span>
+                        <span class="s1">&#39;Content-Length&#39;</span><span class="p">:</span><span class="nb">len</span><span class="p">(</span><span class="n">soapBody</span><span class="p">),</span>
+                        <span class="s1">&#39;Content-Type&#39;</span><span class="p">:</span><span class="s1">&#39;text/xml; charset=&quot;utf-8&quot;&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;SOAPAction&#39;</span><span class="p">:</span><span class="s1">&#39;&quot;</span><span class="si">%s</span><span class="s1">#</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">serviceType</span><span class="p">,</span><span class="n">actionName</span><span class="p">)</span>
+                        <span class="p">}</span>
+
+        <span class="c1">#Generate the final payload</span>
+        <span class="k">for</span> <span class="n">head</span> <span class="ow">in</span> <span class="n">headers</span><span class="p">:</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="n">headers</span><span class="p">[</span><span class="n">head</span><span class="p">]</span>
+                <span class="n">soapRequest</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">: </span><span class="si">%s</span><span class="se">\r\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">head</span><span class="p">,</span><span class="n">value</span><span class="p">)</span>
+        <span class="n">soapRequest</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\r\n</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">soapBody</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span> <span class="s2">&quot;Action: ---------- tx request -----------&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">pprint</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span> <span class="n">soapRequest</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span> <span class="n">headers</span><span class="p">)</span>
+                <span class="n">xml</span> <span class="o">=</span> <span class="n">minidom</span><span class="o">.</span><span class="n">parseString</span><span class="p">(</span><span class="n">soapBody</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span> <span class="n">xml</span><span class="o">.</span><span class="n">toprettyxml</span><span class="p">())</span>
+            <span class="nb">print</span><span class="p">(</span> <span class="s2">&quot;Action: -------- end of tx request ------&quot;</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="n">soapRequest</span><span class="p">)</span>
+        <span class="c1">#Send data and go into recieve loop</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">isv6</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">intIP</span><span class="p">):</span>
+            <span class="n">sock</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">socket</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">AF_INET</span><span class="p">,</span><span class="n">socket</span><span class="o">.</span><span class="n">SOCK_STREAM</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">sock</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">socket</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">AF_INET6</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">SOCK_STREAM</span><span class="p">)</span>
+        <span class="n">sock</span><span class="o">.</span><span class="n">settimeout</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">)</span>
+        <span class="n">sock</span><span class="o">.</span><span class="n">connect</span><span class="p">((</span><span class="n">host</span><span class="p">,</span><span class="n">port</span><span class="p">))</span>
+        <span class="n">sock</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">soapRequest</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf8&quot;</span><span class="p">))</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">sock</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">8192</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">data</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span> <span class="s2">&quot;No response!&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">soapResponse</span> <span class="o">+=</span> <span class="n">data</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf8&quot;</span><span class="p">)</span>
+
+        <span class="n">sock</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="p">(</span><span class="n">header</span><span class="p">,</span><span class="n">body</span><span class="p">)</span> <span class="o">=</span> <span class="n">soapResponse</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\r\n\r\n</span><span class="s1">&#39;</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span> <span class="s2">&quot;Action: --------rx http response header----------&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span> <span class="n">header</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span> <span class="s2">&quot;Action: -------- rx http response body----------&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">body</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">pprint</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span> <span class="n">body</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">xml</span> <span class="o">=</span> <span class="n">minidom</span><span class="o">.</span><span class="n">parseString</span><span class="p">(</span><span class="n">body</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span> <span class="n">xml</span><span class="o">.</span><span class="n">toprettyxml</span><span class="p">())</span>
+            <span class="nb">print</span><span class="p">(</span> <span class="s2">&quot;Action: --------end of rx http response body  -----&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">header</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;HTTP/1.&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="s1">&#39; 200 &#39;</span> <span class="ow">in</span> <span class="n">header</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\r\n</span><span class="s1">&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="n">err_code</span><span class="p">,</span><span class="n">err_desc</span><span class="o">=</span><span class="n">parseErrMsg</span><span class="p">(</span><span class="n">body</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">UPNPError</span><span class="p">(</span><span class="n">header</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\r\n</span><span class="s1">&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span><span class="mi">1</span><span class="p">)[</span><span class="mi">1</span><span class="p">],</span>
+                <span class="n">err_code</span><span class="p">,</span><span class="n">err_desc</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span></div></div>
+            <span class="k">return</span> <span class="n">body</span>
+
+
+<div class="viewcode-block" id="IGDPortOpener"><a class="viewcode-back" href="../../_generated/communication.igdc.html#communication.igdc.IGDPortOpener">[docs]</a><span class="k">class</span> <span class="nc">IGDPortOpener</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ip</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ip</span> <span class="o">=</span> <span class="n">ip</span>
+
+<div class="viewcode-block" id="IGDPortOpener.discover"><a class="viewcode-back" href="../../_generated/communication.igdc.html#communication.igdc.IGDPortOpener.discover">[docs]</a>    <span class="k">def</span> <span class="nf">discover</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span></div>
+        <span class="k">pass</span>
+
+<div class="viewcode-block" id="IGDPortOpener.add_port_mapping"><a class="viewcode-back" href="../../_generated/communication.igdc.html#communication.igdc.IGDPortOpener.add_port_mapping">[docs]</a>    <span class="k">def</span> <span class="nf">add_port_mapping</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">port</span><span class="p">,</span> <span class="n">protocol</span><span class="p">,</span> <span class="n">description</span><span class="p">):</span></div>
+        <span class="k">pass</span>
+
+<div class="viewcode-block" id="IGDPortOpener.delete_port_mapping"><a class="viewcode-back" href="../../_generated/communication.igdc.html#communication.igdc.IGDPortOpener.delete_port_mapping">[docs]</a>    <span class="k">def</span> <span class="nf">delete_port_mapping</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">port</span><span class="p">,</span> <span class="n">protocol</span><span class="p">,</span> <span class="n">description</span><span class="p">):</span></div></div>
+        <span class="k">pass</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">client</span> <span class="o">=</span> <span class="n">IGDClient</span><span class="p">(</span><span class="s2">&quot;192.168.1.25&quot;</span><span class="p">)</span>
+    <span class="n">client</span><span class="o">.</span><span class="n">AddPortMapping</span><span class="p">(</span><span class="s2">&quot;192.168.1.16&quot;</span><span class="p">,</span> <span class="mi">21116</span><span class="p">,</span> <span class="s2">&quot;TCP&quot;</span><span class="p">,</span> <span class="mi">21116</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;P2P EM&quot;</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Etienne Desticourt.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'0.1.0-alpha',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

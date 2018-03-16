@@ -1,0 +1,437 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>communication.network &mdash; EncryptedMessenger 0.1.0-alpha documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../genindex.html"/>
+        <link rel="search" title="Search" href="../../search.html"/>
+    <link rel="top" title="EncryptedMessenger 0.1.0-alpha documentation" href="../../index.html"/>
+        <link rel="up" title="Module code" href="../index.html"/> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> EncryptedMessenger
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Info:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../_static/systems.html">Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_static/encryption_protocols.html">Encryption Protocols</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_static/communication_protocols.html">Communication Protocols</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../_static/communication.html">Communication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_static/encryption.html">Encryption</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_static/ui.html">UI</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">EncryptedMessenger</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>communication.network</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for communication.network</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">encryption.crypter</span> <span class="k">import</span> <span class="n">DEFAULT_PADDING</span><span class="p">,</span> <span class="n">OPENSSL_PADDING</span>
+<span class="kn">from</span> <span class="nn">communication.exceptions</span> <span class="k">import</span> <span class="n">NetworkException</span>
+<span class="kn">from</span> <span class="nn">communication.exceptions</span> <span class="k">import</span> <span class="n">UnexpectedResponseError</span>
+<span class="kn">from</span> <span class="nn">communication.exceptions</span> <span class="k">import</span> <span class="n">UserDoesNotExistError</span>
+<span class="kn">from</span> <span class="nn">communication.exceptions</span> <span class="k">import</span> <span class="n">ChallengeFailureError</span>
+<span class="kn">from</span> <span class="nn">communication.exceptions</span> <span class="k">import</span> <span class="n">CommandFailureError</span>
+<span class="kn">import</span> <span class="nn">config</span>
+<span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">keys.utils</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">base64</span>
+
+<span class="c1"># TODO: Rename class, network might be meaningless in this context, or not explicit enough (PeerNetwork ? PeerResolver? PeerRegistry?)</span>
+<div class="viewcode-block" id="Network"><a class="viewcode-back" href="../../_generated/communication.network.html#communication.network.Network">[docs]</a><span class="k">class</span> <span class="nc">Network</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Manages connections to the network of peers on which users are registered.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        url: The endpoint to the peer network&#39;s API.</span>
+<span class="sd">        key_dir: The directory in which the user&#39;s private key is stored.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">NO_USER_ERROR</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;error&#39;</span><span class="p">:</span> <span class="s1">&#39;No such user.&#39;</span><span class="p">}</span>
+    <span class="n">EXISTING_USER_ERROR</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;error&#39;</span><span class="p">:</span> <span class="s1">&#39;User already exists.&#39;</span><span class="p">}</span>
+    <span class="n">OK_RESPONSE</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;status&#39;</span><span class="p">:</span> <span class="s1">&#39;OK&#39;</span><span class="p">}</span>
+    <span class="n">FAILED_CHALLENGE_ERROR</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;error&#39;</span><span class="p">:</span> <span class="s1">&#39;Challenge failed.&#39;</span><span class="p">}</span>
+    <span class="n">NO_CHALLENGE_ERROR</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;error&#39;</span><span class="p">:</span> <span class="s1">&#39;No existing challenge for user.&#39;</span><span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">key_dir</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">KEY_DIR</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="n">url</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">key_dir</span> <span class="o">=</span> <span class="n">key_dir</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">raise_on_wrong_http_code</span><span class="p">(</span><span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">post</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">raise_on_wrong_http_code</span><span class="p">(</span><span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Created network consumer with url </span><span class="si">%s</span><span class="s2">.&quot;</span><span class="p">,</span> <span class="n">url</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Network.raise_on_wrong_http_code"><a class="viewcode-back" href="../../_generated/communication.network.html#communication.network.Network.raise_on_wrong_http_code">[docs]</a>    <span class="k">def</span> <span class="nf">raise_on_wrong_http_code</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Creates a function that will raise a NetworkException when failling to fetch an http resource.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            func: A function that returns an object that holds an http status code.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A function that raises a NetworkException when the http functions returns an error status code.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">def</span> <span class="nf">new_func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Executed query. args: </span><span class="si">%s</span><span class="s2">, kwargs: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">args</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">kwargs</span><span class="p">))</span>
+            <span class="n">resp</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">resp</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">NetworkException</span><span class="p">(</span><span class="n">resp</span><span class="o">.</span><span class="n">status_code</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">resp</span></div>
+        <span class="k">return</span> <span class="n">new_func</span>
+
+<div class="viewcode-block" id="Network.has_peer"><a class="viewcode-back" href="../../_generated/communication.network.html#communication.network.Network.has_peer">[docs]</a>    <span class="k">def</span> <span class="nf">has_peer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Checks whether the network has a peer with a specific name.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            name: The name of the peer to look for.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A boolean indicating whether the peer exists.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Checking if peer </span><span class="si">%s</span><span class="s2"> exists.&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fetch_peer</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span> <span class="o">==</span> <span class="n">Network</span><span class="o">.</span><span class="n">NO_USER_ERROR</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+        <span class="k">return</span> <span class="kc">True</span>
+
+<div class="viewcode-block" id="Network.register"><a class="viewcode-back" href="../../_generated/communication.network.html#communication.network.Network.register">[docs]</a>    <span class="k">def</span> <span class="nf">register</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">public_pem</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Registers a user on the peer network.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            username: The name to register with.</span>
+<span class="sd">            public_pem: The public key to publicize so other users can connect to you.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            CommandFailureError: The peer network returned an error when attempting to register.</span>
+<span class="sd">            UnexpectedResponseError: The network answered with an unexpected message.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Registering new user: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">username</span><span class="p">)</span>
+
+        <span class="n">public_key</span> <span class="o">=</span> <span class="n">public_pem</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf8&quot;</span><span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">+</span> <span class="s2">&quot;/user&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;username&quot;</span><span class="p">:</span> <span class="n">username</span><span class="p">,</span>
+                                                     <span class="s2">&quot;public_key&quot;</span><span class="p">:</span> <span class="n">public_key</span><span class="p">})</span>
+
+        <span class="n">content</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">content</span> <span class="o">==</span> <span class="n">Network</span><span class="o">.</span><span class="n">OK_RESPONSE</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">elif</span> <span class="s2">&quot;error&quot;</span> <span class="ow">in</span> <span class="n">content</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">CommandFailureError</span><span class="p">(</span><span class="n">content</span><span class="p">[</span><span class="s2">&quot;error&quot;</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span></div>
+            <span class="k">raise</span> <span class="n">UnpexpectedResponseError</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Network.connect"><a class="viewcode-back" href="../../_generated/communication.network.html#communication.network.Network.connect">[docs]</a>    <span class="k">def</span> <span class="nf">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">username</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Connects to the network to update the user&#39;s ip.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            username: The username of the user with which to connect.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            UserDoesNotExistError: There is no user with that username registered on the network.</span>
+<span class="sd">            UnexpectedResponseError: The network answered with an unexpected message.</span>
+<span class="sd">            ChallengeFailureError: The user failed to authenticate by solving the network&#39;s challenge with his private key.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Connecting to network as </span><span class="si">%s</span><span class="s2">.&quot;</span><span class="p">,</span> <span class="n">username</span><span class="p">)</span>
+        <span class="c1"># Ask for an auth challenge and decrypt it</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">+</span> <span class="s2">&quot;/challenge/&quot;</span> <span class="o">+</span> <span class="n">username</span><span class="p">)</span>
+        <span class="n">challenge</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="s2">&quot;challenge&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">challenge</span> <span class="ow">or</span> <span class="s2">&quot;ip&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">challenge</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">challenge</span> <span class="o">==</span> <span class="n">Network</span><span class="o">.</span><span class="n">NO_USER_ERROR</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">UserDoesNotExistError</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">UnpexpectedResponseError</span><span class="p">(</span><span class="s2">&quot;Server provided unexpected response to challenge request.&quot;</span><span class="p">)</span>
+
+        <span class="n">encrypted_secret</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64decode</span><span class="p">(</span><span class="n">challenge</span><span class="p">[</span><span class="s2">&quot;challenge&quot;</span><span class="p">])</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="n">keys</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">load_private_key</span><span class="p">(</span><span class="n">username</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">key_dir</span><span class="p">)</span>
+        <span class="n">secret_bytes</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">encrypted_secret</span><span class="p">,</span> <span class="n">OPENSSL_PADDING</span><span class="p">())</span>
+        <span class="n">secret</span> <span class="o">=</span> <span class="n">secret_bytes</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf8&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Send decrypted challenge along with new ip</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;username&quot;</span><span class="p">:</span> <span class="n">username</span><span class="p">,</span>
+                <span class="s2">&quot;challenge&quot;</span><span class="p">:</span> <span class="n">secret</span><span class="p">,</span>
+                <span class="s2">&quot;ip&quot;</span><span class="p">:</span> <span class="n">challenge</span><span class="p">[</span><span class="s2">&quot;ip&quot;</span><span class="p">]}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Messenger public ip is </span><span class="si">%s</span><span class="s2">.&quot;</span><span class="p">,</span> <span class="n">challenge</span><span class="p">[</span><span class="s2">&quot;ip&quot;</span><span class="p">])</span>
+
+        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">+</span> <span class="s2">&quot;/ip&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">content</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">content</span> <span class="o">==</span> <span class="n">Network</span><span class="o">.</span><span class="n">OK_RESPONSE</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Succesfully connected to network.&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="k">elif</span> <span class="n">content</span> <span class="o">==</span> <span class="n">Network</span><span class="o">.</span><span class="n">FAILED_CHALLENGE_ERROR</span> <span class="ow">or</span> <span class="n">content</span> <span class="o">==</span> <span class="n">Network</span><span class="o">.</span><span class="n">NO_CHALLENGE_ERROR</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ChallengeFailureError</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span></div>
+            <span class="k">raise</span> <span class="n">UnexpectedResponseError</span><span class="p">(</span><span class="s2">&quot;Server provided unexpected response to ip update request.&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Network.get_peer_info"><a class="viewcode-back" href="../../_generated/communication.network.html#communication.network.Network.get_peer_info">[docs]</a>    <span class="k">def</span> <span class="nf">get_peer_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">username</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Fetches the contact information (ip and public key) of the specified user.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            username: The name of the user whose info we want to fetch.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A JSON string that holds the user&#39;s data.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            UserDoesNotExistError: There is no user with that username registered on the network.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fetch_peer</span><span class="p">(</span><span class="n">username</span><span class="p">)</span>
+        <span class="n">content</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">content</span> <span class="o">==</span> <span class="n">Network</span><span class="o">.</span><span class="n">NO_USER_ERROR</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">UserDoesNotExistError</span><span class="p">()</span>
+        <span class="n">ip</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fetch_peer_ip</span><span class="p">(</span><span class="n">username</span><span class="p">)</span>
+        <span class="n">content</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">ip</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">content</span>
+
+<div class="viewcode-block" id="Network.get_peer_ip"><a class="viewcode-back" href="../../_generated/communication.network.html#communication.network.Network.get_peer_ip">[docs]</a>    <span class="k">def</span> <span class="nf">get_peer_ip</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">username</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Fetches the last recorded ip of the specified user.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            username: The name of the user whose ip we want to fetch.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            The user&#39;s ip.</span>
+<span class="sd">        &quot;&quot;&quot;</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">fetch_peer_ip</span><span class="p">(</span><span class="n">username</span><span class="p">)[</span><span class="s2">&quot;ip&quot;</span><span class="p">]</span>
+
+<div class="viewcode-block" id="Network.fetch_peer"><a class="viewcode-back" href="../../_generated/communication.network.html#communication.network.Network.fetch_peer">[docs]</a>    <span class="k">def</span> <span class="nf">fetch_peer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">username</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Fetches the specified user&#39;s identification info (username and public key).</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            username: The name of the user whose ip we want to fetch.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A JSON string that holds the user&#39;s public key and username.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">+</span> <span class="s2">&quot;/user/&quot;</span> <span class="o">+</span> <span class="n">username</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">response</span>
+
+<div class="viewcode-block" id="Network.fetch_peer_ip"><a class="viewcode-back" href="../../_generated/communication.network.html#communication.network.Network.fetch_peer_ip">[docs]</a>    <span class="k">def</span> <span class="nf">fetch_peer_ip</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">username</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Fetches the last recorded ip of the specified user.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            username: The name of the user whose ip we want to fetch.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A JSON string holding the user&#39;s ip.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Fetching ip for </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">username</span><span class="p">)</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">+</span> <span class="s2">&quot;/ip/&quot;</span> <span class="o">+</span> <span class="n">username</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+
+    <span class="c1"># TODO: Doesn&#39;t seem to be used and returns nonsensical results [list of ips with no other in ordered by listdir&#39;s order, weird]: Remove!</span>
+<div class="viewcode-block" id="Network.fetch_contact_ips"><a class="viewcode-back" href="../../_generated/communication.network.html#communication.network.Network.fetch_contact_ips">[docs]</a>    <span class="k">def</span> <span class="nf">fetch_contact_ips</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="c1"># TODO: contact-&gt; contacts</span>
+        <span class="sd">&quot;&quot;&quot;Fetches the ips of all the user&#39;s contacts.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A list of ips.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ips</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">contact_names</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="s2">&quot;contacts&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">contact_names</span><span class="p">:</span>
+            <span class="n">contact</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fetch_peer_ip</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+            <span class="n">ips</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">contact</span><span class="p">)</span></div></div>
+        <span class="k">return</span> <span class="n">ips</span>
+</pre></div>
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Etienne Desticourt.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'0.1.0-alpha',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

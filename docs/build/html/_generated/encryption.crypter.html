@@ -1,0 +1,504 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>encryption.crypter module &mdash; EncryptedMessenger 0.1.0-alpha documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../genindex.html"/>
+        <link rel="search" title="Search" href="../search.html"/>
+    <link rel="top" title="EncryptedMessenger 0.1.0-alpha documentation" href="../index.html"/>
+        <link rel="up" title="Encryption package" href="../_static/encryption.html"/>
+        <link rel="next" title="encryption.exceptions module" href="encryption.exceptions.html"/>
+        <link rel="prev" title="Encryption package" href="../_static/encryption.html"/> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> EncryptedMessenger
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Info:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../_static/systems.html">Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_static/encryption_protocols.html">Encryption Protocols</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_static/communication_protocols.html">Communication Protocols</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../_static/communication.html">Communication</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../_static/encryption.html">Encryption</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Crypter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="encryption.exceptions.html">Exceptions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../_static/ui.html">UI</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">EncryptedMessenger</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../_static/encryption.html">Encryption package</a> &raquo;</li>
+        
+      <li>encryption.crypter module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/_generated/encryption.crypter.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-encryption.crypter">
+<span id="encryption-crypter-module"></span><h1>encryption.crypter module<a class="headerlink" href="#module-encryption.crypter" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="encryption.crypter.Crypter">
+<em class="property">class </em><code class="descclassname">encryption.crypter.</code><code class="descname">Crypter</code><span class="sig-paren">(</span><em>RNG</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encryption/crypter.html#Crypter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#encryption.crypter.Crypter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A utility that holds a user’s secret keys, handles the authentication handshake, encryption and decryption of messages,
+and garantees their integrity.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>RNG</strong> – A random function that’ll be used to generate keys. Must be cryptographically secure.</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="encryption.crypter.Crypter.decrypt_key">
+<code class="descname">decrypt_key</code><span class="sig-paren">(</span><em>encrypted_key</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encryption/crypter.html#Crypter.decrypt_key"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#encryption.crypter.Crypter.decrypt_key" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decrypts a key.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>encrypted_key</strong> – The secret key to decrypt.</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The decrypted key.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><code class="xref py py-exc docutils literal notranslate"><span class="pre">NoKeyException</span></code> – If the RSA key hasn’t been loaded yet.</li>
+<li><code class="xref py py-exc docutils literal notranslate"><span class="pre">CrypterException</span></code> – If the loaded RSA key is public. It needs a private key to decrypt things.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="encryption.crypter.Crypter.decrypt_message">
+<code class="descname">decrypt_message</code><span class="sig-paren">(</span><em>message</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encryption/crypter.html#Crypter.decrypt_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#encryption.crypter.Crypter.decrypt_message" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decrypts the given message using the current AES key.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>message</strong> – The message to decrypt.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The decrypted message as a string.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><code class="xref py py-exc docutils literal notranslate"><span class="pre">CorruptedMessageException</span></code> – The HMAC signature did not match the message or the message wasn’t the right size.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="encryption.crypter.Crypter.encrypt_key">
+<code class="descname">encrypt_key</code><span class="sig-paren">(</span><em>raw_key</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encryption/crypter.html#Crypter.encrypt_key"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#encryption.crypter.Crypter.encrypt_key" title="Permalink to this definition">¶</a></dt>
+<dd><p>Encrypts a key.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>raw_key</strong> – The secret key to encrypt.</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The encrypted key.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><code class="xref py py-exc docutils literal notranslate"><span class="pre">NoKeyException</span></code> – If the RSA key hasn’t been loaded yet.</li>
+<li><code class="xref py py-exc docutils literal notranslate"><span class="pre">CrypterException</span></code> – If the loaded RSA key is private. It needs a public key to encrypt things.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="encryption.crypter.Crypter.encrypt_message">
+<code class="descname">encrypt_message</code><span class="sig-paren">(</span><em>message</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encryption/crypter.html#Crypter.encrypt_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#encryption.crypter.Crypter.encrypt_message" title="Permalink to this definition">¶</a></dt>
+<dd><p>Encrypts the given message using the current AES key.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>message</strong> – The message to encrypt.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">An encrypted message along with its HMAC and its initialization vector.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><code class="xref py py-exc docutils literal notranslate"><span class="pre">NoKeyException</span></code> – If an AES key hasn’t been generated yet.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="encryption.crypter.Crypter.gen_and_set_aes_key">
+<code class="descname">gen_and_set_aes_key</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encryption/crypter.html#Crypter.gen_and_set_aes_key"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#encryption.crypter.Crypter.gen_and_set_aes_key" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates and stores a 32 bytes AES key to encrypt messages with.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The generated 32 bytes AES key.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="encryption.crypter.Crypter.gen_and_set_rsa_key">
+<code class="descname">gen_and_set_rsa_key</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encryption/crypter.html#Crypter.gen_and_set_rsa_key"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#encryption.crypter.Crypter.gen_and_set_rsa_key" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates and stores a new RSA key pair.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="encryption.crypter.Crypter.gen_hmac">
+<code class="descname">gen_hmac</code><span class="sig-paren">(</span><em>iv</em>, <em>encrypted_message</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encryption/crypter.html#Crypter.gen_hmac"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#encryption.crypter.Crypter.gen_hmac" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates 32 bytes of HMAC from a given initialization vector and encrypted message
+to ensure the message’s integrity.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>iv</strong> – The initialization vector to generate the HMAC.</li>
+<li><strong>encrypted_message</strong> – The encrypted message to which the HMAC will be merged.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">The generated 32 bytes HMAC.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="encryption.crypter.Crypter.get_public_key_pem">
+<code class="descname">get_public_key_pem</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encryption/crypter.html#Crypter.get_public_key_pem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#encryption.crypter.Crypter.get_public_key_pem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets pem data for the public rsa key.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The pem data bytes.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><code class="xref py py-exc docutils literal notranslate"><span class="pre">CrypterException</span></code> – If the current key type does not exist.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="encryption.crypter.Crypter.load_rsa_key">
+<code class="descname">load_rsa_key</code><span class="sig-paren">(</span><em>key_type</em>, <em>directory='keys'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encryption/crypter.html#Crypter.load_rsa_key"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#encryption.crypter.Crypter.load_rsa_key" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads an RSA key to perform handhsakes/authentication with.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>key_type</strong> – keys.PUBLIC or keys.PRIVATE.</li>
+<li><strong>directory</strong> – The directory in which the key is stored.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><code class="xref py py-exc docutils literal notranslate"><span class="pre">CrypterException</span></code> – If the specified key_type does not exist.</li>
+<li><code class="xref py py-exc docutils literal notranslate"><span class="pre">NoKeyException</span></code> – If there is no key file in the specified directory.</li>
+<li><code class="xref py py-exc docutils literal notranslate"><span class="pre">BackendException</span></code> – If the serialized key is of a type that is not supported by the backend
+or if the key is encrypted with a symmetric cipher that is not supported by the backend.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="encryption.crypter.Crypter.set_public_key_from_pem">
+<code class="descname">set_public_key_from_pem</code><span class="sig-paren">(</span><em>pem_data</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encryption/crypter.html#Crypter.set_public_key_from_pem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#encryption.crypter.Crypter.set_public_key_from_pem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets a new public key from pem data.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>pem data bytes.</strong> (<em>The</em>) – </td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="encryption.crypter.Crypter.sign">
+<code class="descname">sign</code><span class="sig-paren">(</span><em>private_key</em>, <em>message</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encryption/crypter.html#Crypter.sign"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#encryption.crypter.Crypter.sign" title="Permalink to this definition">¶</a></dt>
+<dd><p>Signs a message with the private RSA key to authenticate it.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>private_key</strong> – The secret key with which to sign the message.</li>
+<li><strong>message</strong> – The message to sign.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">The signature.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="encryption.crypter.Crypter.verify_signature">
+<code class="descname">verify_signature</code><span class="sig-paren">(</span><em>public_key</em>, <em>message</em>, <em>signature</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encryption/crypter.html#Crypter.verify_signature"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#encryption.crypter.Crypter.verify_signature" title="Permalink to this definition">¶</a></dt>
+<dd><p>Verifies the author’s identity for a given message.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>public_key</strong> – The public key of the author.</li>
+<li><strong>message</strong> – The message to authenticate.</li>
+<li><strong>signature</strong> – The signature with which the author signed the message.</li>
+<li><strong>private_key</strong> – The secret key with which to sign the message.</li>
+<li><strong>message</strong> – The message to sign.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-exc docutils literal notranslate"><span class="pre">InvalidSignature</span></code> – If the signature does not match the public key.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="encryption.crypter.DEFAULT_PADDING">
+<code class="descclassname">encryption.crypter.</code><code class="descname">DEFAULT_PADDING</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encryption/crypter.html#DEFAULT_PADDING"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#encryption.crypter.DEFAULT_PADDING" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="encryption.crypter.OPENSSL_PADDING">
+<code class="descclassname">encryption.crypter.</code><code class="descname">OPENSSL_PADDING</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/encryption/crypter.html#OPENSSL_PADDING"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#encryption.crypter.OPENSSL_PADDING" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="encryption.exceptions.html" class="btn btn-neutral float-right" title="encryption.exceptions module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../_static/encryption.html" class="btn btn-neutral" title="Encryption package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Etienne Desticourt.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'0.1.0-alpha',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

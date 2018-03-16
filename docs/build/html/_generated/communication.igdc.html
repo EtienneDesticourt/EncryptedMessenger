@@ -1,0 +1,373 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>communication.igdc module &mdash; EncryptedMessenger 0.1.0-alpha documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../genindex.html"/>
+        <link rel="search" title="Search" href="../search.html"/>
+    <link rel="top" title="EncryptedMessenger 0.1.0-alpha documentation" href="../index.html"/> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> EncryptedMessenger
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Info:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../_static/systems.html">Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_static/encryption_protocols.html">Encryption Protocols</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_static/communication_protocols.html">Communication Protocols</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../_static/communication.html">Communication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_static/encryption.html">Encryption</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_static/ui.html">UI</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">EncryptedMessenger</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+      <li>communication.igdc module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/_generated/communication.igdc.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-communication.igdc">
+<span id="communication-igdc-module"></span><h1>communication.igdc module<a class="headerlink" href="#module-communication.igdc" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="communication.igdc.FakeSocket">
+<em class="property">class </em><code class="descclassname">communication.igdc.</code><code class="descname">FakeSocket</code><a class="reference internal" href="../_modules/communication/igdc.html#FakeSocket"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#communication.igdc.FakeSocket" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">_io.StringIO</span></code></p>
+<dl class="method">
+<dt id="communication.igdc.FakeSocket.makefile">
+<code class="descname">makefile</code><span class="sig-paren">(</span><em>*args</em>, <em>**kw</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/communication/igdc.html#FakeSocket.makefile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#communication.igdc.FakeSocket.makefile" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="communication.igdc.IGDClient">
+<em class="property">class </em><code class="descclassname">communication.igdc.</code><code class="descname">IGDClient</code><span class="sig-paren">(</span><em>intIP</em>, <em>ctrlURL=None</em>, <em>service='WANIPC'</em>, <em>edebug=False</em>, <em>pprint=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/communication/igdc.html#IGDClient"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#communication.igdc.IGDClient" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>UPnP IGD v1 Client class, supports all actions</p>
+<dl class="method">
+<dt id="communication.igdc.IGDClient.AddPortMapping">
+<code class="descname">AddPortMapping</code><span class="sig-paren">(</span><em>intIP</em>, <em>extPort</em>, <em>proto</em>, <em>intPort</em>, <em>enabled=1</em>, <em>duration=0</em>, <em>desc=''</em>, <em>remoteHost=''</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/communication/igdc.html#IGDClient.AddPortMapping"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#communication.igdc.IGDClient.AddPortMapping" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="communication.igdc.IGDClient.DeletePortMapping">
+<code class="descname">DeletePortMapping</code><span class="sig-paren">(</span><em>extPort</em>, <em>proto</em>, <em>remoteHost=''</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/communication/igdc.html#IGDClient.DeletePortMapping"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#communication.igdc.IGDClient.DeletePortMapping" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="communication.igdc.IGDClient.discovery">
+<code class="descname">discovery</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/communication/igdc.html#IGDClient.discovery"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#communication.igdc.IGDClient.discovery" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find IGD device and its control URL via UPnP multicast discovery</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="communication.igdc.IGDClient.sendSOAP">
+<code class="descname">sendSOAP</code><span class="sig-paren">(</span><em>hostName</em>, <em>serviceType</em>, <em>controlURL</em>, <em>actionName</em>, <em>actionArguments</em>, <em>hideErr=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/communication/igdc.html#IGDClient.sendSOAP"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#communication.igdc.IGDClient.sendSOAP" title="Permalink to this definition">¶</a></dt>
+<dd><p>send a SOAP request and get the response</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="communication.igdc.IGDPortOpener">
+<em class="property">class </em><code class="descclassname">communication.igdc.</code><code class="descname">IGDPortOpener</code><span class="sig-paren">(</span><em>ip</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/communication/igdc.html#IGDPortOpener"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#communication.igdc.IGDPortOpener" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="communication.igdc.IGDPortOpener.add_port_mapping">
+<code class="descname">add_port_mapping</code><span class="sig-paren">(</span><em>port</em>, <em>protocol</em>, <em>description</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/communication/igdc.html#IGDPortOpener.add_port_mapping"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#communication.igdc.IGDPortOpener.add_port_mapping" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="communication.igdc.IGDPortOpener.delete_port_mapping">
+<code class="descname">delete_port_mapping</code><span class="sig-paren">(</span><em>port</em>, <em>protocol</em>, <em>description</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/communication/igdc.html#IGDPortOpener.delete_port_mapping"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#communication.igdc.IGDPortOpener.delete_port_mapping" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="communication.igdc.IGDPortOpener.discover">
+<code class="descname">discover</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/communication/igdc.html#IGDPortOpener.discover"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#communication.igdc.IGDPortOpener.discover" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="communication.igdc.UPNPError">
+<em class="property">exception </em><code class="descclassname">communication.igdc.</code><code class="descname">UPNPError</code><span class="sig-paren">(</span><em>hcode</em>, <em>ucode</em>, <em>udes</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/communication/igdc.html#UPNPError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#communication.igdc.UPNPError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="communication.igdc.get1stTagText">
+<code class="descclassname">communication.igdc.</code><code class="descname">get1stTagText</code><span class="sig-paren">(</span><em>xmls</em>, <em>tagname_list</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/communication/igdc.html#get1stTagText"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#communication.igdc.get1stTagText" title="Permalink to this definition">¶</a></dt>
+<dd><p>return 1st tag’s value in the xmls</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="communication.igdc.getProtoId">
+<code class="descclassname">communication.igdc.</code><code class="descname">getProtoId</code><span class="sig-paren">(</span><em>proto_name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/communication/igdc.html#getProtoId"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#communication.igdc.getProtoId" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="communication.igdc.httpparse">
+<code class="descclassname">communication.igdc.</code><code class="descname">httpparse</code><span class="sig-paren">(</span><em>fp</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/communication/igdc.html#httpparse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#communication.igdc.httpparse" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="communication.igdc.inet_ntop">
+<code class="descclassname">communication.igdc.</code><code class="descname">inet_ntop</code><span class="sig-paren">(</span><em>address_family</em>, <em>packed_ip</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/communication/igdc.html#inet_ntop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#communication.igdc.inet_ntop" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="communication.igdc.inet_pton">
+<code class="descclassname">communication.igdc.</code><code class="descname">inet_pton</code><span class="sig-paren">(</span><em>address_family</em>, <em>ip_string</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/communication/igdc.html#inet_pton"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#communication.igdc.inet_pton" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="communication.igdc.isLLA">
+<code class="descclassname">communication.igdc.</code><code class="descname">isLLA</code><span class="sig-paren">(</span><em>addr</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/communication/igdc.html#isLLA"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#communication.igdc.isLLA" title="Permalink to this definition">¶</a></dt>
+<dd><p>return True if addr is IPv6 Link Local Address</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="communication.igdc.isv6">
+<code class="descclassname">communication.igdc.</code><code class="descname">isv6</code><span class="sig-paren">(</span><em>addr</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/communication/igdc.html#isv6"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#communication.igdc.isv6" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="communication.igdc.parseErrMsg">
+<code class="descclassname">communication.igdc.</code><code class="descname">parseErrMsg</code><span class="sig-paren">(</span><em>err_resp</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/communication/igdc.html#parseErrMsg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#communication.igdc.parseErrMsg" title="Permalink to this definition">¶</a></dt>
+<dd><p>parse UPnP error message, err_resp is the returned XML in http body
+reurn UPnP error code and error description</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="communication.igdc.sockaddr">
+<em class="property">class </em><code class="descclassname">communication.igdc.</code><code class="descname">sockaddr</code><a class="reference internal" href="../_modules/communication/igdc.html#sockaddr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#communication.igdc.sockaddr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">_ctypes.Structure</span></code></p>
+<dl class="attribute">
+<dt id="communication.igdc.sockaddr.ipv4_addr">
+<code class="descname">ipv4_addr</code><a class="headerlink" href="#communication.igdc.sockaddr.ipv4_addr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Structure/Union member</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="communication.igdc.sockaddr.ipv6_addr">
+<code class="descname">ipv6_addr</code><a class="headerlink" href="#communication.igdc.sockaddr.ipv6_addr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Structure/Union member</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="communication.igdc.sockaddr.sa_family">
+<code class="descname">sa_family</code><a class="headerlink" href="#communication.igdc.sockaddr.sa_family" title="Permalink to this definition">¶</a></dt>
+<dd><p>Structure/Union member</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="communication.igdc.str2bool">
+<code class="descclassname">communication.igdc.</code><code class="descname">str2bool</code><span class="sig-paren">(</span><em>bstr</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/communication/igdc.html#str2bool"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#communication.igdc.str2bool" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Etienne Desticourt.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'0.1.0-alpha',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

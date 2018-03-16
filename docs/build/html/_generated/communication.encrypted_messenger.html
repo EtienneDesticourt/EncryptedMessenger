@@ -1,0 +1,435 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>communication.encrypted_messenger module &mdash; EncryptedMessenger 0.1.0-alpha documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../genindex.html"/>
+        <link rel="search" title="Search" href="../search.html"/>
+    <link rel="top" title="EncryptedMessenger 0.1.0-alpha documentation" href="../index.html"/>
+        <link rel="up" title="Communication package" href="../_static/communication.html"/>
+        <link rel="next" title="communication.exceptions module" href="communication.exceptions.html"/>
+        <link rel="prev" title="communication.contact_manager module" href="communication.contact_manager.html"/> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> EncryptedMessenger
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Info:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../_static/systems.html">Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_static/encryption_protocols.html">Encryption Protocols</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_static/communication_protocols.html">Communication Protocols</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../_static/communication.html">Communication</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="communication.client.html">Client</a></li>
+<li class="toctree-l2"><a class="reference internal" href="communication.contact.html">Contact</a></li>
+<li class="toctree-l2"><a class="reference internal" href="communication.contact_manager.html">Contact Manager</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Encrypted Messenger</a></li>
+<li class="toctree-l2"><a class="reference internal" href="communication.exceptions.html">Exceptions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="communication.messenger.html">Messenger</a></li>
+<li class="toctree-l2"><a class="reference internal" href="communication.network.html">Network</a></li>
+<li class="toctree-l2"><a class="reference internal" href="communication.protocol.html">Protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="communication.server.html">Server</a></li>
+<li class="toctree-l2"><a class="reference internal" href="communication.socket_manager.html">Socket Manager</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../_static/encryption.html">Encryption</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_static/ui.html">UI</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">EncryptedMessenger</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../_static/communication.html">Communication package</a> &raquo;</li>
+        
+      <li>communication.encrypted_messenger module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/_generated/communication.encrypted_messenger.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-communication.encrypted_messenger">
+<span id="communication-encrypted-messenger-module"></span><h1>communication.encrypted_messenger module<a class="headerlink" href="#module-communication.encrypted_messenger" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="communication.encrypted_messenger.EncryptedMessenger">
+<em class="property">class </em><code class="descclassname">communication.encrypted_messenger.</code><code class="descname">EncryptedMessenger</code><span class="sig-paren">(</span><em>role</em>, <em>socket</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/communication/encrypted_messenger.html#EncryptedMessenger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#communication.encrypted_messenger.EncryptedMessenger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="communication.messenger.html#communication.messenger.Messenger" title="communication.messenger.Messenger"><code class="xref py py-class docutils literal notranslate"><span class="pre">communication.messenger.Messenger</span></code></a></p>
+<p>Handles the transmission and encryption of messages over a connection.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>role</strong> – Whether the messenger should work as a server or client.</li>
+<li><strong>socket</strong> – A handle to the connection</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="communication.encrypted_messenger.EncryptedMessenger.consume_message">
+<code class="descname">consume_message</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/communication/encrypted_messenger.html#EncryptedMessenger.consume_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#communication.encrypted_messenger.EncryptedMessenger.consume_message" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fetches message from the connection.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A decrypted message.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="communication.encrypted_messenger.EncryptedMessenger.consume_messages">
+<code class="descname">consume_messages</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/communication/encrypted_messenger.html#EncryptedMessenger.consume_messages"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#communication.encrypted_messenger.EncryptedMessenger.consume_messages" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fetches all pending messages.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">All decrypted messages.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="communication.encrypted_messenger.EncryptedMessenger.perform_handshake">
+<code class="descname">perform_handshake</code><span class="sig-paren">(</span><em>private_key</em>, <em>contact_key</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/communication/encrypted_messenger.html#EncryptedMessenger.perform_handshake"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#communication.encrypted_messenger.EncryptedMessenger.perform_handshake" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs a handshake with the contact to which we’re connected.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>private_key</strong> – The user’s private key.</li>
+<li><strong>contact_key</strong> – The contact’s public key.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code> – This error will be raised if the messenger’s role does not exist.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="communication.encrypted_messenger.EncryptedMessenger.perform_handshake_as_client">
+<code class="descname">perform_handshake_as_client</code><span class="sig-paren">(</span><em>private_key</em>, <em>contact_key</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/communication/encrypted_messenger.html#EncryptedMessenger.perform_handshake_as_client"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#communication.encrypted_messenger.EncryptedMessenger.perform_handshake_as_client" title="Permalink to this definition">¶</a></dt>
+<dd><p>Waits for the contact to start exchanging keys to validate their
+authenticity then sends the user’s.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>private_key</strong> – The user’s private key.</li>
+<li><strong>contact_key</strong> – The contact’s public key.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><code class="xref py py-exc docutils literal notranslate"><span class="pre">HandshakeTimeoutException</span></code> – The wait will time-out if no handshake messages are received in a given period.</li>
+<li><code class="xref py py-exc docutils literal notranslate"><span class="pre">OSError</span></code> – The messenger will raise this error if there are issues with the connection
+while attempting to receive data.</li>
+<li><em># TODO</em> – Document crypter errors after I’ve documented crypter.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="communication.encrypted_messenger.EncryptedMessenger.perform_handshake_as_server">
+<code class="descname">perform_handshake_as_server</code><span class="sig-paren">(</span><em>private_key</em>, <em>contact_key</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/communication/encrypted_messenger.html#EncryptedMessenger.perform_handshake_as_server"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#communication.encrypted_messenger.EncryptedMessenger.perform_handshake_as_server" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes the initiative in exchanging keys with the contact to
+start the messaging session.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>private_key</strong> – The user’s private key.</li>
+<li><strong>contact_key</strong> – The contact’s public key.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><code class="xref py py-exc docutils literal notranslate"><span class="pre">HandshakeTimeoutException</span></code> – The wait will time-out if no handshake messages are received in a given period.</li>
+<li><code class="xref py py-exc docutils literal notranslate"><span class="pre">OSError</span></code> – The messenger will raise this error if there are issues with the connection
+while attempting to receive data.</li>
+<li><em># TODO</em> – Document crypter errors after I’ve documented crypter.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="communication.encrypted_messenger.EncryptedMessenger.run">
+<code class="descname">run</code><span class="sig-paren">(</span><em>private_key</em>, <em>contact_public_key</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/communication/encrypted_messenger.html#EncryptedMessenger.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#communication.encrypted_messenger.EncryptedMessenger.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Start the messaging session.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>private_key</strong> – The private key of the user.</li>
+<li><strong>contact_public_key</strong> – The public of the contact with whom the user is connected.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="communication.encrypted_messenger.EncryptedMessenger.send">
+<code class="descname">send</code><span class="sig-paren">(</span><em>message</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/communication/encrypted_messenger.html#EncryptedMessenger.send"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#communication.encrypted_messenger.EncryptedMessenger.send" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sends a message over the current connection.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>message</strong> – A unicode string of the message.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="communication.encrypted_messenger.EncryptedMessenger.wait_for_next_message">
+<code class="descname">wait_for_next_message</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/communication/encrypted_messenger.html#EncryptedMessenger.wait_for_next_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#communication.encrypted_messenger.EncryptedMessenger.wait_for_next_message" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tries continuously to fetch a message until it does.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The latest pending message.</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><code class="xref py py-exc docutils literal notranslate"><span class="pre">HandshakeTimeoutException</span></code> – The wait will time-out if no handshake messages are received in a given period.</li>
+<li><code class="xref py py-exc docutils literal notranslate"><span class="pre">OSError</span></code> – The messenger will raise this error if there are issues with the connection
+while attempting to receive data.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="communication.exceptions.html" class="btn btn-neutral float-right" title="communication.exceptions module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="communication.contact_manager.html" class="btn btn-neutral" title="communication.contact_manager module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Etienne Desticourt.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'0.1.0-alpha',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

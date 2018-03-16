@@ -1,0 +1,409 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>communication.contact module &mdash; EncryptedMessenger 0.1.0-alpha documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../genindex.html"/>
+        <link rel="search" title="Search" href="../search.html"/>
+    <link rel="top" title="EncryptedMessenger 0.1.0-alpha documentation" href="../index.html"/>
+        <link rel="up" title="Communication package" href="../_static/communication.html"/>
+        <link rel="next" title="communication.contact_manager module" href="communication.contact_manager.html"/>
+        <link rel="prev" title="communication.client module" href="communication.client.html"/> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> EncryptedMessenger
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Info:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../_static/systems.html">Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_static/encryption_protocols.html">Encryption Protocols</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_static/communication_protocols.html">Communication Protocols</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../_static/communication.html">Communication</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="communication.client.html">Client</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Contact</a></li>
+<li class="toctree-l2"><a class="reference internal" href="communication.contact_manager.html">Contact Manager</a></li>
+<li class="toctree-l2"><a class="reference internal" href="communication.encrypted_messenger.html">Encrypted Messenger</a></li>
+<li class="toctree-l2"><a class="reference internal" href="communication.exceptions.html">Exceptions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="communication.messenger.html">Messenger</a></li>
+<li class="toctree-l2"><a class="reference internal" href="communication.network.html">Network</a></li>
+<li class="toctree-l2"><a class="reference internal" href="communication.protocol.html">Protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="communication.server.html">Server</a></li>
+<li class="toctree-l2"><a class="reference internal" href="communication.socket_manager.html">Socket Manager</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../_static/encryption.html">Encryption</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_static/ui.html">UI</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">EncryptedMessenger</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../_static/communication.html">Communication package</a> &raquo;</li>
+        
+      <li>communication.contact module</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/_generated/communication.contact.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-communication.contact">
+<span id="communication-contact-module"></span><h1>communication.contact module<a class="headerlink" href="#module-communication.contact" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="communication.contact.Contact">
+<em class="property">class </em><code class="descclassname">communication.contact.</code><code class="descname">Contact</code><span class="sig-paren">(</span><em>owner_name</em>, <em>contact_name</em>, <em>public_key</em>, <em>ip=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/communication/contact.html#Contact"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#communication.contact.Contact" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>One of the user’s contacts.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>owner_name</strong> – The name of the user.</li>
+<li><strong>contact_name</strong> – The name of the contact.</li>
+<li><strong>public_key</strong> – The public key to be used for the handshake with said contact.</li>
+<li><strong>ip</strong> – The ip to use to connect to the contact.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="communication.contact.Contact.connect">
+<code class="descname">connect</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/communication/contact.html#Contact.connect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#communication.contact.Contact.connect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Attempts to connect to the contact’s server and start a messaging session.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code> – A value error is raised when the contact’s ip is not defined.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="communication.contact.Contact.from_json">
+<code class="descname">from_json</code><span class="sig-paren">(</span><em>contact_data</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/communication/contact.html#Contact.from_json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#communication.contact.Contact.from_json" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a contact from JSON data.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>owner</strong> – The user’s name.</li>
+<li><strong>contact_data</strong> – A JSON object containing the necessary parameters to define a contact.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">A contact instance with the specified parameters.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="communication.contact.Contact.get_pending_messages">
+<code class="descname">get_pending_messages</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/communication/contact.html#Contact.get_pending_messages"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#communication.contact.Contact.get_pending_messages" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks if there are any pending messages.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">All pending messages or an empty list if there aren’t any.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="communication.contact.Contact.has_connected">
+<code class="descname">has_connected</code><span class="sig-paren">(</span><em>socket</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/communication/contact.html#Contact.has_connected"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#communication.contact.Contact.has_connected" title="Permalink to this definition">¶</a></dt>
+<dd><p>Should be called if the contact has connected to our server.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>socket</strong> – The socket handle.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="communication.contact.Contact.num_pending_messages">
+<code class="descname">num_pending_messages</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/communication/contact.html#Contact.num_pending_messages"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#communication.contact.Contact.num_pending_messages" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks how many pending messages there are.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The number of pending messages.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="communication.contact.Contact.save">
+<code class="descname">save</code><span class="sig-paren">(</span><em>save_dir</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/communication/contact.html#Contact.save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#communication.contact.Contact.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Saves the contact as JSON data.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>save_dir</strong> – The directory in which to save the contact.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="communication.contact.Contact.start_messenger">
+<code class="descname">start_messenger</code><span class="sig-paren">(</span><em>socket</em>, <em>role</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/communication/contact.html#Contact.start_messenger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#communication.contact.Contact.start_messenger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Starts a messaging session with the contact.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>socket</strong> – A handle to the socket which we’ll be used to pass messages.</li>
+<li><strong>role</strong> – Whether the user is a server (the contact has connected to him), or a client.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="communication.contact.Contact.stop_messenger">
+<code class="descname">stop_messenger</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/communication/contact.html#Contact.stop_messenger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#communication.contact.Contact.stop_messenger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stops the ongoing messaging session if there is one.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="communication.contact.Contact.tell">
+<code class="descname">tell</code><span class="sig-paren">(</span><em>message</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/communication/contact.html#Contact.tell"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#communication.contact.Contact.tell" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sends a message to the contact.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>message</strong> – The message to send.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="communication.contact_manager.html" class="btn btn-neutral float-right" title="communication.contact_manager module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="communication.client.html" class="btn btn-neutral" title="communication.client module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Etienne Desticourt.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'0.1.0-alpha',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

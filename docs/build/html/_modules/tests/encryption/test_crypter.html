@@ -1,0 +1,369 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>tests.encryption.test_crypter &mdash; EncryptedMessenger 0.1.0-alpha documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../../genindex.html"/>
+        <link rel="search" title="Search" href="../../../search.html"/>
+    <link rel="top" title="EncryptedMessenger 0.1.0-alpha documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> EncryptedMessenger
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Info:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../_static/systems.html">Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_static/encryption_protocols.html">Encryption Protocols</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_static/communication_protocols.html">Communication Protocols</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../_static/communication.html">Communication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_static/encryption.html">Encryption</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_static/ui.html">UI</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">EncryptedMessenger</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>tests.encryption.test_crypter</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for tests.encryption.test_crypter</h1><div class="highlight"><pre>
+<span></span>
+<span class="kn">from</span> <span class="nn">cryptography.hazmat.primitives.ciphers</span> <span class="k">import</span> <span class="n">Cipher</span><span class="p">,</span> <span class="n">algorithms</span><span class="p">,</span> <span class="n">modes</span>
+<span class="kn">from</span> <span class="nn">cryptography.hazmat.backends</span> <span class="k">import</span> <span class="n">default_backend</span>
+<span class="kn">from</span> <span class="nn">cryptography.hazmat.primitives</span> <span class="k">import</span> <span class="n">hashes</span><span class="p">,</span> <span class="n">hmac</span>
+<span class="kn">from</span> <span class="nn">cryptography.hazmat.primitives.asymmetric</span> <span class="k">import</span> <span class="n">padding</span>
+<span class="kn">import</span> <span class="nn">unittest</span>
+<span class="kn">import</span> <span class="nn">socket</span>
+<span class="kn">import</span> <span class="nn">threading</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">encryption</span> <span class="k">import</span> <span class="n">crypter</span><span class="p">,</span> <span class="n">exceptions</span>
+<span class="kn">from</span> <span class="nn">communication</span> <span class="k">import</span> <span class="n">protocol</span>
+<span class="kn">import</span> <span class="nn">keys.utils</span> <span class="k">as</span> <span class="nn">utils</span>
+
+<span class="c1"># AES KEY</span>
+<span class="n">TEST_AES_KEY</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;|</span><span class="se">\x89</span><span class="s1">4</span><span class="se">\xb1\xe5</span><span class="s1">)yE</span><span class="se">\x9d</span><span class="s1">3{</span><span class="se">\xcc\xc9</span><span class="s1">E</span><span class="se">\xb5\xc5</span><span class="s1">IeT</span><span class="se">\x99\xa2</span><span class="s1">,f~</span><span class="se">\x98\xe3\x9d\x05\\</span><span class="s1">X</span><span class="se">\x92\xdf</span><span class="s1">&#39;</span>
+<span class="n">TEST_ENC_AES_KEY</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">O</span><span class="se">\xd4</span><span class="s1">r</span><span class="se">\x9c\xea\x9f</span><span class="s1">Z</span><span class="se">\xb5</span><span class="s1">T</span><span class="se">\x89\x9f\xa2\x7f</span><span class="s1">0</span><span class="se">\x1c</span><span class="s1">u</span><span class="se">\x0b\x88</span><span class="s1">8</span><span class="se">\xb1\xba</span><span class="s1">T</span><span class="se">\x18</span><span class="s1">Pe</span><span class="se">\xaf\xc8</span><span class="s1">@</span><span class="se">\x0e\x99\xb7</span><span class="s1">q</span><span class="se">\xfb\r</span><span class="s1">?O</span><span class="se">\x9c</span><span class="s1">#G4o, </span><span class="se">\xf2\xbd\x89</span><span class="s1">(</span><span class="se">\x8e\xbb</span><span class="s1">E</span><span class="se">\x1c</span><span class="s1">S$</span><span class="se">\xd4\xee</span><span class="s1">5R</span><span class="se">\xe5</span><span class="s1">M{</span><span class="se">\xd6\x8e\xee</span><span class="s1">i</span><span class="se">\xa5\x92\x01</span><span class="s1">ke</span><span class="se">\xe2\xa8</span><span class="s1">W/G</span><span class="se">\x91\xd1\xa9\xc8\x04\xb2</span><span class="s1">m]</span><span class="se">\x01\xbf\xbe\xb7\x8b\xa7\xdf\x82\xe8\x03</span><span class="s1">Q</span><span class="se">\xf2\x9d\xe5\xb0\xb5\x99</span><span class="s1">kO</span><span class="se">\x02</span><span class="s1">R</span><span class="se">\x16</span><span class="s1">S</span><span class="se">\xf4</span><span class="s1">)$^P</span><span class="se">\xb3\x15\x0c</span><span class="s1">X</span><span class="se">\x0f</span><span class="s1">d</span><span class="se">\xd9</span><span class="s1">WFH</span><span class="se">\xc1</span><span class="s1"> </span><span class="se">\xeb</span><span class="s1"> `K</span><span class="se">\xc9\xee\xfc</span><span class="s1">0&amp;</span><span class="se">\xf2</span><span class="s1">4</span><span class="se">\x14\xde\x85\xcc</span><span class="s1">P</span><span class="se">\xd7\xcb\xac</span><span class="s1">:</span><span class="se">\xe2</span><span class="s1">B</span><span class="se">\x98</span><span class="s1">}</span><span class="se">\x91\x1c</span><span class="s1">X</span><span class="se">\x9c\xff</span><span class="s1">x</span><span class="se">\x05\x8a</span><span class="s1">2</span><span class="se">\x93</span><span class="s1">  </span><span class="se">\x00</span><span class="s1">I</span><span class="se">\xdf\x9a\xe8\xf9\xaa\xd4</span><span class="s1">-&amp;</span><span class="se">\x12\x96</span><span class="s1">2V</span><span class="se">\xb9</span><span class="s1">^</span><span class="se">\xf2\x01\xe0\x9d</span><span class="s1">~+</span><span class="se">\xbf\x1c\x94\xf1\x06\xf0\x84</span><span class="s1">B</span><span class="se">\xbc\xfb\x88\xda</span><span class="s1">m</span><span class="se">\xae\x1f</span><span class="s1">&amp;</span><span class="se">\x00\x9e</span><span class="s1">P</span><span class="se">\xbd\x81\xcb\xb8\xd0\xe1\xf8\x17</span><span class="s1">9</span><span class="se">\xe9\xc3\xe6\xe1\xf9\xce\xde\xd7\r\xd4</span><span class="s1">o-&gt;</span><span class="se">\xdb\xf2</span><span class="s1">~</span><span class="se">\xce\xb8\xa4</span><span class="s1">hz^</span><span class="se">\xc9\xbb</span><span class="s1">&lt;</span><span class="se">\xa7\xd4</span><span class="s1">aOZu2W</span><span class="se">\xd7\x0b\x1d\x93</span><span class="s1">gd</span><span class="se">\xff\x9c</span><span class="s1">R~</span><span class="se">\x10\x12\x95\x88</span><span class="s1">&#39;</span>
+<span class="c1"># RSA KEYS</span>
+<span class="n">DUMMY_KEYS_DIR</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;tests&quot;</span><span class="p">,</span> <span class="s2">&quot;dummy_keys&quot;</span><span class="p">)</span>
+<span class="c1"># Test message</span>
+<span class="n">TEST_MESSAGE</span> <span class="o">=</span> <span class="sa">b</span><span class="s2">&quot;Hello, world!</span><span class="se">\x00</span><span class="s2">&quot;</span>
+<span class="c1"># Encrypted padded test message</span>
+<span class="n">TEST_ENCRYPTED_MESSAGE</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;z</span><span class="se">\xd5</span><span class="s1">%</span><span class="se">\x94\x0b\x1e</span><span class="s1">,</span><span class="se">\x05\x0b</span><span class="s1">S</span><span class="se">\x8e\xd8\x90\xfb\x9b\xa0\xa1</span><span class="s1">I</span><span class="se">\x95</span><span class="s1">k(</span><span class="se">\xf7\xb9\x88</span><span class="s1">yka</span><span class="se">\x93\x08</span><span class="s1">p</span><span class="se">\x12</span><span class="s1">&amp;</span><span class="se">\xbe</span><span class="s1">{</span><span class="se">\xb2</span><span class="s1">bg</span><span class="se">\x9f</span><span class="s1">&lt;</span><span class="se">\xcc</span><span class="s1">mr</span><span class="se">\xf1\t\xb3</span><span class="s1">q</span><span class="se">\xeb\xa3\x99\xbb</span><span class="s1">%}</span><span class="se">\xc3\x04\xa5\xf4\xf7\x01\x07\xbc\x95</span><span class="s1">&gt;</span><span class="se">\xa1\xbc</span><span class="s1">&#39;</span>
+<span class="n">TEST_IV</span> <span class="o">=</span> <span class="n">TEST_ENCRYPTED_MESSAGE</span><span class="p">[:</span><span class="mi">16</span><span class="p">]</span>
+<span class="n">TEST_HMAC</span> <span class="o">=</span> <span class="n">TEST_ENCRYPTED_MESSAGE</span><span class="p">[</span><span class="o">-</span><span class="mi">32</span><span class="p">:]</span>
+<span class="c1"># Modified encrypted padded test message</span>
+<span class="n">TEST_ENCRYPTED_MESSAGE_MOD</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;z</span><span class="se">\xd5</span><span class="s1">%</span><span class="se">\x94\x0b\x1e</span><span class="s1">,</span><span class="se">\x05\x0b</span><span class="s1">S</span><span class="se">\x8e\xd8\x90\xfb\x9b\xa0\xa1</span><span class="s1">I</span><span class="se">\x95</span><span class="s1">k(</span><span class="se">\xf7\xb9\x88</span><span class="s1">yka</span><span class="se">\x94\x09</span><span class="s1">p</span><span class="se">\x12</span><span class="s1">&amp;</span><span class="se">\xbe</span><span class="s1">{</span><span class="se">\xb2</span><span class="s1">bg</span><span class="se">\x9f</span><span class="s1">&lt;</span><span class="se">\xcc</span><span class="s1">mr</span><span class="se">\xf1\t\xb3</span><span class="s1">q</span><span class="se">\xeb\xa3\x99\xbb</span><span class="s1">%}</span><span class="se">\xc3\x04\xa5\xf4\xf7\x01\x07\xbc\x95</span><span class="s1">&gt;</span><span class="se">\xa1\xbc</span><span class="s1">&#39;</span>
+
+
+<div class="viewcode-block" id="TestCrypter"><a class="viewcode-back" href="../../../_generated/tests.encryption.test_crypter.html#tests.encryption.test_crypter.TestCrypter">[docs]</a><span class="k">class</span> <span class="nc">TestCrypter</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+
+<div class="viewcode-block" id="TestCrypter.mockRNG"><a class="viewcode-back" href="../../../_generated/tests.encryption.test_crypter.html#tests.encryption.test_crypter.TestCrypter.mockRNG">[docs]</a>    <span class="k">def</span> <span class="nf">mockRNG</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">numBytes</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">numBytes</span> <span class="o">==</span> <span class="mi">16</span><span class="p">:</span>  <span class="c1"># Asking for an IV</span>
+            <span class="k">return</span> <span class="n">TEST_IV</span>
+        <span class="k">elif</span> <span class="n">numBytes</span> <span class="o">==</span> <span class="mi">32</span><span class="p">:</span>  <span class="c1"># Asking for AES key</span>
+            <span class="k">return</span> <span class="n">TEST_AES_KEY</span>
+        <span class="k">else</span><span class="p">:</span></div>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Test parameters have changed.&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="TestCrypter.setUp"><a class="viewcode-back" href="../../../_generated/tests.encryption.test_crypter.html#tests.encryption.test_crypter.TestCrypter.setUp">[docs]</a>    <span class="k">def</span> <span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">test_crypter</span> <span class="o">=</span> <span class="n">crypter</span><span class="o">.</span><span class="n">Crypter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mockRNG</span><span class="p">)</span>
+
+<div class="viewcode-block" id="TestCrypter.test_load_rsa_key_success"><a class="viewcode-back" href="../../../_generated/tests.encryption.test_crypter.html#tests.encryption.test_crypter.TestCrypter.test_load_rsa_key_success">[docs]</a>    <span class="k">def</span> <span class="nf">test_load_rsa_key_success</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">test_crypter</span><span class="o">.</span><span class="n">load_rsa_key</span><span class="p">(</span><span class="n">utils</span><span class="o">.</span><span class="n">PRIVATE</span><span class="p">,</span> <span class="n">DUMMY_KEYS_DIR</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;Unexpected exception in loadRsaKey while loading private key.&quot;</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_crypter</span><span class="o">.</span><span class="n">rsa_key</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;Private key failed to be loaded.&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">test_crypter</span><span class="o">.</span><span class="n">rsa_key</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">test_crypter</span><span class="o">.</span><span class="n">load_rsa_key</span><span class="p">(</span><span class="n">utils</span><span class="o">.</span><span class="n">PUBLIC</span><span class="p">,</span> <span class="n">DUMMY_KEYS_DIR</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;Unexpected exception in loadRsaKey while loading public key.&quot;</span></div>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_crypter</span><span class="o">.</span><span class="n">rsa_key</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;Public key failed to be loaded.&quot;</span>
+
+<div class="viewcode-block" id="TestCrypter.test_load_rsa_key_no_file"><a class="viewcode-back" href="../../../_generated/tests.encryption.test_crypter.html#tests.encryption.test_crypter.TestCrypter.test_load_rsa_key_no_file">[docs]</a>    <span class="k">def</span> <span class="nf">test_load_rsa_key_no_file</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertRaises</span><span class="p">(</span><span class="n">exceptions</span><span class="o">.</span><span class="n">CrypterException</span><span class="p">,</span>
+                          <span class="bp">self</span><span class="o">.</span><span class="n">test_crypter</span><span class="o">.</span><span class="n">load_rsa_key</span><span class="p">,</span> <span class="n">utils</span><span class="o">.</span><span class="n">PUBLIC</span><span class="p">,</span> <span class="s2">&quot;wrong_dir&quot;</span><span class="p">)</span></div>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_crypter</span><span class="o">.</span><span class="n">rsa_key</span> <span class="o">==</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="TestCrypter.test_load_rsa_key_unknown_type"><a class="viewcode-back" href="../../../_generated/tests.encryption.test_crypter.html#tests.encryption.test_crypter.TestCrypter.test_load_rsa_key_unknown_type">[docs]</a>    <span class="k">def</span> <span class="nf">test_load_rsa_key_unknown_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertRaises</span><span class="p">(</span><span class="n">exceptions</span><span class="o">.</span><span class="n">CrypterException</span><span class="p">,</span>
+                          <span class="bp">self</span><span class="o">.</span><span class="n">test_crypter</span><span class="o">.</span><span class="n">load_rsa_key</span><span class="p">,</span> <span class="s2">&quot;WRONG KEY TYPE&quot;</span><span class="p">,</span> <span class="n">DUMMY_KEYS_DIR</span><span class="p">)</span></div>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_crypter</span><span class="o">.</span><span class="n">rsa_key</span> <span class="o">==</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="TestCrypter.test_gen_and_set_aes_key"><a class="viewcode-back" href="../../../_generated/tests.encryption.test_crypter.html#tests.encryption.test_crypter.TestCrypter.test_gen_and_set_aes_key">[docs]</a>    <span class="k">def</span> <span class="nf">test_gen_and_set_aes_key</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_crypter</span><span class="o">.</span><span class="n">aes_key</span> <span class="o">==</span> <span class="kc">None</span>
+        <span class="n">new_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_crypter</span><span class="o">.</span><span class="n">gen_and_set_aes_key</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_crypter</span><span class="o">.</span><span class="n">aes_key</span> <span class="o">!=</span> <span class="kc">None</span></div>
+        <span class="k">assert</span> <span class="n">new_key</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_crypter</span><span class="o">.</span><span class="n">aes_key</span>
+
+<div class="viewcode-block" id="TestCrypter.test_encrypt_message_success"><a class="viewcode-back" href="../../../_generated/tests.encryption.test_crypter.html#tests.encryption.test_crypter.TestCrypter.test_encrypt_message_success">[docs]</a>    <span class="k">def</span> <span class="nf">test_encrypt_message_success</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">test_crypter</span><span class="o">.</span><span class="n">gen_and_set_aes_key</span><span class="p">()</span>
+        <span class="n">encryptedMessage</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_crypter</span><span class="o">.</span><span class="n">encrypt_message</span><span class="p">(</span><span class="n">TEST_MESSAGE</span><span class="p">)</span></div>
+        <span class="k">assert</span> <span class="n">encryptedMessage</span> <span class="o">==</span> <span class="n">TEST_ENCRYPTED_MESSAGE</span>
+
+<div class="viewcode-block" id="TestCrypter.test_encrypt_message_no_key"><a class="viewcode-back" href="../../../_generated/tests.encryption.test_crypter.html#tests.encryption.test_crypter.TestCrypter.test_encrypt_message_no_key">[docs]</a>    <span class="k">def</span> <span class="nf">test_encrypt_message_no_key</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertRaises</span><span class="p">(</span><span class="n">exceptions</span><span class="o">.</span><span class="n">NoKeyException</span><span class="p">,</span>
+                          <span class="bp">self</span><span class="o">.</span><span class="n">test_crypter</span><span class="o">.</span><span class="n">encrypt_message</span><span class="p">,</span></div>
+                          <span class="n">TEST_MESSAGE</span><span class="p">)</span>
+
+<div class="viewcode-block" id="TestCrypter.test_decrypt_message_success"><a class="viewcode-back" href="../../../_generated/tests.encryption.test_crypter.html#tests.encryption.test_crypter.TestCrypter.test_decrypt_message_success">[docs]</a>    <span class="k">def</span> <span class="nf">test_decrypt_message_success</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">test_crypter</span><span class="o">.</span><span class="n">gen_and_set_aes_key</span><span class="p">()</span>
+        <span class="n">decrypted</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_crypter</span><span class="o">.</span><span class="n">decrypt_message</span><span class="p">(</span><span class="n">TEST_ENCRYPTED_MESSAGE</span><span class="p">)</span>
+        <span class="c1"># test message to string without termination char</span></div>
+        <span class="k">assert</span> <span class="n">decrypted</span> <span class="o">==</span> <span class="n">TEST_MESSAGE</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf8&#39;</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+<div class="viewcode-block" id="TestCrypter.test_decrypt_message_no_key"><a class="viewcode-back" href="../../../_generated/tests.encryption.test_crypter.html#tests.encryption.test_crypter.TestCrypter.test_decrypt_message_no_key">[docs]</a>    <span class="k">def</span> <span class="nf">test_decrypt_message_no_key</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertRaises</span><span class="p">(</span><span class="n">exceptions</span><span class="o">.</span><span class="n">NoKeyException</span><span class="p">,</span>
+                          <span class="bp">self</span><span class="o">.</span><span class="n">test_crypter</span><span class="o">.</span><span class="n">encrypt_message</span><span class="p">,</span></div>
+                          <span class="n">TEST_MESSAGE</span><span class="p">)</span>
+
+<div class="viewcode-block" id="TestCrypter.test_decrypt_message_auth_comprommised"><a class="viewcode-back" href="../../../_generated/tests.encryption.test_crypter.html#tests.encryption.test_crypter.TestCrypter.test_decrypt_message_auth_comprommised">[docs]</a>    <span class="k">def</span> <span class="nf">test_decrypt_message_auth_comprommised</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">test_crypter</span><span class="o">.</span><span class="n">gen_and_set_aes_key</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertRaises</span><span class="p">(</span><span class="n">exceptions</span><span class="o">.</span><span class="n">CorruptedMessageException</span><span class="p">,</span>
+                          <span class="bp">self</span><span class="o">.</span><span class="n">test_crypter</span><span class="o">.</span><span class="n">decrypt_message</span><span class="p">,</span></div>
+                          <span class="n">TEST_ENCRYPTED_MESSAGE_MOD</span><span class="p">)</span>
+
+<div class="viewcode-block" id="TestCrypter.test_encrypt_key_success"><a class="viewcode-back" href="../../../_generated/tests.encryption.test_crypter.html#tests.encryption.test_crypter.TestCrypter.test_encrypt_key_success">[docs]</a>    <span class="k">def</span> <span class="nf">test_encrypt_key_success</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">test_crypter</span><span class="o">.</span><span class="n">load_rsa_key</span><span class="p">(</span><span class="n">utils</span><span class="o">.</span><span class="n">PUBLIC</span><span class="p">,</span> <span class="n">DUMMY_KEYS_DIR</span><span class="p">)</span>
+        <span class="n">enc_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_crypter</span><span class="o">.</span><span class="n">encrypt_key</span><span class="p">(</span><span class="n">TEST_AES_KEY</span><span class="p">)</span>
+
+        <span class="n">private_key</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">load_key</span><span class="p">(</span><span class="n">utils</span><span class="o">.</span><span class="n">PRIVATE</span><span class="p">,</span> <span class="n">DUMMY_KEYS_DIR</span><span class="p">)</span></div>
+        <span class="k">assert</span> <span class="n">TEST_AES_KEY</span> <span class="o">==</span> <span class="n">private_key</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span><span class="n">enc_key</span><span class="p">,</span> <span class="n">crypter</span><span class="o">.</span><span class="n">DEFAULT_PADDING</span><span class="p">())</span>
+
+<div class="viewcode-block" id="TestCrypter.test_encrypt_key_wrong_key"><a class="viewcode-back" href="../../../_generated/tests.encryption.test_crypter.html#tests.encryption.test_crypter.TestCrypter.test_encrypt_key_wrong_key">[docs]</a>    <span class="k">def</span> <span class="nf">test_encrypt_key_wrong_key</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">test_crypter</span><span class="o">.</span><span class="n">load_rsa_key</span><span class="p">(</span><span class="n">utils</span><span class="o">.</span><span class="n">PRIVATE</span><span class="p">,</span> <span class="n">DUMMY_KEYS_DIR</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertRaises</span><span class="p">(</span><span class="n">exceptions</span><span class="o">.</span><span class="n">CrypterException</span><span class="p">,</span>
+                          <span class="bp">self</span><span class="o">.</span><span class="n">test_crypter</span><span class="o">.</span><span class="n">encrypt_key</span><span class="p">,</span></div>
+                          <span class="n">TEST_AES_KEY</span><span class="p">)</span>
+
+<div class="viewcode-block" id="TestCrypter.test_encrypt_key_no_key"><a class="viewcode-back" href="../../../_generated/tests.encryption.test_crypter.html#tests.encryption.test_crypter.TestCrypter.test_encrypt_key_no_key">[docs]</a>    <span class="k">def</span> <span class="nf">test_encrypt_key_no_key</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertRaises</span><span class="p">(</span><span class="n">exceptions</span><span class="o">.</span><span class="n">NoKeyException</span><span class="p">,</span>
+                          <span class="bp">self</span><span class="o">.</span><span class="n">test_crypter</span><span class="o">.</span><span class="n">encrypt_key</span><span class="p">,</span></div>
+                          <span class="n">TEST_AES_KEY</span><span class="p">)</span>
+
+<div class="viewcode-block" id="TestCrypter.test_decrypt_key_success"><a class="viewcode-back" href="../../../_generated/tests.encryption.test_crypter.html#tests.encryption.test_crypter.TestCrypter.test_decrypt_key_success">[docs]</a>    <span class="k">def</span> <span class="nf">test_decrypt_key_success</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">test_crypter</span><span class="o">.</span><span class="n">load_rsa_key</span><span class="p">(</span><span class="n">utils</span><span class="o">.</span><span class="n">PRIVATE</span><span class="p">,</span> <span class="n">DUMMY_KEYS_DIR</span><span class="p">)</span>
+        <span class="n">decKey</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">test_crypter</span><span class="o">.</span><span class="n">decrypt_key</span><span class="p">(</span><span class="n">TEST_ENC_AES_KEY</span><span class="p">)</span></div>
+        <span class="k">assert</span> <span class="n">decKey</span> <span class="o">==</span> <span class="n">TEST_AES_KEY</span>
+
+<div class="viewcode-block" id="TestCrypter.test_decrypt_key_wrong_key"><a class="viewcode-back" href="../../../_generated/tests.encryption.test_crypter.html#tests.encryption.test_crypter.TestCrypter.test_decrypt_key_wrong_key">[docs]</a>    <span class="k">def</span> <span class="nf">test_decrypt_key_wrong_key</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">test_crypter</span><span class="o">.</span><span class="n">load_rsa_key</span><span class="p">(</span><span class="n">utils</span><span class="o">.</span><span class="n">PUBLIC</span><span class="p">,</span> <span class="n">DUMMY_KEYS_DIR</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertRaises</span><span class="p">(</span><span class="n">exceptions</span><span class="o">.</span><span class="n">CrypterException</span><span class="p">,</span>
+                          <span class="bp">self</span><span class="o">.</span><span class="n">test_crypter</span><span class="o">.</span><span class="n">decrypt_key</span><span class="p">,</span></div>
+                          <span class="n">TEST_ENC_AES_KEY</span><span class="p">)</span>
+
+<div class="viewcode-block" id="TestCrypter.test_decrypt_key_no_key"><a class="viewcode-back" href="../../../_generated/tests.encryption.test_crypter.html#tests.encryption.test_crypter.TestCrypter.test_decrypt_key_no_key">[docs]</a>    <span class="k">def</span> <span class="nf">test_decrypt_key_no_key</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertRaises</span><span class="p">(</span><span class="n">exceptions</span><span class="o">.</span><span class="n">NoKeyException</span><span class="p">,</span>
+                          <span class="bp">self</span><span class="o">.</span><span class="n">test_crypter</span><span class="o">.</span><span class="n">decrypt_key</span><span class="p">,</span></div></div>
+                          <span class="n">TEST_ENC_AES_KEY</span><span class="p">)</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">unittest</span><span class="o">.</span><span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Etienne Desticourt.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'0.1.0-alpha',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
