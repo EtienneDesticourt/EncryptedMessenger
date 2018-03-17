@@ -2,6 +2,7 @@
 <head>
 
     <link rel="stylesheet" type="text/css" href="../css/main.css" media="screen" />
+    <script src="qrc:///qtwebchannel/qwebchannel.js"></script>
     <script type="text/javascript" src="../js/main.js"></script>
 </head>
 <body>
@@ -9,9 +10,9 @@
     <header class="header">
         <p>Encrypted Messenger</p>
         <div class="controls">
-            <a href="#" onclick="title_bar.minimize();">-</a>
-            <a href="#" onclick="title_bar.maximize();">^</a>
-            <a href="#" onclick="title_bar.close();">*</a>
+            <a href="javascript.void(0)" onclick="minimize_window();">-</a>
+            <a href="javascript.void(0)" onclick="maximize_window();">^</a>
+            <a href="javascript.void(0)" onclick="close_window();">*</a>
         </div>
     </header>
 

@@ -2,7 +2,6 @@ from PyQt5 import QtCore
 from PyQt5 import QtGui
 from PyQt5.QtCore import QUrl, QObject
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QGraphicsDropShadowEffect
-from PyQt5.QtWebKitWidgets import QWebView
 import os
 import threading
 import time

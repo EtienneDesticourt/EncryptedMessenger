@@ -3,7 +3,7 @@ from PyQt5 import QtCore
 from PyQt5.QtCore import Qt
 
 class SkinnedTitleBar(QtWidgets.QDialog):
-    "A plain, button less title bar"
+    "A plain, buttonless title bar"
 
     def __init__(self, parent, height, color_hex):
         QtWidgets.QWidget.__init__(self, parent)
@@ -12,8 +12,9 @@ class SkinnedTitleBar(QtWidgets.QDialog):
         self.setMinimumHeight(height)
         self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
 
+    # Warning: Pyqt5 5.10 -> Can't overwrite close slot.
     @QtCore.pyqtSlot()
-    def close(self):
+    def custom_close(self):
         self.parentWidget().close()
 
     @QtCore.pyqtSlot()

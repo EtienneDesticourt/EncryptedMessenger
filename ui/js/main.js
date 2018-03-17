@@ -1,4 +1,25 @@
 /*
+ * TITLE BAR
+ */
+
+new QWebChannel(qt.webChannelTransport, function (channel) {
+    titleBar = channel.objects.title_bar;
+    wrapper = channel.objects.wrapper;
+});
+
+function close_window() {
+    titleBar.custom_close();
+}
+
+function minimize_window() {
+    titleBar.minimize();
+}
+
+function maximize_window() {
+    titleBar.maximize();
+}
+
+/*
  *  CONTACT LIST
  */
 

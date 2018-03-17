@@ -19,7 +19,7 @@ class Application(QObject):
         self.main_dialog = main_dialog
         self.network = network
         self.contact_manager = ContactManager(network)
-        self.main_dialog.add_binding(self, "wrapper")
+        self.main_dialog.add_js_object(self, "wrapper")
         self.active_contact_name = None
         self.user = None
         self.logger = logging.getLogger(__name__)
