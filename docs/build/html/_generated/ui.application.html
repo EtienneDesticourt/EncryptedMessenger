@@ -90,11 +90,11 @@
               
             
             
-              <p class="caption"><span class="caption-text">Info:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../_static/systems.html">Systems</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../_static/encryption_protocols.html">Encryption Protocols</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../_static/communication_protocols.html">Communication Protocols</a></li>
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../_static/install.html">Install</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_static/systems.html">     Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_static/encryption_protocols.html">     Encryption Protocols</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_static/communication_protocols.html">     Communication Protocols</a></li>
 </ul>
 <p class="caption"><span class="caption-text">API:</span></p>
 <ul class="current">
@@ -170,8 +170,119 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="ui-application-module">
-<h1>ui.application module<a class="headerlink" href="#ui-application-module" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-ui.application">
+<span id="ui-application-module"></span><h1>ui.application module<a class="headerlink" href="#module-ui.application" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="ui.application.Application">
+<em class="property">class </em><code class="descclassname">ui.application.</code><code class="descname">Application</code><span class="sig-paren">(</span><em>main_dialog</em>, <em>network</em>, <em>ContactManager=&lt;class 'communication.contact_manager.ContactManager'&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ui/application.html#Application"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ui.application.Application" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PyQt5.QtCore.QObject</span></code></p>
+<dl class="method">
+<dt id="ui.application.Application.activate_contact">
+<code class="descname">activate_contact</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ui/application.html#Application.activate_contact"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ui.application.Application.activate_contact" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ui.application.Application.add_friend">
+<code class="descname">add_friend</code><span class="sig-paren">(</span><em>username</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ui/application.html#Application.add_friend"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ui.application.Application.add_friend" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ui.application.Application.build_qurl">
+<code class="descname">build_qurl</code><span class="sig-paren">(</span><em>local_file</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ui/application.html#Application.build_qurl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ui.application.Application.build_qurl" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ui.application.Application.connect">
+<code class="descname">connect</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ui/application.html#Application.connect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ui.application.Application.connect" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ui.application.Application.debug_print">
+<code class="descname">debug_print</code><span class="sig-paren">(</span><em>message</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ui/application.html#Application.debug_print"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ui.application.Application.debug_print" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ui.application.Application.display_error_notification">
+<code class="descname">display_error_notification</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ui/application.html#Application.display_error_notification"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ui.application.Application.display_error_notification" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ui.application.Application.display_offline_notification">
+<code class="descname">display_offline_notification</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ui/application.html#Application.display_offline_notification"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ui.application.Application.display_offline_notification" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ui.application.Application.display_online_notification">
+<code class="descname">display_online_notification</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ui/application.html#Application.display_online_notification"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ui.application.Application.display_online_notification" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ui.application.Application.get_active_contact_latest_message">
+<code class="descname">get_active_contact_latest_message</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ui/application.html#Application.get_active_contact_latest_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ui.application.Application.get_active_contact_latest_message" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ui.application.Application.get_active_contact_name">
+<code class="descname">get_active_contact_name</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ui/application.html#Application.get_active_contact_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ui.application.Application.get_active_contact_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ui.application.Application.get_active_contact_num_messages">
+<code class="descname">get_active_contact_num_messages</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ui/application.html#Application.get_active_contact_num_messages"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ui.application.Application.get_active_contact_num_messages" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ui.application.Application.get_contact_name">
+<code class="descname">get_contact_name</code><span class="sig-paren">(</span><em>index</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ui/application.html#Application.get_contact_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ui.application.Application.get_contact_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ui.application.Application.get_num_contacts">
+<code class="descname">get_num_contacts</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ui/application.html#Application.get_num_contacts"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ui.application.Application.get_num_contacts" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ui.application.Application.get_username">
+<code class="descname">get_username</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ui/application.html#Application.get_username"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ui.application.Application.get_username" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ui.application.Application.handle_connecting_contact">
+<code class="descname">handle_connecting_contact</code><span class="sig-paren">(</span><em>socket</em>, <em>ip</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ui/application.html#Application.handle_connecting_contact"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ui.application.Application.handle_connecting_contact" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ui.application.Application.is_online">
+<code class="descname">is_online</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ui/application.html#Application.is_online"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ui.application.Application.is_online" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ui.application.Application.load_index">
+<code class="descname">load_index</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ui/application.html#Application.load_index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ui.application.Application.load_index" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ui.application.Application.load_register">
+<code class="descname">load_register</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ui/application.html#Application.load_register"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ui.application.Application.load_register" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ui.application.Application.post_message">
+<code class="descname">post_message</code><span class="sig-paren">(</span><em>message</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ui/application.html#Application.post_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ui.application.Application.post_message" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ui.application.Application.register">
+<code class="descname">register</code><span class="sig-paren">(</span><em>username</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ui/application.html#Application.register"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ui.application.Application.register" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="ui.application.Application.start">
+<code class="descname">start</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ui/application.html#Application.start"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#ui.application.Application.start" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </div>
 
 

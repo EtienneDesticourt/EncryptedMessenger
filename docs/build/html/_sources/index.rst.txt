@@ -11,6 +11,7 @@ Welcome to EncryptedMessenger's documentation!
 	:maxdepth: 2
 	:caption: Info:
 
+   Install <_static/install>
 	Systems <_static/systems>
 	Encryption Protocols <_static/encryption_protocols>
 	Communication Protocols <_static/communication_protocols>

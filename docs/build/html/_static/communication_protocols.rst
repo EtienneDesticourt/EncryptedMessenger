@@ -1,5 +1,5 @@
-Encryption Protocols
-==================
+Communication Protocols
+=======================
 
 
 .. contents::

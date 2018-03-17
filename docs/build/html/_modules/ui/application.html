@@ -1,0 +1,401 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>ui.application &mdash; EncryptedMessenger 0.1.0-alpha documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../genindex.html"/>
+        <link rel="search" title="Search" href="../../search.html"/>
+    <link rel="top" title="EncryptedMessenger 0.1.0-alpha documentation" href="../../index.html"/>
+        <link rel="up" title="Module code" href="../index.html"/> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> EncryptedMessenger
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../_static/install.html">Install</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_static/systems.html">     Systems</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_static/encryption_protocols.html">     Encryption Protocols</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_static/communication_protocols.html">     Communication Protocols</a></li>
+</ul>
+<p class="caption"><span class="caption-text">API:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../_static/communication.html">Communication</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_static/encryption.html">Encryption</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_static/ui.html">UI</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">EncryptedMessenger</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>ui.application</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for ui.application</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">PyQt5.QtCore</span> <span class="k">import</span> <span class="n">QUrl</span><span class="p">,</span> <span class="n">QObject</span><span class="p">,</span> <span class="n">pyqtSlot</span>
+<span class="kn">from</span> <span class="nn">communication.network</span> <span class="k">import</span> <span class="n">Network</span>
+<span class="kn">from</span> <span class="nn">communication.exceptions</span> <span class="k">import</span> <span class="n">NetworkException</span>
+<span class="kn">from</span> <span class="nn">communication.exceptions</span> <span class="k">import</span> <span class="n">UserDoesNotExistError</span>
+<span class="kn">from</span> <span class="nn">communication.contact_manager</span> <span class="k">import</span> <span class="n">ContactManager</span>
+<span class="kn">from</span> <span class="nn">communication.server</span> <span class="k">import</span> <span class="n">Server</span>
+<span class="kn">from</span> <span class="nn">communication.socket_manager</span> <span class="k">import</span> <span class="n">SocketManager</span>
+<span class="kn">from</span> <span class="nn">user</span> <span class="k">import</span> <span class="n">User</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">threading</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">config</span>
+
+
+<div class="viewcode-block" id="Application"><a class="viewcode-back" href="../../_generated/ui.application.html#ui.application.Application">[docs]</a><span class="k">class</span> <span class="nc">Application</span><span class="p">(</span><span class="n">QObject</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">main_dialog</span><span class="p">,</span> <span class="n">network</span><span class="p">,</span> <span class="n">ContactManager</span><span class="o">=</span><span class="n">ContactManager</span><span class="p">):</span>
+        <span class="n">QObject</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">main_dialog</span> <span class="o">=</span> <span class="n">main_dialog</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">network</span> <span class="o">=</span> <span class="n">network</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">contact_manager</span> <span class="o">=</span> <span class="n">ContactManager</span><span class="p">(</span><span class="n">network</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">main_dialog</span><span class="o">.</span><span class="n">add_js_object</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;wrapper&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">active_contact_name</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">user</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Application.start"><a class="viewcode-back" href="../../_generated/ui.application.html#ui.application.Application.start">[docs]</a>    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">USER_FILE</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">username</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">user</span> <span class="o">=</span> <span class="n">User</span><span class="p">(</span><span class="n">username</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">network</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">contact_manager</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">load_index</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;No user file.&quot;</span><span class="p">)</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">load_register</span><span class="p">()</span>
+
+<div class="viewcode-block" id="Application.register"><a class="viewcode-back" href="../../_generated/ui.application.html#ui.application.Application.register">[docs]</a>    <span class="nd">@pyqtSlot</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">result</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">register</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">username</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">username_taken</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">has_peer</span><span class="p">(</span><span class="n">username</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">username_taken</span><span class="p">:</span>
+                <span class="k">return</span> <span class="s2">&quot;There is already a user with that name.&quot;</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">user</span> <span class="o">=</span> <span class="n">User</span><span class="p">(</span><span class="n">username</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">network</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">contact_manager</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">register</span><span class="p">()</span>
+            <span class="k">return</span> <span class="s2">&quot;OK&quot;</span>
+
+        <span class="k">except</span> <span class="n">NetworkException</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;There was a problem during a request to the peer registry.&quot;</span><span class="p">,</span> <span class="n">exc_info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">return</span> <span class="s2">&quot;There was a network exception during the registration process.&quot;</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="s2">&quot;There was a problem while attempting to register a new user under id </span><span class="si">%s</span><span class="s2">.&quot;</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">exc_info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+            <span class="k">return</span> <span class="s2">&quot;There was a critical error during the registration process.&quot;</span>
+
+<div class="viewcode-block" id="Application.connect"><a class="viewcode-back" href="../../_generated/ui.application.html#ui.application.Application.connect">[docs]</a>    <span class="nd">@pyqtSlot</span><span class="p">(</span><span class="n">result</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+        <span class="k">except</span> <span class="n">NetworkException</span><span class="p">:</span>
+            <span class="c1"># TODO: show error page</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="s2">&quot;There was a problem during a request to the peer registry.&quot;</span><span class="p">,</span> <span class="n">exc_info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="c1"># TODO: show error page</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="s2">&quot;There was an unexpected exception.&quot;</span><span class="p">,</span> <span class="n">exc_info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+            <span class="k">return</span>
+
+<div class="viewcode-block" id="Application.activate_contact"><a class="viewcode-back" href="../../_generated/ui.application.html#ui.application.Application.activate_contact">[docs]</a>    <span class="nd">@pyqtSlot</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">activate_contact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">set_active_contact</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">active_contact</span><span class="o">.</span><span class="n">connected</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">main_dialog</span><span class="o">.</span><span class="n">evaluate_js</span><span class="p">(</span><span class="s2">&quot;addNewMessages();&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">main_dialog</span><span class="o">.</span><span class="n">evaluate_js</span><span class="p">(</span><span class="s2">&quot;addNotConnectedMessage();&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Application.add_friend"><a class="viewcode-back" href="../../_generated/ui.application.html#ui.application.Application.add_friend">[docs]</a>    <span class="nd">@pyqtSlot</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">result</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">add_friend</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">username</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Attempting to add contact </span><span class="si">%s</span><span class="s2">.&quot;</span><span class="p">,</span> <span class="n">username</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">add_contact</span><span class="p">(</span><span class="n">username</span><span class="p">)</span>
+            <span class="k">return</span> <span class="s2">&quot;OK&quot;</span>
+        <span class="k">except</span> <span class="n">UserDoesNotExistError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;There is no user with that name.&quot;</span>
+        <span class="k">except</span> <span class="n">NetworkException</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;There was a problem during a request to the peer registry.&quot;</span><span class="p">,</span> <span class="n">exc_info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+            <span class="k">return</span> <span class="s2">&quot;There was a network exception.&quot;</span>
+
+<div class="viewcode-block" id="Application.handle_connecting_contact"><a class="viewcode-back" href="../../_generated/ui.application.html#ui.application.Application.handle_connecting_contact">[docs]</a>    <span class="k">def</span> <span class="nf">handle_connecting_contact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">socket</span><span class="p">,</span> <span class="n">ip</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">contact_manager</span><span class="o">.</span><span class="n">contact_connected</span><span class="p">(</span><span class="n">socket</span><span class="p">,</span> <span class="n">ip</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;There was an error while trying to handle an incoming connection from ip </span><span class="si">%s</span><span class="s2"> with socket </span><span class="si">%s</span><span class="s2">.&quot;</span><span class="p">,</span> <span class="n">ip</span><span class="p">,</span> <span class="n">socket</span><span class="p">,</span> <span class="n">exc_info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">display_error_notification</span><span class="p">()</span></div>
+        <span class="n">SocketManager</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">socket</span><span class="p">)</span> <span class="c1"># TODO: Indent? Closing is done in contact_connected</span>
+
+
+<div class="viewcode-block" id="Application.display_online_notification"><a class="viewcode-back" href="../../_generated/ui.application.html#ui.application.Application.display_online_notification">[docs]</a>    <span class="nd">@pyqtSlot</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">display_online_notification</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span></div>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Went online&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Application.display_offline_notification"><a class="viewcode-back" href="../../_generated/ui.application.html#ui.application.Application.display_offline_notification">[docs]</a>    <span class="nd">@pyqtSlot</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">display_offline_notification</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span></div>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Went offline&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Application.display_error_notification"><a class="viewcode-back" href="../../_generated/ui.application.html#ui.application.Application.display_error_notification">[docs]</a>    <span class="k">def</span> <span class="nf">display_error_notification</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span></div>
+        <span class="k">pass</span>
+
+<div class="viewcode-block" id="Application.post_message"><a class="viewcode-back" href="../../_generated/ui.application.html#ui.application.Application.post_message">[docs]</a>    <span class="nd">@pyqtSlot</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">post_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">say</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="s2">&quot;There was an error while posting message.&quot;</span><span class="p">,</span> <span class="n">exc_info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Application.is_online"><a class="viewcode-back" href="../../_generated/ui.application.html#ui.application.Application.is_online">[docs]</a>    <span class="nd">@pyqtSlot</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">result</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">is_online</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">contact_manager</span><span class="o">.</span><span class="n">get_contact</span><span class="p">(</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">connected</span>
+
+<div class="viewcode-block" id="Application.get_num_contacts"><a class="viewcode-back" href="../../_generated/ui.application.html#ui.application.Application.get_num_contacts">[docs]</a>    <span class="nd">@pyqtSlot</span><span class="p">(</span><span class="n">result</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">get_num_contacts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span></div>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">contact_manager</span><span class="o">.</span><span class="n">contacts</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Application.get_contact_name"><a class="viewcode-back" href="../../_generated/ui.application.html#ui.application.Application.get_contact_name">[docs]</a>    <span class="nd">@pyqtSlot</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">result</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">get_contact_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">contact_manager</span><span class="o">.</span><span class="n">contacts</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">name</span>
+
+<div class="viewcode-block" id="Application.get_active_contact_name"><a class="viewcode-back" href="../../_generated/ui.application.html#ui.application.Application.get_active_contact_name">[docs]</a>    <span class="nd">@pyqtSlot</span><span class="p">(</span><span class="n">result</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">get_active_contact_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">active_contact</span><span class="p">:</span></div>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">active_contact</span><span class="o">.</span><span class="n">name</span>
+
+<div class="viewcode-block" id="Application.get_active_contact_num_messages"><a class="viewcode-back" href="../../_generated/ui.application.html#ui.application.Application.get_active_contact_num_messages">[docs]</a>    <span class="nd">@pyqtSlot</span><span class="p">(</span><span class="n">result</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">get_active_contact_num_messages</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">active_contact</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">active_contact</span><span class="o">.</span><span class="n">messenger</span><span class="o">.</span><span class="n">num_pending_messages</span><span class="p">()</span></div>
+        <span class="k">return</span> <span class="mi">0</span>
+
+<div class="viewcode-block" id="Application.get_active_contact_latest_message"><a class="viewcode-back" href="../../_generated/ui.application.html#ui.application.Application.get_active_contact_latest_message">[docs]</a>    <span class="nd">@pyqtSlot</span><span class="p">(</span><span class="n">result</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">get_active_contact_latest_message</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">active_contact</span><span class="o">.</span><span class="n">messenger</span><span class="o">.</span><span class="n">consume_message</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span></div>
+            <span class="k">pass</span>
+
+<div class="viewcode-block" id="Application.get_username"><a class="viewcode-back" href="../../_generated/ui.application.html#ui.application.Application.get_username">[docs]</a>    <span class="nd">@pyqtSlot</span><span class="p">(</span><span class="n">result</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">get_username</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">:</span></div>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">username</span>
+
+<div class="viewcode-block" id="Application.load_index"><a class="viewcode-back" href="../../_generated/ui.application.html#ui.application.Application.load_index">[docs]</a>    <span class="nd">@pyqtSlot</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">load_index</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">build_qurl</span><span class="p">(</span><span class="s2">&quot;ui</span><span class="se">\\</span><span class="s2">html</span><span class="se">\\</span><span class="s2">index.html&quot;</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">main_dialog</span><span class="o">.</span><span class="n">load_page</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Application.load_register"><a class="viewcode-back" href="../../_generated/ui.application.html#ui.application.Application.load_register">[docs]</a>    <span class="nd">@pyqtSlot</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">load_register</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">build_qurl</span><span class="p">(</span><span class="s2">&quot;ui</span><span class="se">\\</span><span class="s2">html</span><span class="se">\\</span><span class="s2">register.html&quot;</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">main_dialog</span><span class="o">.</span><span class="n">load_page</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Application.debug_print"><a class="viewcode-back" href="../../_generated/ui.application.html#ui.application.Application.debug_print">[docs]</a>    <span class="nd">@pyqtSlot</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">debug_print</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span></div>
+        <span class="nb">print</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Application.build_qurl"><a class="viewcode-back" href="../../_generated/ui.application.html#ui.application.Application.build_qurl">[docs]</a>    <span class="k">def</span> <span class="nf">build_qurl</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">local_file</span><span class="p">):</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="n">local_file</span><span class="p">)</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">QUrl</span><span class="o">.</span><span class="n">fromLocalFile</span><span class="p">(</span><span class="n">path</span><span class="p">)</span></div></div>
+        <span class="k">return</span> <span class="n">path</span>
+</pre></div>
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Etienne Desticourt.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'0.1.0-alpha',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
