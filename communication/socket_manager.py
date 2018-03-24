@@ -1,4 +1,4 @@
-import socket
+import tests.communication.socket_mock as socket
 import logging
 
 class SocketManager(object):
@@ -8,20 +8,21 @@ class SocketManager(object):
         socket: An optional existing socket.
     """
 
-    def __init__(self, socket=None):
-        self.socket = socket
+    def __init__(self, socket_handle=None, socketlib=socket):
+        self.socket = socket_handle
+        self.socketlib = socketlib
         self.logger = logging.getLogger(__name__)
 
     def __enter__(self):
         if not self.socket:
-            self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.socket = self.socketlib.socket(self.socketlib.AF_INET, self.socketlib.SOCK_STREAM)
             self.logger.info("Created new socket %s.", str(self.socket))
         return self
 
     def __exit__(self, *a):
         self.logger.info("Closing socket %s.", str(self.socket))
         try:
-            self.socket.shutdown(socket.SHUT_RDWR)
+            self.socket.shutdown(self.socketlib.SHUT_RDWR)
         except OSError:  # Was never connected or already closed
             pass
         finally:

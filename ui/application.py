@@ -1,25 +1,42 @@
-from PyQt5.QtCore import QUrl, QObject, pyqtSlot
+from PyQt5.QtCore import QUrl, QObject, pyqtSlot, pyqtSignal, QVariant, pyqtProperty
+from PyQt5 import QtCore
 from communication.network import Network
 from communication.exceptions import NetworkException
 from communication.exceptions import UserDoesNotExistError
 from communication.contact_manager import ContactManager
 from communication.server import Server
 from communication.socket_manager import SocketManager
+# from ui.widgets.notification_dialog import NotificationDialog
 from user import User
 import os
 import threading
 import logging
 import config
 
-
 class Application(QObject):
+    # Impromptu events after page load
+    contact_added        = pyqtSignal()
+    contact_loaded       = pyqtSignal(str)
+    contact_connected    = pyqtSignal(str)
+    contact_disconnected = pyqtSignal(str)
+    message_received     = pyqtSignal(str, str)
+    topl_error_raised    = pyqtSignal()
 
-    def __init__(self, main_dialog, network, ContactManager=ContactManager):
+    # Emitted on end of page load
+    user_connected       = pyqtSignal(str)
+    connected_to_contact = pyqtSignal(str)
+    user_registered      = pyqtSignal()
+
+    def __init__(self, main_dialog, network, settings, ContactManager=ContactManager):
         QObject.__init__(self)
         self.main_dialog = main_dialog
         self.network = network
-        self.contact_manager = ContactManager(network)
+        self.contact_manager = ContactManager(network,
+                                              connection_callback=self.on_contact_status_changed,
+                                              message_callback=self.on_message_received)
+        self.settings_manager = settings
         self.main_dialog.add_js_object(self, "wrapper")
+        self.main_dialog.add_js_object(self.settings_manager, "settings")
         self.active_contact_name = None
         self.user = None
         self.logger = logging.getLogger(__name__)
@@ -35,6 +52,38 @@ class Application(QObject):
             self.logger.info("No user file.")
             self.load_register()
 
+    def on_contact_status_changed(self, contact, connected):
+        if connected:
+            # TODO: Remove hardcoded
+            # notif = NotificationDialog(contact.name, "%s has connected." % contact.name, (100, 100))
+            # notif.show()
+            self.contact_connected.emit(contact.name)
+        else:
+            self.contact_disconnected.emit(contact.name)
+
+    def on_message_received(self, contact, message):
+        if self.main_dialog.windowState() & QtCore.Qt.WindowMinimized:
+            # TODO: Remove hardcoded
+            # notif = NotificationDialog("name", "message", (100, 100))
+            # self.notifs.append(notif)
+            # notif.show()
+            pass
+        elif not self.main_dialog.hasFocus():
+            self.main_dialog.flash_taskbar_icon()
+
+        self.message_received.emit(contact.name, message.decode('utf8'))
+
+    @pyqtSlot()
+    def on_callbacks_defined(self):
+        # We reemit all events that might have been missed while the callbacks were being defined
+        self.user_connected.emit(self.user.username)
+        for contact in self.contact_manager.contacts:
+            self.contact_loaded.emit(contact.name)
+            if contact.connected:
+                self.connected_to_contact.emit(contact.name)
+        self.settings_manager.load_settings()
+
+
     @pyqtSlot(str, result=str)
     def register(self, username):
         try:
@@ -44,6 +93,7 @@ class Application(QObject):
 
             self.user = User(username, self.network, self.contact_manager)
             self.user.register()
+            self.user_registered.emit(username)
             return "OK"
 
         except NetworkException:
@@ -75,17 +125,23 @@ class Application(QObject):
         else:
             self.main_dialog.evaluate_js("addNotConnectedMessage();")
 
-    @pyqtSlot(str, result=str)
+    @pyqtSlot(str)
     def add_friend(self, username):
         self.logger.info("Attempting to add contact %s.", username)
         try:
+            # Need to emit contact_added first because
+            # add_contact will connect directly
+            self.contact_added.emit()
+            # TODO SEPARATE ADD AND CONNECT
             self.user.add_contact(username)
-            return "OK"
         except UserDoesNotExistError:
-            return "There is no user with that name."
+            # TODO: emit error signal
+            # return "There is no user with that name."
+            pass
         except NetworkException:
+            # TODO: emit error signal
             self.logger.error("There was a problem during a request to the peer registry.", exc_info=True)
-            return "There was a network exception."
+            # return "There was a network exception."
 
     def handle_connecting_contact(self, socket, ip):
         try:
@@ -146,24 +202,24 @@ class Application(QObject):
 
     @pyqtSlot(result=str)
     def get_username(self):
+        print("heyo")
+        return "thisisastring"
         if self.user:
-            return self.user.username
+            return QObject(self.user.username)
+        return QObject("No user loaded.")
 
     @pyqtSlot()
+    # TODO: REMOVE-> MOVED TO WEB DIALOG
     def load_index(self):
-        path = self.build_qurl("ui\\html\\index.html")
+        path = "ui\\html\\index.html"
         self.main_dialog.load_page(path)
 
     @pyqtSlot()
+    # TODO: REMOVE-> MOVED TO WEB DIALOG
     def load_register(self):
-        path = self.build_qurl("ui\\html\\register.html")
+        path = "ui\\html\\register.html"
         self.main_dialog.load_page(path)
 
     @pyqtSlot(str)
     def debug_print(self, message):
-        print(message)
-
-    def build_qurl(self, local_file):
-        path = os.path.join(os.getcwd(), local_file)
-        path = QUrl.fromLocalFile(path)
-        return path
+        print(message)        

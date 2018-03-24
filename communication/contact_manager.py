@@ -12,10 +12,15 @@ class ContactManager(object):
         contact_dir: A directory in which contacts are/can be stored.
     """
 
-    def __init__(self, peer_registry, contact_dir=config.CONTACT_DIR):
+    def __init__(self, peer_registry,
+                 connection_callback=lambda contact, connected: None,
+                 message_callback=lambda contact, message: None,
+                 contact_dir=config.CONTACT_DIR):
         self.contacts = []
         self.peer_registry = peer_registry
         self.contact_dir = contact_dir
+        self.connection_callback = connection_callback
+        self.message_callback = message_callback
         self.logger = logging.getLogger(__name__)
 
     def get_contact(self, name):
@@ -69,7 +74,7 @@ class ContactManager(object):
         self.update_contacts_ip()
         contact = self.get_contact_by_ip(ip)
         if contact:
-            contact.has_connected(socket)
+            contact.has_connected(socket, self.message_callback)
         else:
             self.logger.info("Found no matching contact for ip %s.", ip)
 
@@ -93,7 +98,7 @@ class ContactManager(object):
         with open(path, "rb") as f:
             public_key = f.read()
 
-        contact = Contact(owner_name, contact_name, public_key)
+        contact = Contact(owner_name, contact_name, public_key, self.connection_callback)
 
         self.contacts.append(contact)
         return contact
@@ -118,7 +123,7 @@ class ContactManager(object):
         if not contact.connected:
             contact.ip = self.peer_registry.get_peer_ip(contact.name)
             if contact.ip:
-                contact.connect()
+                contact.connect(self.message_callback)
             else:
                 self.logger.info("No ip for contact %s.", contact.name)
 
@@ -135,10 +140,10 @@ class ContactManager(object):
             peer: The contact data as a JSON string.
         """
         self.logger.info("Adding new contact %s for owner %s.", peer, owner)
-        contact = Contact.from_json(owner, peer)
+        contact = Contact.from_json(owner, peer, self.connection_callback)
         for other_contact in self.contacts:
             if contact.name == other_contact.name:
-                return
+                return # TODO: Raise ExistingContactError here?
         contact.save(self.contact_dir)
         self.contacts.append(contact)
         threading.Thread(target=self.connect_to_contact, args=[contact]).start()

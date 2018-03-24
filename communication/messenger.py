@@ -1,4 +1,3 @@
-import socket
 import threading
 import logging
 from communication import protocol
@@ -57,9 +56,9 @@ class Messenger(object):
             # Set buffer to last incomplete message or '' if ending on a
             # separator
             buffer = messages.pop()
-            self.message_queue += messages
-            if len(messages):
-                self.message_callback()
+            self.message_queue += messages # TODO: Remove
+            for m in messages:
+                self.message_callback(m)
         self.logger.info("Messenger stopped.")
 
     def send(self, message):
@@ -77,37 +76,37 @@ class Messenger(object):
         while sent < len(form_message):
             try:
                 sent += self.socket.send(form_message[sent:])
-            except (socket.error, AttributeError) as e:
+            except (OSError, AttributeError) as e:
                 self.logger.critical("Error while sending message.", exc_info=True)
                 raise MessengerException("Socket not connected.") from e
 
-    def consume_message(self):
-        """Consumes the first message from the queue.
+    # def consume_message(self):
+    #     """Consumes the first message from the queue.
 
-        Returns:
-            A message or None if the queue is empty.
-        """
-        if len(self.message_queue) > 0:
-            message = self.message_queue[0]
-            self.message_queue = self.message_queue[1:]
-            return message
-        return None
+    #     Returns:
+    #         A message or None if the queue is empty.
+    #     """
+    #     if len(self.message_queue) > 0:
+    #         message = self.message_queue[0]
+    #         self.message_queue = self.message_queue[1:]
+    #         return message
+    #     return None
 
-    def consume_messages(self):
-        """Consumes all messages in the queue.
+    # def consume_messages(self):
+    #     """Consumes all messages in the queue.
 
-        Returns:
-            A list of messages or an empty list if the queue is empty.
-        """
-        messages = self.message_queue
-        self.message_queue = []
-        return messages
+    #     Returns:
+    #         A list of messages or an empty list if the queue is empty.
+    #     """
+    #     messages = self.message_queue
+    #     self.message_queue = []
+    #     return messages
 
     # TODO: Rename or make property and document
     def num_pending_messages(self):
         return len(self.message_queue)
 
-    def message_callback(self):
+    def message_callback(self, message):
         """Does nothing by default.
         This function will be called when a message is received and can be overwriten 
         to do any kind of necessary processing on received messages.

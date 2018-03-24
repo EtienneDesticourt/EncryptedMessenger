@@ -45,23 +45,34 @@ class EncryptedMessenger(messenger.Messenger):
         encrypted = self.crypter.encrypt_message(message)
         super().send(encrypted)
 
-    def consume_message(self):
-        """Fetches message from the connection.
+    def set_message_callback(self, callback):
+        """Overwrites the current message callback.
 
-        Returns:
-            A decrypted message.
+        Args:
+            callback: The new function that'll be called when a message is received.
         """
-        message = super().consume_message()
-        return self.crypter.decrypt_message(message)
+        def decryptor_callback(message):
+            decrypted = self.crypter.decrypt_message(message)
+            return callback(decrypted)
+        self.message_callback = decryptor_callback
 
-    def consume_messages(self):
-        """Fetches all pending messages.
+    # def consume_message(self):
+    #     """Fetches message from the connection.
 
-        Returns:
-            All decrypted messages.
-        """
-        messages = super().consume_messages()
-        return [self.crypter.decrypt_message(mess) for mess in messages]
+    #     Returns:
+    #         A decrypted message.
+    #     """
+    #     message = super().consume_message()
+    #     return self.crypter.decrypt_message(message)
+
+    # def consume_messages(self):
+    #     """Fetches all pending messages.
+
+    #     Returns:
+    #         All decrypted messages.
+    #     """
+    #     messages = super().consume_messages()
+    #     return [self.crypter.decrypt_message(mess) for mess in messages]
 
     def wait_for_next_message(self):
         """Tries continuously to fetch a message until it does.

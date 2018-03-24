@@ -28,10 +28,15 @@ class BorderlessWindow(QWidget):
     AERO_STYLE = WS_POPUP | WS_THICKFRAME | WS_CAPTION | WS_SYSMENU | WS_MAXIMIZEBOX | WS_MINIMIZEBOX
 
     def __init__(self, TitleBar, *args, **kwargs):
-        QWidget.__init__(self)
+        super(BorderlessWindow, self).__init__()
+        # QWidget.__init__(self)
         self.setWindowFlags(Qt.FramelessWindowHint)
         # self.setAttribute(Qt.WA_TranslucentBackground)
         self.title_bar = TitleBar(*args, **kwargs)
+
+    def flash_taskbar_icon(self):
+        hwnd = self.get_window_handle()
+        win32gui.FlashWindowEx(hwnd, win32con.FLASHW_ALL | win32con.FLASHW_TIMERNOFG, 0, 0)
 
     def load_dwm_api(self):
         """Loads the windows Desktop Window Manager API.

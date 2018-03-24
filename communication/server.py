@@ -1,4 +1,3 @@
-import socket
 import threading
 import logging
 from communication.exceptions import ServerException
@@ -39,7 +38,7 @@ class Server(SocketManager):
         try:
             self.socket.bind((self.host, self.port))
             self.logger.info("Bound socket on %s:%s with socket %s.", self.host, str(self.port), str(self.socket))
-        except socket.error as e:
+        except OSError as e:
             self.logger.critical("Socket error while trying to bind socket on %s:%s", self.host, str(self.port), exc_info=True)
             raise ServerException("Another program is already using this port.") from e
 
