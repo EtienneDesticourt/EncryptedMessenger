@@ -1,16 +1,16 @@
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtWidgets import QVBoxLayout
-from PyQt5.QtWebEngineWidgets import QWebEngineView 
-from  PyQt5.QtWebChannel import QWebChannel
+from PyQt5.QtWebEngineWidgets import QWebEngineView
+from PyQt5.QtWebChannel import QWebChannel
 import logging
 import os
-from PyQt5.QtCore import QUrl, QObject, pyqtSlot, pyqtSignal, QVariant, pyqtProperty
+from PyQt5.QtCore import QUrl
 
 
 class WebDialog(QWidget):
+
     def __init__(self, parent=None):
         super(WebDialog, self).__init__(parent=parent)
-        # QWidget.__init__(self)
         self.view = QWebEngineView()
         self.view.setParent(self)
 
@@ -22,7 +22,7 @@ class WebDialog(QWidget):
 
         layout = QVBoxLayout()
 
-        layout.setContentsMargins( 0, 0, 0, 0)
+        layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(layout)
         layout.addWidget(self.view)
         layout.setSpacing(0)

@@ -1,36 +1,36 @@
 from PyQt5 import QtCore
-from PyQt5 import QtGui
 from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import QWidget, qApp
-from PyQt5.QtWidgets import QVBoxLayout, QMainWindow
-from PyQt5.QtWebEngineWidgets import QWebEngineView 
-from  PyQt5.QtWebChannel import QWebChannel
-import logging
-from ui.widgets.web_dialog import WebDialog
-import sys
 from PyQt5.QtCore import Qt, QEvent
 from PyQt5.QtGui import QMouseEvent
+from PyQt5.QtWidgets import QWidget
+from ui.widgets.web_dialog import WebDialog
 import threading
+import logging
+import sys
 
-class NotificationDialog(QtWidgets.QDialog, WebDialog):
+
+class NotificationDialog(QWidget, WebDialog):
     popuphidden = QtCore.pyqtSignal()
 
     def __init__(self, name, text, size,
-                 visible_time = 5000,
-                 fade_time = 800):
+                 visible_time=5000,
+                 fade_time=800):
         super(NotificationDialog, self).__init__()
         self.name = name
         self.text = text
         self.visible_time = visible_time
         self.fade_time = fade_time
 
-        self.setWindowFlags(QtCore.Qt.SplashScreen | QtCore.Qt.FramelessWindowHint | QtCore.Qt.WindowStaysOnTopHint)
+        self.setWindowFlags(QtCore.Qt.SplashScreen |
+                            QtCore.Qt.FramelessWindowHint | QtCore.Qt.WindowStaysOnTopHint)
         self.setMinimumSize(QtCore.QSize(300, 100))
 
-        self.animation = QtCore.QPropertyAnimation(self, b"windowOpacity", self)
+        self.animation = QtCore.QPropertyAnimation(
+            self, b"windowOpacity", self)
         self.animation.finished.connect(self.hide)
 
-        self.timer = threading.Timer(self.visible_time / 1000, self.hide_animation)
+        self.timer = threading.Timer(
+            self.visible_time / 1000, self.hide_animation)
         # self.timer = QtCore.QTimer(self)
         # self.timer.timeout.connect(self.hide_animation)
         # self.popuphidden.connect(self.close)
@@ -43,11 +43,10 @@ class NotificationDialog(QtWidgets.QDialog, WebDialog):
         # self.setMouseTracking(True)
 
         # qApp.installEventFilter(self)
-        
+
         self.view.loadFinished.connect(self.set_content)
 
         # self.add_js_object(self, "wrapper")
-
 
     def set_content(self):
         js_function = """
@@ -75,7 +74,6 @@ class NotificationDialog(QtWidgets.QDialog, WebDialog):
         self.animation.start()
         self.timer.start()
         # self.set_content()
-
 
     def hide_animation(self):
         # self.timer.stop()
