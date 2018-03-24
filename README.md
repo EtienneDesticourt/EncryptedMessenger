@@ -1,6 +1,6 @@
 # EncryptedMessenger
 
-This is a small encrypted peer to peer messenger application.   
+This is a small encrypted peer to peer messenger application.  
 
 
 I've been frustrated with a lot of the messaging software I've tried over the past few years.   
@@ -20,9 +20,8 @@ The docs are available here: https://encrypted-messenger-docs.herokuapp.com/
 
 # Quickstart
 
-Just clone the directory and run:  
-`python ui/app.py`
+After cloning the directory you can install the dependencies with:  
+`pip install -r requirements.txt`
 
-You'll have to figure out the dependencies yourself because I haven't gone around to documenting them.  
-They should all be available through pip except PyQt5 where you need version 5.5 which is hard to find.  
-I'm in the process of updating it to work with the most recent version but it takes time.  
+Just clone the directory and run:  
+`python main.py`
